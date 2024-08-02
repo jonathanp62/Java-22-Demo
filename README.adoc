@@ -1,0 +1,21 @@
+Java-22-Demo
+------------
+
+A program that demonstrates the new features of Java 22.
+
+Logging
+~~~~~~~
+
+Logging is achieved using the SLF4J facade over Logback. The logging configuration is supplied in *config/logback.xml*. It can be overriden with a java system property, i.e. *-Dlogback.configurationFile=config/logback.xml*
+
+Gradle JavaExec Tasks
+~~~~~~~~~~~~~~~~~~~~~
+
+[options="header"]
+|=======================
+|Task Name              |Application Invocation
+|execProgram            |No arguments
+|=======================
+
+Current version: 0.1.0.
+~~~~~~~~~~~~~~~~~~~~~~~
