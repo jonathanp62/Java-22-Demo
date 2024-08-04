@@ -30,12 +30,16 @@ package net.jmp.demo.java22;
  * SOFTWARE.
  */
 
+import java.util.List;
 import java.util.Objects;
 
 import org.slf4j.LoggerFactory;
 
 import org.slf4j.ext.XLogger;
 
+/**
+ * The main class.
+ */
 final class Main implements Runnable {
     /** The logger. */
     private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
@@ -54,6 +58,9 @@ final class Main implements Runnable {
         this.arguments = Objects.requireNonNull(args);
     }
 
+    /**
+     * The run method.
+     */
     @Override
     public void run() {
         this.logger.entry();
@@ -63,6 +70,23 @@ final class Main implements Runnable {
         } else {
             this.logger.debug("{} {}", Name.NAME_STRING, Version.VERSION_STRING);
         }
+
+        this.runDemos();
+
+        this.logger.exit();
+    }
+
+    /**
+     * Method that runs the demo classes.
+     */
+    private void runDemos() {
+        this.logger.entry();
+
+        List<Demo> demos = List.of(
+                new ScopedValueDemo()
+        );
+
+        demos.forEach(Demo::demo);
 
         this.logger.exit();
     }

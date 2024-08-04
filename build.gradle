@@ -113,12 +113,18 @@ publishing {
 }
 
 tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs += ['--enable-preview']
+
     options.encoding = 'UTF-8'
     options.release.set(22)
 }
 
 tasks.withType(Javadoc).configureEach {
     options.encoding = 'UTF-8'
+}
+
+tasks.withType(JavaExec).configureEach {
+    jvmArgs += '--enable-preview'
 }
 
 /*
