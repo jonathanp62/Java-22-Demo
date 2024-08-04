@@ -1,11 +1,11 @@
 package net.jmp.demo.java22;
 
 /*
- * (#)ScopedValueDemo.java  0.1.0   08/04/2024
+ * (#)ScopedValueDemo.java  0.2.0   08/04/2024
  *
  * @author   Jonathan Parker
- * @version  0.1.0
- * @since    0.1.0
+ * @version  0.2.0
+ * @since    0.2.0
  *
  * MIT License
  *
@@ -31,6 +31,8 @@ package net.jmp.demo.java22;
  */
 
 import java.util.UUID;
+
+import java.util.concurrent.Callable;
 import java.util.concurrent.StructuredTaskScope;
 
 import org.slf4j.LoggerFactory;
@@ -179,50 +181,67 @@ final class ScopedValueDemo implements Demo {
     private void inheritance() {
         this.logger.entry();
 
+        final Callable<String> childTask1 = () -> {
+            if (this.logger.isInfoEnabled()) {
+                this.logger.info("NAME 1: {}", NAME.get());   // Martin
+            }
+
+            return NAME.get() + ":1";
+        };
+
+        final Callable<String> childTask2 = () -> {
+            if (this.logger.isInfoEnabled()) {
+                this.logger.info("NAME 2: {}", NAME.get());   // Martin
+            }
+
+            return NAME.get() + ":2";
+        };
+
+        final Callable<String> childTask3 = () -> {
+            if (this.logger.isInfoEnabled()) {
+                this.logger.info("NAME 3: {}", NAME.get());   // Martin
+            }
+
+            return NAME.get() + ":3";
+        };
+
         ScopedValue.runWhere(NAME, "Duke", () -> {
             try (final var scope = new StructuredTaskScope<String>()) {
-                scope.fork((() -> this.childTask1()));
-                scope.fork((() -> this.childTask2()));
-                scope.fork((() -> this.childTask3()));
+                final StructuredTaskScope.Subtask<String> subtask1 = scope.fork(childTask1);
+                final StructuredTaskScope.Subtask<String> subtask2 = scope.fork(childTask2);
+                final StructuredTaskScope.Subtask<String> subtask3 = scope.fork(childTask3);
+
+                scope.join();
+
+                this.logSubtaskStatus(subtask1, 1);
+                this.logSubtaskStatus(subtask2, 2);
+                this.logSubtaskStatus(subtask3, 3);
+             } catch (final InterruptedException ie) {
+                this.logger.error(ie.getMessage());
+                Thread.currentThread().interrupt();
             }
         });
-        this.logger.exit();
-    }
-
-    /**
-     * The first child task.
-     */
-    private void childTask1() {
-        this.logger.entry();
-
-        if (this.logger.isInfoEnabled()) {
-            this.logger.info("NAME 1: {}", NAME.get());   // Martin
-        }
 
         this.logger.exit();
     }
 
     /**
-     * The second child task.
+     * Log the status of a subtask.
+     *
+     * @param   subtask java.util.concurrent.StructuredTaskScope.Subtask&lt;java.lang.String&gt;
+     * @param   item    int
      */
-    private void childTask2() {
-        this.logger.entry();
+    private void logSubtaskStatus(final StructuredTaskScope.Subtask<String> subtask, final int item) {
+        this.logger.entry(subtask, item);
 
-        if (this.logger.isInfoEnabled()) {
-            this.logger.info("NAME 2: {}", NAME.get());   // Martin
-        }
+        assert subtask != null;
 
-        this.logger.exit();
-    }
-
-    /**
-     * The third child task.
-     */
-    private void childTask3() {
-        this.logger.entry();
-
-        if (this.logger.isInfoEnabled()) {
-            this.logger.info("NAME 3: {}", NAME.get());   // Martin
+        if (subtask.state() == StructuredTaskScope.Subtask.State.SUCCESS) {
+            this.logger.info("Child task {}: {}", item, subtask.get());
+        } else if (subtask.state() == StructuredTaskScope.Subtask.State.FAILED) {
+            this.logger.error("Child task {} failed: {}", item, subtask.exception().getMessage());
+        } else {
+            this.logger.error("Child task {} result or exception is not available", item);
         }
 
         this.logger.exit();

@@ -1,12 +1,11 @@
 package net.jmp.demo.java22;
 
 /*
- * (#)Main.java 0.2.0   08/04/2024
- * (#)Main.java 0.1.0   08/02/2024
+ * (#)StreamGatherersDemo.java  0.2.0   08/04/2024
  *
  * @author   Jonathan Parker
  * @version  0.2.0
- * @since    0.1.0
+ * @since    0.2.0
  *
  * MIT License
  *
@@ -31,64 +30,30 @@ package net.jmp.demo.java22;
  * SOFTWARE.
  */
 
-import java.util.List;
-import java.util.Objects;
-
 import org.slf4j.LoggerFactory;
 
 import org.slf4j.ext.XLogger;
 
 /**
- * The main class.
+ * The class that demonstrates stream gatherers.
  */
-final class Main implements Runnable {
+final class StreamGatherersDemo implements Demo {
     /** The logger. */
     private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
 
-    /** The command line arguments. */
-    private final String[] arguments;
-
     /**
-     * A constructor that takes the
-     * command line arguments from
-     * the bootstrap class.
+     * The default constructor.
      */
-    Main(final String[] args) {
+    StreamGatherersDemo() {
         super();
-
-        this.arguments = Objects.requireNonNull(args);
     }
 
     /**
-     * The run method.
+     * The demo method.
      */
     @Override
-    public void run() {
+    public void demo() {
         this.logger.entry();
-
-        if (this.logger.isInfoEnabled() || this.logger.isWarnEnabled() || this.logger.isErrorEnabled()) {
-            System.out.format("%s %s%n", Name.NAME_STRING, Version.VERSION_STRING);
-        } else {
-            this.logger.debug("{} {}", Name.NAME_STRING, Version.VERSION_STRING);
-        }
-
-        this.runDemos();
-
-        this.logger.exit();
-    }
-
-    /**
-     * Method that runs the demo classes.
-     */
-    private void runDemos() {
-        this.logger.entry();
-
-        List<Demo> demos = List.of(
-                new ScopedValueDemo(),
-                new StreamGatherersDemo()
-        );
-
-        demos.forEach(Demo::demo);
 
         this.logger.exit();
     }
