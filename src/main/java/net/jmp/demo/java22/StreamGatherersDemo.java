@@ -30,12 +30,14 @@ package net.jmp.demo.java22;
  * SOFTWARE.
  */
 
+import java.util.List;
+
 import org.slf4j.LoggerFactory;
 
 import org.slf4j.ext.XLogger;
 
 /**
- * The class that demonstrates stream gatherers.
+ * The class that demonstrates built-in stream gatherers.
  */
 final class StreamGatherersDemo implements Demo {
     /** The logger. */
@@ -55,6 +57,58 @@ final class StreamGatherersDemo implements Demo {
     public void demo() {
         this.logger.entry();
 
+        this.slidingWindows();
+        this.fixedWindows();
+        this.scan();
+        this.fold();
+        this.mapConcurrent();
+
+        this.logger.exit();
+    }
+
+    /**
+     * Sliding windows.
+     */
+    private void slidingWindows() {
+        this.logger.entry();
+
+        final var countries = List.of("India", "Poland", "UK", "Australia", "USA", "Netherlands");
+
+        this.logger.exit();
+    }
+
+    /**
+     * Fixed windows.
+     */
+    private void fixedWindows() {
+        this.logger.entry();
+
+        final var composers = List.of("Mozart", "Bach", "Beethoven", "Mahler", "Bruckner", "Liszt", "Chopin", "Telemann");
+
+        this.logger.exit();
+    }
+
+    /**
+     * Scan.
+     */
+    private void scan() {
+        this.logger.entry();
+        this.logger.exit();
+    }
+
+    /**
+     * Fold.
+     */
+    private void fold() {
+        this.logger.entry();
+        this.logger.exit();
+    }
+
+    /**
+     * Map concurrent.
+     */
+    private void mapConcurrent() {
+        this.logger.entry();
         this.logger.exit();
     }
 }
