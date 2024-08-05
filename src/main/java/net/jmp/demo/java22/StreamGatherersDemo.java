@@ -133,6 +133,17 @@ final class StreamGatherersDemo implements Demo {
      */
     private void fold() {
         this.logger.entry();
+
+        final String numbers = Stream.of(
+                1, 2, 3, 4, 5, 6, 7, 8, 9
+        ).gather(
+                Gatherers.fold(() -> "", (string, number) -> string + number)
+        ).findFirst().get();
+
+        if (this.logger.isInfoEnabled()) {
+            this.logger.info("Fold: {}", numbers);
+        }
+
         this.logger.exit();
     }
 
@@ -141,6 +152,9 @@ final class StreamGatherersDemo implements Demo {
      */
     private void mapConcurrent() {
         this.logger.entry();
+
+        final List<Integer> numbers = List.of(1, 2, 3, 4, 5, 6, 7, 8, 9);
+        
         this.logger.exit();
     }
 }
