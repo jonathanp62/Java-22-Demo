@@ -32,6 +32,9 @@ package net.jmp.demo.java22;
 
 import java.util.List;
 
+import java.util.stream.Gatherers;
+import java.util.stream.Stream;
+
 import org.slf4j.LoggerFactory;
 
 import org.slf4j.ext.XLogger;
@@ -72,7 +75,16 @@ final class StreamGatherersDemo implements Demo {
     private void slidingWindows() {
         this.logger.entry();
 
-        final var countries = List.of("India", "Poland", "UK", "Australia", "USA", "Netherlands");
+        final List<String> countries = List.of("India", "Poland", "UK", "Australia", "USA", "Netherlands");
+
+        final List<List<String>> windows = countries
+                .stream()
+                .gather(Gatherers.windowSliding(3))
+                .toList();
+
+        if (this.logger.isInfoEnabled()) {
+            this.logger.info("Sliding windows: {}", windows);
+        }
 
         this.logger.exit();
     }
@@ -83,7 +95,16 @@ final class StreamGatherersDemo implements Demo {
     private void fixedWindows() {
         this.logger.entry();
 
-        final var composers = List.of("Mozart", "Bach", "Beethoven", "Mahler", "Bruckner", "Liszt", "Chopin", "Telemann");
+        final List<String> composers = List.of("Mozart", "Bach", "Beethoven", "Mahler", "Bruckner", "Liszt", "Chopin", "Telemann", "Vivaldi");
+
+        final List<List<String>> windows = composers
+                .stream()
+                .gather(Gatherers.windowFixed(2))
+                .toList();
+
+        if (this.logger.isInfoEnabled()) {
+            this.logger.info("Fixed windows: {}", windows);
+        }
 
         this.logger.exit();
     }
@@ -93,6 +114,17 @@ final class StreamGatherersDemo implements Demo {
      */
     private void scan() {
         this.logger.entry();
+
+        final List<String> numbers = Stream.of(
+                1, 2, 3, 4, 5, 6, 7, 8, 9
+        ).gather(
+                Gatherers.scan(() -> "", (string, number) -> string + number)
+        ).toList();
+
+        if (this.logger.isInfoEnabled()) {
+            this.logger.info("Scan: {}", numbers);
+        }
+
         this.logger.exit();
     }
 
