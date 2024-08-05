@@ -67,7 +67,11 @@ final class Main implements Runnable {
         this.logger.entry();
 
         if (this.logger.isInfoEnabled() || this.logger.isWarnEnabled() || this.logger.isErrorEnabled()) {
-            System.out.format("%s %s%n", Name.NAME_STRING, Version.VERSION_STRING);
+            final String name = Name.NAME_STRING;
+            final String version = Version.VERSION_STRING;
+            final String greeting = STR."\{name} \{version}";
+
+            System.out.println(greeting);
         } else {
             this.logger.debug("{} {}", Name.NAME_STRING, Version.VERSION_STRING);
         }
