@@ -32,6 +32,7 @@ package net.jmp.demo.java22;
 
 import java.util.List;
 
+import java.util.function.Function;
 import java.util.stream.Gatherers;
 import java.util.stream.Stream;
 
@@ -154,7 +155,18 @@ final class StreamGatherersDemo implements Demo {
         this.logger.entry();
 
         final List<Integer> numbers = List.of(1, 2, 3, 4, 5, 6, 7, 8, 9);
-        
+
+        final Function<Integer, String> toString = String::valueOf;
+
+        final List<String> strings = numbers
+                .stream()
+                .gather(Gatherers.mapConcurrent(2, toString))
+                .toList();
+
+        if (this.logger.isInfoEnabled()) {
+            this.logger.info("MapConcurrent: {}", strings);
+        }
+
         this.logger.exit();
     }
 }
