@@ -89,7 +89,8 @@ final class Main implements Runnable {
 
         List<Demo> demos = List.of(
                 new ScopedValueDemo(),
-                new StreamGatherersDemo()
+                new StreamGatherersDemo(),
+                new StringTemplatesDemo()
         );
 
         demos.forEach(Demo::demo);

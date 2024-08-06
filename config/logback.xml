@@ -47,6 +47,9 @@
     <logger name="net.jmp.demo.java22.StreamGatherersDemo" additivity="false" level="debug">
         <appender-ref ref="MAIN" />
     </logger>
+    <logger name="net.jmp.demo.java22.StringTemplatesDemo" additivity="false" level="debug">
+        <appender-ref ref="MAIN" />
+    </logger>
 
     <root level="info">
         <appender-ref ref="MAIN" />
