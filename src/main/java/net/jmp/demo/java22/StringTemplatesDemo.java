@@ -75,6 +75,7 @@ final class StringTemplatesDemo implements Demo {
         demos.forEach(Demo::demo);
 
         this.raw();
+        this.interpolation();
 
         this.logger.exit();
     }
@@ -93,6 +94,35 @@ final class StringTemplatesDemo implements Demo {
         assert info.equals("My name is Jonathan");
 
         this.logger.info(info);
+
+        this.logger.exit();
+    }
+
+    /**
+     * RAW fragments and values and
+     * interpolating them.
+     */
+    private void interpolation() {
+        this.logger.entry();
+
+        final int x = 10;
+        final int y = 20;
+
+        final StringTemplate st = RAW."\{x} + \{y} = \{x + y}";
+
+        final List<String> fragments = st.fragments();
+        final List<Object> values = st.values();
+
+        this.logger.info(st.toString());
+
+        fragments.forEach(fragment -> this.logger.info("Fragment: {}", fragment));
+        values.forEach(fragment -> this.logger.info("Value   : {}", fragment));
+
+        final String string = StringTemplate.interpolate(fragments, values);
+
+        assert string.equals("10 + 20 = 30");
+
+        this.logger.info(string);
 
         this.logger.exit();
     }
