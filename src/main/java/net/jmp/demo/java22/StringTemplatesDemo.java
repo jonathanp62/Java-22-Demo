@@ -36,6 +36,10 @@ import java.time.LocalTime;
 
 import java.time.format.DateTimeFormatter;
 
+import static java.lang.StringTemplate.RAW;
+
+import static java.util.FormatProcessor.FMT;
+
 import java.util.List;
 
 import org.slf4j.LoggerFactory;
@@ -69,6 +73,26 @@ final class StringTemplatesDemo implements Demo {
         );
 
         demos.forEach(Demo::demo);
+
+        this.raw();
+
+        this.logger.exit();
+    }
+
+    /**
+     * RAW is a standard template processor that
+     * produces an unprocessed StringTemplate object.
+     */
+    private void raw() {
+        this.logger.entry();
+
+        final String name = "Jonathan";
+        final StringTemplate st = RAW."My name is \{name}";
+        final String info = STR.process(st);
+
+        assert info.equals("My name is Jonathan");
+
+        this.logger.info(info);
 
         this.logger.exit();
     }
@@ -186,6 +210,20 @@ final class StringTemplatesDemo implements Demo {
 
             logger.info(time);
 
+            final String name    = "Joan Smith";
+            final String phone   = "555-123-4567";
+            final String address = "1 Maple Drive, Anytown";
+            final String json = STR."""
+
+                {
+                    "name":    "\{name}",
+                    "phone":   "\{phone}",
+                    "address": "\{address}"
+                }
+                """;
+
+            logger.info(json);
+
             logger.exit();
         }
 
@@ -258,7 +296,43 @@ final class StringTemplatesDemo implements Demo {
         @Override
         public void demo() {
             logger.entry();
+
+            Rectangle[] zone = new Rectangle[] {
+                    new Rectangle("Addison", 17.8, 31.4),
+                    new Rectangle("Baby", 9.6, 12.4),
+                    new Rectangle("Carrie", 7.1, 11.23),
+            };
+
+            String table = FMT."""
+
+                Description     Width    Height     Area
+                %-12s\{zone[0].name}  %7.2f\{zone[0].width}  %7.2f\{zone[0].height}     %7.2f\{zone[0].area()}
+                %-12s\{zone[1].name}  %7.2f\{zone[1].width}  %7.2f\{zone[1].height}     %7.2f\{zone[1].area()}
+                %-12s\{zone[2].name}  %7.2f\{zone[2].width}  %7.2f\{zone[2].height}     %7.2f\{zone[2].area()}
+                \{" ".repeat(28)} Total %7.2f\{zone[0].area() + zone[1].area() + zone[2].area()}
+                """;
+
+            logger.info(table);
+
             logger.exit();
+        }
+    }
+
+    /**
+     * A rectangle.
+     *
+     * @param   name    java.lang.String
+     * @param   width   double
+     * @param   height  double
+     */
+    record Rectangle(String name, double width, double height) {
+        /**
+         * Return the area of the rectangle.
+         *
+         * @return  double
+         */
+        double area() {
+            return this.width * this.height;
         }
     }
 }

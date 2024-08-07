@@ -1,12 +1,11 @@
 package net.jmp.demo.java22;
 
 /*
- * (#)Main.java 0.2.0   08/04/2024
- * (#)Main.java 0.1.0   08/02/2024
+ * (#)KeyedFunctionExecutorDemo.java    0.2.0   08/07/2024
  *
  * @author   Jonathan Parker
  * @version  0.2.0
- * @since    0.1.0
+ * @since    0.2.0
  *
  * MIT License
  *
@@ -32,69 +31,58 @@ package net.jmp.demo.java22;
  */
 
 import java.util.List;
-import java.util.Objects;
+
+import java.util.function.Function;
+
+import java.util.stream.IntStream;
+
+import net.jmp.demo.java22.util.KeyedFunctionExecutor;
 
 import org.slf4j.LoggerFactory;
 
 import org.slf4j.ext.XLogger;
 
 /**
- * The main class.
+ * Class that demonstrates the keyed function executor.
  */
-final class Main implements Runnable {
+final class KeyedFunctionExecutorDemo implements Demo {
     /** The logger. */
     private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
 
-    /** The command line arguments. */
-    private final String[] arguments;
-
     /**
-     * A constructor that takes the
-     * command line arguments from
-     * the bootstrap class.
+     * The default constructor.
      */
-    Main(final String[] args) {
+    KeyedFunctionExecutorDemo() {
         super();
-
-        this.arguments = Objects.requireNonNull(args);
     }
 
     /**
-     * The run method.
+     * The demo method.
      */
     @Override
-    public void run() {
+    public void demo() {
         this.logger.entry();
 
-        if (this.logger.isInfoEnabled() || this.logger.isWarnEnabled() || this.logger.isErrorEnabled()) {
-            final String name = Name.NAME_STRING;
-            final String version = Version.VERSION_STRING;
-            final String greeting = STR."\{name} \{version}";
+        final KeyedFunctionExecutor<String> keyedFunctionExecutor = new KeyedFunctionExecutor<>();
 
-            System.out.println(greeting);
-        } else {
-            this.logger.debug("{} {}", Name.NAME_STRING, Version.VERSION_STRING);
-        }
+        final Function<String, Void> function = s -> {
+            logger.info("Function processed value: {}", s);
 
-        this.runDemos();
+            return null;
+        };
 
-        this.logger.exit();
-    }
+        keyedFunctionExecutor.start();
 
-    /**
-     * Method that runs the demo classes.
-     */
-    private void runDemos() {
-        this.logger.entry();
+        final List<String> elements =
+                IntStream.rangeClosed(1, 50)
+                        .mapToObj(i -> STR."Item \{i}")
+                        .toList();
 
-        List<Demo> demos = List.of(
-                new KeyedFunctionExecutorDemo(),
-                new ScopedValueDemo(),
-                new StreamGatherersDemo(),
-                new StringTemplatesDemo()
-        );
+        elements.forEach(e -> {
+            keyedFunctionExecutor.process(function, e, STR."Value for \{e}");
+        });
 
-        demos.forEach(Demo::demo);
+        keyedFunctionExecutor.stop();
 
         this.logger.exit();
     }
