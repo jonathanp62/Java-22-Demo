@@ -1,9 +1,10 @@
 /*
+ * (#)build.gradle  0.3.0   08/07/2024
  * (#)build.gradle  0.2.0   08/02/2024
  * (#)build.gradle  0.1.0   08/02/2024
  *
  * @author   Jonathan Parker
- * @version  0.2.0
+ * @version  0.3.0
  * @since    0.1.0
  *
  * MIT License
@@ -85,7 +86,7 @@ dependencies {
 }
 
 group = 'net.jmp.demo.java22'
-version = '0.2.0'
+version = '0.3.0'
 description = 'Java-22-Demo'
 
 println "The groupId is ${project.group}"

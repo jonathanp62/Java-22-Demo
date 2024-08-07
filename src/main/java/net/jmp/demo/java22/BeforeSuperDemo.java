@@ -1,13 +1,11 @@
 package net.jmp.demo.java22;
 
 /*
- * (#)Main.java 0.3.0   08/07/2024
- * (#)Main.java 0.2.0   08/04/2024
- * (#)Main.java 0.1.0   08/02/2024
+ * (#)BeforeSuperDemo.java  0.3.0   08/07/2024
  *
  * @author   Jonathan Parker
  * @version  0.3.0
- * @since    0.1.0
+ * @since    0.3.0
  *
  * MIT License
  *
@@ -32,72 +30,30 @@ package net.jmp.demo.java22;
  * SOFTWARE.
  */
 
-import java.util.List;
-import java.util.Objects;
-
 import org.slf4j.LoggerFactory;
 
 import org.slf4j.ext.XLogger;
 
 /**
- * The main class.
+ * A class the demonstrates statements before 'super()' in a constructor.
  */
-final class Main implements Runnable {
+final class BeforeSuperDemo implements Demo {
     /** The logger. */
     private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
 
-    /** The command line arguments. */
-    private final String[] arguments;
-
     /**
-     * A constructor that takes the
-     * command line arguments from
-     * the bootstrap class.
+     * The default constructor.
      */
-    Main(final String[] args) {
+    BeforeSuperDemo() {
         super();
-
-        this.arguments = Objects.requireNonNull(args);
     }
 
     /**
-     * The run method.
+     * The demo method.
      */
     @Override
-    public void run() {
+    public void demo() {
         this.logger.entry();
-
-        if (this.logger.isInfoEnabled() || this.logger.isWarnEnabled() || this.logger.isErrorEnabled()) {
-            final String name = Name.NAME_STRING;
-            final String version = Version.VERSION_STRING;
-            final String greeting = STR."\{name} \{version}";
-
-            System.out.println(greeting);
-        } else {
-            this.logger.debug("{} {}", Name.NAME_STRING, Version.VERSION_STRING);
-        }
-
-        this.runDemos();
-
-        this.logger.exit();
-    }
-
-    /**
-     * Method that runs the demo classes.
-     */
-    private void runDemos() {
-        this.logger.entry();
-
-        List<Demo> demos = List.of(
-                new KeyedFunctionExecutorDemo(),
-                new ScopedValueDemo(),
-                new StreamGatherersDemo(),
-                new StringTemplatesDemo(),
-                new BeforeSuperDemo(),
-                new UnnamedVariablesDemo()
-        );
-
-        demos.forEach(Demo::demo);
 
         this.logger.exit();
     }
