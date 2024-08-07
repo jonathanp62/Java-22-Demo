@@ -78,6 +78,7 @@ repositories {
 dependencies {
     runtimeOnly         libs.ch.qos.logback.logback.classic
     runtimeOnly         libs.ch.qos.logback.logback.core
+    implementation      libs.com.google.guava.guava
     implementation      libs.org.slf4j.slf4j.api
     implementation      libs.org.slf4j.slf4j.ext
     testImplementation  libs.junit.junit

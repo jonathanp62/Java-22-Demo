@@ -30,13 +30,23 @@ package net.jmp.demo.java22.util;
  * SOFTWARE.
  */
 
+import com.google.common.util.concurrent.Striped;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import java.util.concurrent.*;
 
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+
 import java.util.function.Function;
+
+import org.slf4j.LoggerFactory;
+
+import org.slf4j.ext.XLogger;
 
 /**
  * The keyed function executor.
@@ -46,6 +56,9 @@ import java.util.function.Function;
 public final class KeyedFunctionExecutor<T> {
     private static final int DEFAULT_NUMBER_OF_THREADS = Runtime.getRuntime().availableProcessors();
 
+    /** The logger. */
+    private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
+
     /** The map of keyed entries. */
     private final Map<String, T> map = new ConcurrentHashMap<>();
 
@@ -54,6 +67,9 @@ public final class KeyedFunctionExecutor<T> {
 
     /** A list of runnable futures. */
     private final List<Future<Void>> futures = new ArrayList<>();
+
+    /** Control access to the map. */
+    private final Striped<ReadWriteLock> locks = Striped.readWriteLock(64);
 
     /** True once the start method has been invoked. */
     private boolean isStarted;
@@ -85,13 +101,19 @@ public final class KeyedFunctionExecutor<T> {
      * Start the executor.
      */
     public void start() {
+        this.logger.entry();
+
         this.isStarted = true;
+
+        this.logger.exit();
     }
 
     /**
      * Stop the executor.
      */
     public void stop() {
+        this.logger.entry();
+
         this.futures.forEach(future -> {
             if (!future.isDone()) {
                 try {
@@ -111,6 +133,8 @@ public final class KeyedFunctionExecutor<T> {
         this.executor.shutdown();
 
         this.isStarted = false;
+
+        this.logger.exit();
     }
 
     /**
@@ -121,18 +145,36 @@ public final class KeyedFunctionExecutor<T> {
      * @param   value       T
      */
     public void process(final Function<T, Void> function, final String key, final T value) {
+        this.logger.entry(function, key, value);
+
+        Objects.requireNonNull(function);
+        Objects.requireNonNull(key);
+        Objects.requireNonNull(value);
+
         if (!this.isStarted) {
             throw new IllegalStateException("This KeyedFunctionExecutor was not started");
         }
 
         this.map.put(key, value);
 
-        final T val = map.get(key);
+        final Lock lock = this.locks.get(key).writeLock();
 
-        this.map.remove(key);
+        if (lock.tryLock()) {
+            try {
+                while (map.containsKey(key)) {
+                    final T val = map.get(key);
 
-        final Future<Void> future = this.executor.submit(() -> function.apply(val));
+                    this.map.remove(key);
 
-        this.futures.add(future);
+                    final Future<Void> future = this.executor.submit(() -> function.apply(val));
+
+                    this.futures.add(future);
+                }
+            } finally {
+                lock.unlock();
+            }
+        }
+
+        this.logger.exit();
     }
 }
