@@ -30,10 +30,13 @@ package net.jmp.demo.java22;
  * SOFTWARE.
  */
 
+import java.util.List;
+
 import org.slf4j.LoggerFactory;
 
 import org.slf4j.ext.XLogger;
 
+\
 /**
  * A class the demonstrates using unnamed variables.
  */
@@ -55,6 +58,55 @@ final class UnnamedVariablesDemo implements Demo {
     public void demo() {
         this.logger.entry();
 
+        this.unnamedVariables();
+
+        this.logger.exit();
+    }
+
+    /**
+     * Unnamed variables.
+     */
+    private void unnamedVariables() {
+        this.logger.entry();
+
+        // As an exception
+
+        try {
+            int number = 10 / 0;
+        } catch (ArithmeticException _) {
+            this.logger.error("Division by zero");
+        }
+
+        final var items = List.of(1, 2, 3, 4, 5);
+
+        int totalItems = 0;
+
+        // In an enhanced for loop
+
+        for (final int _ : items) {
+            totalItems++;
+        }
+
+        assert totalItems == items.size();
+
+        // As an unneeded item
+
+        for (int i = 0; i < items.size(); i++) {
+            final var _ = items.get(i);
+        }
+
+        // In a lambda
+
+        items.forEach(_ -> this.logger.info("An iteration"));
+
+        this.logger.exit();
+    }
+
+    /**
+     * Unnamed patterns.
+     */
+    private void unnamedPatterns() {
+        this.logger.entry();
         this.logger.exit();
     }
 }
