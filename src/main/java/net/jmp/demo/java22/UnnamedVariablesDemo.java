@@ -30,7 +30,10 @@ package net.jmp.demo.java22;
  * SOFTWARE.
  */
 
-import java.util.List;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+
+import java.util.*;
 
 import org.slf4j.LoggerFactory;
 
@@ -99,6 +102,14 @@ final class UnnamedVariablesDemo implements Demo {
 
         items.forEach(_ -> this.logger.info("An iteration"));
 
+        // Try with resources
+
+        try (var _ = new OutputStreamWriter(System.out)) {
+
+        } catch (final IOException _) {
+            this.logger.error("Error writing to System.out");
+        }
+
         this.logger.exit();
     }
 
@@ -107,6 +118,19 @@ final class UnnamedVariablesDemo implements Demo {
      */
     private void unnamedPatterns() {
         this.logger.entry();
+
+        // Patterns in case statements
+
+        final List<String> list = new ArrayList<>();
+        final Set<String> set = new HashSet<>();
+        final Collection<String> collection = set;
+
+        switch (collection) {
+            case Set<String> _ -> this.logger.info("Set");
+            case List<String> _ -> this.logger.info("List");
+            default -> this.logger.error("Unsupported collection");
+        }
+
         this.logger.exit();
     }
 }
