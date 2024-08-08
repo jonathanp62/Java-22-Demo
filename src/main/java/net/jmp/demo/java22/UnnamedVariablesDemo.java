@@ -36,7 +36,6 @@ import org.slf4j.LoggerFactory;
 
 import org.slf4j.ext.XLogger;
 
-\
 /**
  * A class the demonstrates using unnamed variables.
  */
@@ -59,6 +58,7 @@ final class UnnamedVariablesDemo implements Demo {
         this.logger.entry();
 
         this.unnamedVariables();
+        this.unnamedPatterns();
 
         this.logger.exit();
     }
