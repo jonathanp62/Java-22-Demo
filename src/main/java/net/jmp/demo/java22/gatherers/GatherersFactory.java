@@ -29,6 +29,8 @@ package net.jmp.demo.java22.gatherers;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
@@ -43,7 +45,22 @@ public class GatherersFactory {
      * @param   <T>         The type of input elements to the gathering operation
      * @param   <A>         The potentially mutable state type of the gathering operation
      */
-    public static <T, A> DistinctByGatherer<T, A> distinctBy(Function<T, A> selector) {
+    public static <T, A> DistinctByGatherer<T, A> distinctBy(final Function<T, A> selector) {
         return new DistinctByGatherer<>(selector);
+    }
+
+    /**
+     * A reduce-by gatherer.
+     *
+     * @param   selector    java.util.function.Function&lt;T, A&gt;
+     * @param   reducer     java.util.function.BiFunction&lt;T, T, T&gt;
+     * @return              net.jmp.demo.java22.gatherers.ReduceByGatherer&lt;T, A&gt;
+     * @param   <T>         The type of input elements to the gathering operation
+     * @param   <A>         The potentially mutable state type of the gathering operation
+     */
+
+    public static <T, A> ReduceByGatherer<T, A> reduceBy(final Function<T, A> selector,
+                                                         final BiFunction<T, T, T> reducer) {
+        return new ReduceByGatherer<>(selector, reducer);
     }
 }

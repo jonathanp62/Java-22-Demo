@@ -1,7 +1,7 @@
 package net.jmp.demo.java22.gatherers;
 
 /*
- * (#)DistinctByGatherer.java   0.4.0   08/09/2024
+ * (#)ReduceByGatherer.java 0.4.0   08/09/2024
  *
  * @author   Jonathan Parker
  * @version  0.4.0
@@ -30,44 +30,49 @@ package net.jmp.demo.java22.gatherers;
  * SOFTWARE.
  */
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Function;
+
 import java.util.function.Supplier;
 
 import java.util.stream.Gatherer;
 
 /**
- * This gatherer ensures stream elements are unique based on a selector function.
- * The optional finisher operation is not present in this gatherer.
+ * This gatherer aggregates elements in a stream based on a selector function.
  *
  * @param   <T> The type of input elements to the gathering operation
  * @param   <A> The potentially mutable state type of the gathering operation
  */
-public final class DistinctByGatherer<T, A> implements Gatherer<T, Set<A>, T> {
+public final class ReduceByGatherer<T, A> implements Gatherer<T, Map<A, T>, T>  {
     /** The selector function. */
     private final Function<T, A> selector;
+
+    /** The reducer function. */
+    private final BiFunction<T, T, T> reducer;
 
     /**
      * The constructor.
      *
      * @param   selector    java.util.function.Function&lt;T, A&gt;
+     * @param   reducer     java.util.function.BiFunction&lt;T, T, T&gt;
      */
-    public DistinctByGatherer(final Function<T, A> selector) {
+    public ReduceByGatherer(final Function<T, A> selector, final BiFunction<T, T, T> reducer) {
         this.selector = Objects.requireNonNull(selector);
+        this.reducer = Objects.requireNonNull(reducer);
     }
 
     /**
      * A function that produces an instance of the intermediate
      * state used for this gathering operation.
      *
-     * @return  java.util.function.Supplier&lt;java.util.Set&lt;A&gt;&gt;
+     * @return  java.util.function.Supplier&lt;java.util.Map&lt;A, T&gt;&gt;
      */
     @Override
-    public Supplier<Set<A>> initializer() {
-        return HashSet::new;
+    public Supplier<Map<A, T>> initializer() {
+        return HashMap::new;
     }
 
     /**
@@ -76,10 +81,11 @@ public final class DistinctByGatherer<T, A> implements Gatherer<T, Set<A>, T> {
      * optionally producing output to the provided
      * downstream type.
      *
-     * @return  java.util.stream.Gatherer.Integrator&lt;java.util.Set&lt;A&gt;, T, T&gt;
+     * @return  java.util.stream.Gatherer.Integrator&lt;java.util.Map&lt;A, T&gt;, T, T&gt;
      */
+
     @Override
-    public Integrator<Set<A>, T, T> integrator() {
+    public Integrator<Map<A, T>, T, T> integrator() {
         /*
          * Greedy integrators consume all their input,
          * and may only relay that the downstream does
@@ -88,20 +94,26 @@ public final class DistinctByGatherer<T, A> implements Gatherer<T, Set<A>, T> {
          * result type (R).
          */
 
-        return Integrator.ofGreedy((state, item, downstream) -> {
-            final A selected = this.selector.apply(item);   // Apply the selector function
-
-            if (!state.contains(selected)) {
-                state.add(selected);
-
-                if (!downstream.push(item)) {
-                    System.err.println(STR."Failed to push \{item} downstream");
-
-                    return false;   // No subsequent integration is desired
-                }
-            }
+        return Integrator.ofGreedy((state, item, _) -> {
+            state.merge(this.selector.apply(item), item, this.reducer);
 
             return true;    // True if subsequent integration is desired
         });
+    }
+
+    /**
+     * A function which accepts the final intermediate state and a
+     * downstream object, allowing to perform a final action at the
+     * end of input elements. The lambda is the state (A) and the
+     * result type (R).
+     *
+     * @return  java.util.function.BiConsumer&lt;java.util.Map&lt;A, T&gt;, java.util.stream.Gatherer.Downstream&gt;
+     */
+    @Override
+    public BiConsumer<Map<A, T>, Downstream<? super T>> finisher () {
+        return (state, downstream) -> {
+            state.values()
+                    .forEach(downstream::push);
+        };
     }
 }

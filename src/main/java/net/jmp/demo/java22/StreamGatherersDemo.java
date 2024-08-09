@@ -193,6 +193,7 @@ final class StreamGatherersDemo implements Demo {
         this.logger.entry();
 
         this.customDistinctBy();
+        this.customReduceByGatherer();
 
         this.logger.exit();
     }
@@ -213,6 +214,27 @@ final class StreamGatherersDemo implements Demo {
 
         money.stream()
                 .gather(GatherersFactory.distinctBy(Money::currency))
+                .forEach(e -> this.logger.info(e.toString()));
+
+        this.logger.exit();
+    }
+
+    /**
+     * A custom reduce-by gatherer.
+     *
+     * @since 0.4.0
+     */
+    private void customReduceByGatherer() {
+        this.logger.entry();
+
+        final List<Money> money = List.of(
+                new Money(BigDecimal.valueOf(12), Currency.getInstance("PLN")),
+                new Money(BigDecimal.valueOf(11), Currency.getInstance("EUR")),
+                new Money(BigDecimal.valueOf(15), Currency.getInstance("PLN"))
+        );
+
+        money.stream()
+                .gather(GatherersFactory.reduceBy(Money::currency, Money::add))
                 .forEach(e -> this.logger.info(e.toString()));
 
         this.logger.exit();
