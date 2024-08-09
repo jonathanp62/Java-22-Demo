@@ -1,12 +1,11 @@
 package net.jmp.demo.java22.util;
 
 /*
- * (#)KeyedFunctionExecutor.java    0.4.0   08/09/2024
- * (#)KeyedFunctionExecutor.java    0.2.0   08/07/2024
+ * (#)AbstractAppliedCollection.java    0.4.0   08/09/2024
  *
  * @author   Jonathan Parker
  * @version  0.4.0
- * @since    0.2.0
+ * @since    0.4.0
  *
  * MIT License
  *
@@ -31,17 +30,13 @@ package net.jmp.demo.java22.util;
  * SOFTWARE.
  */
 
-import com.google.common.util.concurrent.Striped;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
-import java.util.concurrent.*;
-
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import java.util.function.Function;
 
@@ -50,18 +45,15 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.ext.XLogger;
 
 /**
- * The keyed function executor.
+ * An abstract base class for applied collections.
  *
- * @param   <T> The type of value
+ * @param   <T> The type of element
  */
-public final class KeyedFunctionExecutor<T> {
+public abstract class AbstractAppliedCollection<T> {
     private static final int DEFAULT_NUMBER_OF_THREADS = Runtime.getRuntime().availableProcessors();
 
     /** The logger. */
     private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
-
-    /** The map of keyed entries. */
-    private final Map<String, T> map = new ConcurrentHashMap<>();
 
     /** The executor service. */
     private final ExecutorService executor;
@@ -69,16 +61,13 @@ public final class KeyedFunctionExecutor<T> {
     /** A list of runnable futures. */
     private final List<Future<Void>> futures = new ArrayList<>();
 
-    /** Control access to the map. */
-    private final Striped<ReadWriteLock> locks = Striped.readWriteLock(64);
-
     /** True once the start method has been invoked. */
     private boolean isStarted;
 
     /**
      * The default constructor.
      */
-    public KeyedFunctionExecutor() {
+    public AbstractAppliedCollection() {
         super();
 
         this.executor = Executors.newFixedThreadPool(DEFAULT_NUMBER_OF_THREADS);
@@ -88,7 +77,7 @@ public final class KeyedFunctionExecutor<T> {
      * A constructor that takes
      * the number of threads to use.
      */
-    public KeyedFunctionExecutor(final int numberOfThreads) {
+    public AbstractAppliedCollection(final int numberOfThreads) {
         if (numberOfThreads <= 0) {
             throw new IllegalArgumentException("Number of threads must be greater than 0");
         }
@@ -139,43 +128,9 @@ public final class KeyedFunctionExecutor<T> {
     }
 
     /**
-     * Process the keyed function.
+     * Apply the function to each element in the collection.
      *
      * @param   function    java.util.function.Function&lt;T, java.lang.Void&gt;
-     * @param   key         java.lang.String
-     * @param   value       T
      */
-    public void process(final Function<T, Void> function, final String key, final T value) {
-        this.logger.entry(function, key, value);
-
-        Objects.requireNonNull(function);
-        Objects.requireNonNull(key);
-        Objects.requireNonNull(value);
-
-        if (!this.isStarted) {
-            throw new IllegalStateException("This KeyedFunctionExecutor was not started");
-        }
-
-        this.map.put(key, value);
-
-        final Lock lock = this.locks.get(key).writeLock();
-
-        if (lock.tryLock()) {
-            try {
-                while (map.containsKey(key)) {
-                    final T val = map.get(key);
-
-                    this.map.remove(key);
-
-                    final Future<Void> future = this.executor.submit(() -> function.apply(val));
-
-                    this.futures.add(future);
-                }
-            } finally {
-                lock.unlock();
-            }
-        }
-
-        this.logger.exit();
-    }
+    public abstract void apply(final Function<T, Void> function);
 }
