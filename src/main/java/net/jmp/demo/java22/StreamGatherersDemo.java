@@ -1,10 +1,11 @@
 package net.jmp.demo.java22;
 
 /*
+ * (#)StreamGatherersDemo.java  0.4.0   08/09/2024
  * (#)StreamGatherersDemo.java  0.2.0   08/04/2024
  *
  * @author   Jonathan Parker
- * @version  0.2.0
+ * @version  0.4.0
  * @since    0.2.0
  *
  * MIT License
@@ -33,6 +34,7 @@ package net.jmp.demo.java22;
 import java.util.List;
 
 import java.util.function.Function;
+
 import java.util.stream.Gatherers;
 import java.util.stream.Stream;
 
@@ -41,7 +43,11 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.ext.XLogger;
 
 /**
- * The class that demonstrates built-in stream gatherers.
+ * The class that demonstrates built-in stream gatherers
+ * as well as composing custom ones.
+ *
+ * <a href="https://softwaremill.com/stream-gatherers-in-practice-part-1/">Stream Gatherers in practice Part 1</a>
+ * <a href="https://github.com/lukaszrola/java-stream-gather-example">java-stream-gather-example</a>
  */
 final class StreamGatherersDemo implements Demo {
     /** The logger. */
