@@ -74,4 +74,16 @@ public class GatherersFactory {
     public static <T, C extends Comparable<C>> MaxByGatherer<T, C> maxBy(final Function<T, C> selector) {
         return new MaxByGatherer<>(selector);
     }
+
+    /**
+     * A min-by gatherer.
+     *
+     * @param   selector    java.util.function.Function&lt;T, C&gt;
+     * @return              net.jmp.demo.java22.gatherers.MinByGatherer&lt;T, C&gt;
+     * @param   <T>         The type of input elements to the gathering operation
+     * @param   <C>         A type that extends Comparable; T must extend Comparable
+     */
+    public static <T, C extends Comparable<C>> MinByGatherer<T, C> minBy(final Function<T, C> selector) {
+        return new MinByGatherer<>(selector);
+    }
 }

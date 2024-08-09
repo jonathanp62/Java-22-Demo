@@ -195,6 +195,7 @@ final class StreamGatherersDemo implements Demo {
         this.customDistinctBy();
         this.customReduceByGatherer();
         this.customMaxByGatherer();
+        this.customMinByGatherer();
 
         this.logger.exit();
     }
@@ -258,6 +259,28 @@ final class StreamGatherersDemo implements Demo {
         money.stream()
                 .parallel()
                 .gather(GatherersFactory.maxBy(Money::amount))
+                .forEach(e -> this.logger.info(e.toString()));
+
+        this.logger.exit();
+    }
+
+    /**
+     * A custom min-by gatherer.
+     *
+     * @since 0.4.0
+     */
+    private void customMinByGatherer() {
+        this.logger.entry();
+
+        final List<Money> money = List.of(
+                new Money(BigDecimal.valueOf(12), Currency.getInstance("PLN")),
+                new Money(BigDecimal.valueOf(11), Currency.getInstance("EUR")),
+                new Money(BigDecimal.valueOf(15), Currency.getInstance("PLN"))
+        );
+
+        money.stream()
+                .parallel()
+                .gather(GatherersFactory.minBy(Money::amount))
                 .forEach(e -> this.logger.info(e.toString()));
 
         this.logger.exit();

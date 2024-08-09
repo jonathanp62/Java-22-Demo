@@ -1,7 +1,7 @@
 package net.jmp.demo.java22.gatherers;
 
 /*
- * (#)MaxByGathererState.java   0.4.0   08/09/2024
+ * (#)MinByGathererState.java   0.4.0   08/09/2024
  *
  * @author   Jonathan Parker
  * @version  0.4.0
@@ -35,6 +35,6 @@ package net.jmp.demo.java22.gatherers;
  *
  * @param   <T> The type of element
  */
-public final class MaxByGathererState<T> {
-    T maxElement;
+public final class MinByGathererState<T> {
+    T minElement;
 }
