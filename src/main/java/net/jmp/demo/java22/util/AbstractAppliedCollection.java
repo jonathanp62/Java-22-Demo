@@ -67,7 +67,7 @@ public abstract class AbstractAppliedCollection<T> {
     /**
      * The default constructor.
      */
-    public AbstractAppliedCollection() {
+    protected AbstractAppliedCollection() {
         super();
 
         this.executor = Executors.newFixedThreadPool(DEFAULT_NUMBER_OF_THREADS);
@@ -77,7 +77,7 @@ public abstract class AbstractAppliedCollection<T> {
      * A constructor that takes
      * the number of threads to use.
      */
-    public AbstractAppliedCollection(final int numberOfThreads) {
+    protected AbstractAppliedCollection(final int numberOfThreads) {
         if (numberOfThreads <= 0) {
             throw new IllegalArgumentException("Number of threads must be greater than 0");
         }
@@ -90,7 +90,7 @@ public abstract class AbstractAppliedCollection<T> {
     /**
      * Start the executor.
      */
-    public void start() {
+    protected void start() {
         this.logger.entry();
 
         this.isStarted = true;
@@ -101,7 +101,7 @@ public abstract class AbstractAppliedCollection<T> {
     /**
      * Stop the executor.
      */
-    public void stop() {
+    protected void stop() {
         this.logger.entry();
 
         this.futures.forEach(future -> {
@@ -132,5 +132,5 @@ public abstract class AbstractAppliedCollection<T> {
      *
      * @param   function    java.util.function.Function&lt;T, java.lang.Void&gt;
      */
-    public abstract void apply(final Function<T, Void> function);
+    protected abstract void apply(final Function<T, Void> function);
 }
