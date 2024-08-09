@@ -30,22 +30,75 @@ package net.jmp.demo.java22.gatherers;
  * SOFTWARE.
  */
 
+import java.util.HashSet;
 import java.util.Set;
 
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import java.util.stream.Gatherer;
 
-public final class DistinctByGatherer<T, P> implements Gatherer<T, Set<P>, T> {
+/**
+ * This gatherer ensures stream elements are unique based on a selector function.
+ *
+ * @param   <T> The type of input elements to the gathering operation
+ * @param   <A> The potentially mutable state type of the gathering operation
+ */
+public final class DistinctByGatherer<T, A> implements Gatherer<T, Set<A>, T> {
     /** The selector function. */
-    private final Function<T, P> selector;
+    private final Function<T, A> selector;
 
     /**
      * The constructor.
      *
      * @param   selector    java.util.function.Function&lt;T, P&gt;
      */
-    DistinctByGatherer(Function<T, P> selector) {
+    public DistinctByGatherer(Function<T, A> selector) {
         this.selector = selector;
+    }
+
+    /**
+     * A function that produces an instance of the intermediate
+     * state used for this gathering operation.
+     *
+     * @return  java.util.function.Supplier&lt;java.util.Set&lt;A&gt;&gt;
+     */
+    @Override
+    public Supplier<Set<A>> initializer() {
+        return HashSet::new;
+    }
+
+    /**
+     * A function which integrates provided elements,
+     * potentially using the provided intermediate state,
+     * optionally producing output to the provided
+     * downstream type.
+     *
+     * @return  java.util.stream.Gatherer.Integrator&lt;java.util.Set&lt;A&gt;, T, T&gt;
+     */
+    public Integrator<Set<A>, T, T> integrator() {
+        /*
+         * Greedy integrators consume all their input,
+         * and may only relay that the downstream does
+         * not want more elements. The greedy lambda is
+         * the state (A), the element type (T), and the
+         * result type (R).
+         */
+
+        return Integrator.ofGreedy((state, item, downstream) -> {
+            final A selected = this.selector.apply(item);   // Apply the selector function
+
+            if (!state.contains(selected)) {
+                state.add(selected);
+
+                if (!downstream.push(item)) {
+                    System.err.println(STR."Failed to push \{item} downstream");
+
+                    return false;   // No subsequent integration is desired
+                }
+            }
+
+            return true;    // True if subsequent integration is desired
+        });
     }
 }

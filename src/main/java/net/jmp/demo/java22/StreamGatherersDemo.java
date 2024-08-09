@@ -31,12 +31,19 @@ package net.jmp.demo.java22;
  * SOFTWARE.
  */
 
+import java.math.BigDecimal;
+
+import java.util.Currency;
 import java.util.List;
 
 import java.util.function.Function;
 
 import java.util.stream.Gatherers;
 import java.util.stream.Stream;
+
+import net.jmp.demo.java22.gatherers.*;
+
+import net.jmp.demo.java22.records.Money;
 
 import org.slf4j.LoggerFactory;
 
@@ -72,6 +79,7 @@ final class StreamGatherersDemo implements Demo {
         this.scan();
         this.fold();
         this.mapConcurrent();
+        this.custom();
 
         this.logger.exit();
     }
@@ -172,6 +180,40 @@ final class StreamGatherersDemo implements Demo {
         if (this.logger.isInfoEnabled()) {
             this.logger.info("MapConcurrent: {}", strings);
         }
+
+        this.logger.exit();
+    }
+
+    /**
+     * Custom gatherers.
+     *
+     * @since    0.4.0
+     */
+    private void custom() {
+        this.logger.entry();
+
+        this.customDistinctBy();
+
+        this.logger.exit();
+    }
+
+    /**
+     * A custom distinct-by gatherer.
+     *
+     * @since 0.4.0
+     */
+    private void customDistinctBy() {
+        this.logger.entry();
+
+        final List<Money> money = List.of(
+                new Money(BigDecimal.valueOf(12), Currency.getInstance("PLN")),
+                new Money(BigDecimal.valueOf(11), Currency.getInstance("EUR")),
+                new Money(BigDecimal.valueOf(15), Currency.getInstance("PLN"))
+        );
+
+        money.stream()
+                .gather(GatherersFactory.distinctBy(Money::currency))
+                .forEach(e -> this.logger.info(e.toString()));
 
         this.logger.exit();
     }
