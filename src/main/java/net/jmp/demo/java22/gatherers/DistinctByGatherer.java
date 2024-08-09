@@ -41,6 +41,7 @@ import java.util.stream.Gatherer;
 
 /**
  * This gatherer ensures stream elements are unique based on a selector function.
+ * The optional combiner operation is not present in this gatherer.
  * The optional finisher operation is not present in this gatherer.
  *
  * @param   <T> The type of input elements to the gathering operation

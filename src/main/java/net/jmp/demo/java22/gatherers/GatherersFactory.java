@@ -58,9 +58,20 @@ public class GatherersFactory {
      * @param   <T>         The type of input elements to the gathering operation
      * @param   <A>         The potentially mutable state type of the gathering operation
      */
-
     public static <T, A> ReduceByGatherer<T, A> reduceBy(final Function<T, A> selector,
                                                          final BiFunction<T, T, T> reducer) {
         return new ReduceByGatherer<>(selector, reducer);
+    }
+
+    /**
+     * A max-by gatherer.
+     *
+     * @param   selector    java.util.function.Function&lt;T, C&gt;
+     * @return              net.jmp.demo.java22.gatherers.MaxByGatherer&lt;T, C&gt;
+     * @param   <T>         The type of input elements to the gathering operation
+     * @param   <C>         A type that extends Comparable; T must extend Comparable
+     */
+    public static <T, C extends Comparable<C>> MaxByGatherer<T, C> maxBy(final Function<T, C> selector) {
+        return new MaxByGatherer<>(selector);
     }
 }

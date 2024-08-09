@@ -42,6 +42,7 @@ import java.util.stream.Gatherer;
 
 /**
  * This gatherer aggregates elements in a stream based on a selector function.
+ * The optional combiner operation is not present in this gatherer.
  *
  * @param   <T> The type of input elements to the gathering operation
  * @param   <A> The potentially mutable state type of the gathering operation
@@ -83,7 +84,6 @@ public final class ReduceByGatherer<T, A> implements Gatherer<T, Map<A, T>, T>  
      *
      * @return  java.util.stream.Gatherer.Integrator&lt;java.util.Map&lt;A, T&gt;, T, T&gt;
      */
-
     @Override
     public Integrator<Map<A, T>, T, T> integrator() {
         /*
