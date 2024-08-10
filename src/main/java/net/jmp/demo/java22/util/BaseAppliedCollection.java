@@ -1,8 +1,8 @@
 package net.jmp.demo.java22.util;
 
 /*
- * (#)AbstractAppliedCollection.java    0.5.0   08/10/2024
- * (#)AbstractAppliedCollection.java    0.4.0   08/09/2024
+ * (#)BaseAppliedCollection.java    0.5.0   08/10/2024
+ * (#)BaseAppliedCollection.java    0.4.0   08/09/2024
  *
  * @author   Jonathan Parker
  * @version  0.5.0
@@ -39,18 +39,16 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import java.util.function.Consumer;
-
 import org.slf4j.LoggerFactory;
 
 import org.slf4j.ext.XLogger;
 
 /**
- * An abstract base class for applied collections.
+ * A base class for applied collections.
  *
  * @param   <T> The type of element
  */
-public abstract class AbstractAppliedCollection<T> {
+public class BaseAppliedCollection<T> {
     private static final int DEFAULT_NUMBER_OF_THREADS = Runtime.getRuntime().availableProcessors();
 
     /** The logger. */
@@ -68,7 +66,7 @@ public abstract class AbstractAppliedCollection<T> {
     /**
      * The default constructor.
      */
-    protected AbstractAppliedCollection() {
+    protected BaseAppliedCollection() {
         super();
 
         this.executor = Executors.newFixedThreadPool(DEFAULT_NUMBER_OF_THREADS);
@@ -78,7 +76,7 @@ public abstract class AbstractAppliedCollection<T> {
      * A constructor that takes
      * the number of threads to use.
      */
-    protected AbstractAppliedCollection(final int numberOfThreads) {
+    protected BaseAppliedCollection(final int numberOfThreads) {
         if (numberOfThreads <= 0) {
             throw new IllegalArgumentException("Number of threads must be greater than 0");
         }
@@ -129,9 +127,9 @@ public abstract class AbstractAppliedCollection<T> {
     }
 
     /**
-     * Apply the consumer to each element in the collection.
-     *
-     * @param   consumer    java.util.function.Consumer&lt;T&gt;
+     * Return true if the applied collection has been started.
      */
-    protected abstract void apply(final Consumer<T> consumer);
+    protected boolean isStarted() {
+        return !this.isStarted;
+    };
 }

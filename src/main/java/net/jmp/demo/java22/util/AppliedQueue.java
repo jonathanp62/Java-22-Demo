@@ -33,6 +33,7 @@ package net.jmp.demo.java22.util;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Queue;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -51,7 +52,7 @@ import org.slf4j.ext.XLogger;
  *
  * @param   <T> The type of element
  */
-public final class AppliedQueue<T> extends AbstractAppliedCollection<T> implements Queue<T> {
+public final class AppliedQueue<T> extends BaseAppliedCollection<T> implements Queue<T> {
     /** The logger. */
     private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
 
@@ -68,54 +69,86 @@ public final class AppliedQueue<T> extends AbstractAppliedCollection<T> implemen
     }
 
     /**
-     * Apply the consumer to each element in the collection.
+     * Retrieves, but does not remove, the head of this queue. This method differs
+     * from peekAndApply only in that it throws an exception if this queue is empty.
+     * Apply the consumer to the retrieved element.
      *
      * @param   consumer    java.util.function.Consumer&lt;T&gt;
+     * @return              T
      */
-    @Override
-    public void apply(final Consumer<T> consumer) {
+    public T elementAndApply(final Consumer<T> consumer) throws NoSuchElementException {
         this.logger.entry(consumer);
 
-        this.queue.forEach(e -> {
-            final Future<?> future = super.executor.submit(() -> consumer.accept(e));
+        if (super.isStarted()) {
+            throw new IllegalStateException("AppliedQueue has not been started");
+        }
 
-            super.futures.add(future);
-        });
+        if (this.queue.isEmpty()) {
+            throw new NoSuchElementException();
+        }
 
-        this.logger.exit();
+        final T element = this.queue.element();
+        final Future<?> future = super.executor.submit(() -> consumer.accept(element));
+
+        super.futures.add(future);
+
+        this.logger.exit(element);
+
+        return element;
     }
 
     /**
-     * Apply the consumer to all elements on the queue
-     * while leaving the elements in place.
+     * Retrieves, but does not remove, the head of this queue, or returns null if
+     * this queue is empty.
+     * Apply the consumer to the retrieved element if it is not null.
      *
      * @param   consumer    java.util.function.Consumer&lt;T&gt;
+     * @return              T
      */
-    public void peekAndApply(final Consumer<T> consumer) {
+    public T peekAndApply(final Consumer<T> consumer) {
         this.logger.entry(consumer);
 
-        this.apply(consumer);
+        if (super.isStarted()) {
+            throw new IllegalStateException("AppliedQueue has not been started");
+        }
 
-        this.logger.exit();
-    }
+        final T element = this.queue.peek();
 
-    /**
-     * Apply the consumer to all elements on the queue
-     * and remove each one as it is processed.
-     *
-     * @param   consumer    java.util.function.Consumer&lt;T&gt;
-     */
-    public void pollAndApply(final Consumer<T> consumer) {
-        this.logger.entry(consumer);
-
-        while (this.queue.peek() != null) {
-            final T element = this.queue.poll();
+        if (element != null) {
             final Future<?> future = super.executor.submit(() -> consumer.accept(element));
 
             super.futures.add(future);
         }
 
-        this.logger.exit();
+        this.logger.exit(element);
+
+        return element;
+    }
+
+    /**
+     * Retrieves and removes the head of this queue, or returns null if this queue is empty.
+     * Apply the consumer to the retrieved element if it is not null.
+     *
+     * @param   consumer    java.util.function.Consumer&lt;T&gt;
+     */
+    public T pollAndApply(final Consumer<T> consumer) {
+        this.logger.entry(consumer);
+
+        if (super.isStarted()) {
+            throw new IllegalStateException("AppliedQueue has not been started");
+        }
+
+        final T element = this.queue.peek();
+
+        if (element != null) {
+            final Future<?> future = super.executor.submit(() -> consumer.accept(element));
+
+            super.futures.add(future);
+        }
+
+        this.logger.exit(element);
+
+        return element;
     }
 
     // Queue and Collection override methods
