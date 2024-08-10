@@ -204,6 +204,7 @@ final class StreamGatherersDemo implements Demo {
         this.customMaxByGatherer(money);
         this.customMinByGatherer(money);
         this.customMapNotNullGatherer();
+        this.customFindFirstGatherer(money);
 
         this.logger.exit();
     }
@@ -308,6 +309,25 @@ final class StreamGatherersDemo implements Demo {
 
         money.stream()
                 .gather(GatherersFactory.mapNotNull(m -> m.multiply(BigDecimal.TWO)))
+                .forEach(e -> this.logger.info(e.toString()));
+
+        this.logger.exit();
+    }
+
+    /**
+     * A custom find-first gatherer.
+     *
+     * @param   money   java.util.List&lt;net.jmp.demo.java22.records.Money&gt;
+     * @since           0.4.0
+     */
+    private void customFindFirstGatherer(final List<Money> money) {
+        this.logger.entry(money);
+
+        assert money != null;
+        assert !money.isEmpty();
+
+        money.stream()
+                .gather(GatherersFactory.findFirst(m -> m.currency().equals(Currency.getInstance("PLN"))))
                 .forEach(e -> this.logger.info(e.toString()));
 
         this.logger.exit();

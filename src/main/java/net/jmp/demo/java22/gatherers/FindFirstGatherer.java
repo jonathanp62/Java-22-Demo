@@ -1,7 +1,7 @@
 package net.jmp.demo.java22.gatherers;
 
 /*
- * (#)MapNotNullGatherer.java   0.4.0   08/10/2024
+ * (#)FindFirstGatherer.java    0.4.0   08/10/2024
  *
  * @author   Jonathan Parker
  * @version  0.4.0
@@ -32,31 +32,29 @@ package net.jmp.demo.java22.gatherers;
 
 import java.util.Objects;
 
-import java.util.function.Function;
+import java.util.function.Predicate;
 
 import java.util.stream.Gatherer;
 
 /**
- * This gatherer filters out the nulls and applies a transformation to the remaining elements.
+ * This gatherer filters out items based on a predicate function and returns the first.
  * The optional initializer operation is not present in this gatherer.
  * The optional combiner operation is not present in this gatherer.
  * The optional finisher operation is not present in this gatherer.
  *
  * @param   <T> The type of input elements to the gathering operation
- * @param   <A> The potentially mutable state type of the gathering operation
- * @param   <R> The type of output elements from the gatherer operation
  */
-public final class MapNotNullGatherer<T, R> implements Gatherer<T, T, R> {
-    /** The mapping function. */
-    private final Function<T, R> mapper;
+public final class FindFirstGatherer<T> implements Gatherer<T, T, T> {
+    /** The predicate function. */
+    private final Predicate<T> predicate;
 
     /**
      * The constructor.
      *
-     * @param   mapper  java.util.function.Function&lt;T, R&gt;
+     * @param   predicate   java.util.function.Predicate&lt;T&gt;
      */
-    public MapNotNullGatherer(final Function<T, R> mapper) {
-        this.mapper = Objects.requireNonNull(mapper);
+    public FindFirstGatherer(final Predicate<T> predicate) {
+        this.predicate = Objects.requireNonNull(predicate);
     }
 
     /**
@@ -65,10 +63,10 @@ public final class MapNotNullGatherer<T, R> implements Gatherer<T, T, R> {
      * optionally producing output to the provided
      * downstream type.
      *
-     * @return  java.util.stream.Gatherer.Integrator&lt;T, T, R&gt;
+     * @return  java.util.stream.Gatherer.Integrator&lt;T, T, T&gt;
      */
     @Override
-    public Integrator<T, T, R> integrator() {
+    public Integrator<T, T, T> integrator() {
         /*
          * Greedy integrators consume all their input,
          * and may only relay that the downstream does
@@ -78,11 +76,13 @@ public final class MapNotNullGatherer<T, R> implements Gatherer<T, T, R> {
          */
 
         return Integrator.ofGreedy((_, item, downstream) -> {
-            if (item != null) {
-                downstream.push(this.mapper.apply(item));
-            }
+            if (this.predicate.test(item)) {
+                downstream.push(item);
 
-            return true;    // True if subsequent integration is desired
+                return false;   // No subsequent integration is desired
+            } else {
+                return true;    // True if subsequent integration is desired
+            }
         });
     }
 }
