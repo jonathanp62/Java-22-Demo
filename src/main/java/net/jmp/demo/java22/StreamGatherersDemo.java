@@ -39,6 +39,7 @@ import java.util.List;
 
 import java.util.function.Function;
 
+import java.util.stream.Gatherer;
 import java.util.stream.Gatherers;
 import java.util.stream.Stream;
 
@@ -55,6 +56,7 @@ import org.slf4j.ext.XLogger;
  * as well as composing custom ones.
  *
  * <a href="https://softwaremill.com/stream-gatherers-in-practice-part-1/">Stream Gatherers in practice Part 1</a>
+ * <a href="https://softwaremill.com/stream-gatherers-in-practice-part-2/">Stream Gatherers in practice Part 2</a>
  * <a href="https://github.com/lukaszrola/java-stream-gather-example">java-stream-gather-example</a>
  */
 final class StreamGatherersDemo implements Demo {
@@ -206,6 +208,7 @@ final class StreamGatherersDemo implements Demo {
         this.customMapNotNullGatherer();
         this.customFindFirstGatherer(money);
         this.customFindLastGatherer(money);
+        this.customGatherAndThen();
 
         this.logger.exit();
     }
@@ -296,17 +299,7 @@ final class StreamGatherersDemo implements Demo {
     private void customMapNotNullGatherer() {
         this.logger.entry();
 
-        // Cannot add nulls in List.of()
-
-        final List<Money> money = Arrays.asList(
-                null,
-                new Money(BigDecimal.valueOf(12), Currency.getInstance("PLN")),
-                null,
-                new Money(BigDecimal.valueOf(11), Currency.getInstance("EUR")),
-                null,
-                new Money(BigDecimal.valueOf(15), Currency.getInstance("PLN")),
-                null
-        );
+        final List<Money> money = this.getMoneyWithNulls();
 
         money.stream()
                 .gather(GatherersFactory.mapNotNull(m -> m.multiply(BigDecimal.TWO)))
@@ -351,5 +344,54 @@ final class StreamGatherersDemo implements Demo {
                 .forEach(e -> this.logger.info(e.toString()));
 
         this.logger.exit();
+    }
+
+    /**
+     * Try two gatherers using andThen.
+     *
+     * @since   0.4.0
+     */
+    private void customGatherAndThen() {
+        this.logger.entry();
+
+        final List<Money> money = this.getMoneyWithNulls();
+
+        // Combine two gatherers using andThen()
+
+        final MapNotNullGatherer<Money, Money> mapNotNullGatherer = new MapNotNullGatherer<>(m -> m.multiply(BigDecimal.TWO));
+        final ReduceByGatherer<Money, Currency> reducerGatherer = new ReduceByGatherer<>(Money::currency, Money::add);
+
+        final Gatherer<Money, ?, ? super Money> gatherers = mapNotNullGatherer.andThen(reducerGatherer);
+
+        money.stream()
+                .gather(gatherers)
+                .forEach(e -> this.logger.info(e.toString()));
+
+        this.logger.exit();
+    }
+
+    /**
+     * Return a list of money with nulls interspersed.
+     *
+     * @return  java.util.List&lt;net.jmp.demo.java22.records.Money&gt;
+     */
+    private List<Money> getMoneyWithNulls() {
+        this.logger.entry();
+
+        // Cannot add nulls in List.of()
+
+        final List<Money> money = Arrays.asList(
+                null,
+                new Money(BigDecimal.valueOf(12), Currency.getInstance("PLN")),
+                null,
+                new Money(BigDecimal.valueOf(11), Currency.getInstance("EUR")),
+                null,
+                new Money(BigDecimal.valueOf(15), Currency.getInstance("PLN")),
+                null
+        );
+
+        this.logger.exit(money);
+
+        return money;
     }
 }
