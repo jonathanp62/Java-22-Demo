@@ -192,10 +192,16 @@ final class StreamGatherersDemo implements Demo {
     private void custom() {
         this.logger.entry();
 
-        this.customDistinctBy();
-        this.customReduceByGatherer();
-        this.customMaxByGatherer();
-        this.customMinByGatherer();
+        final List<Money> money = List.of(
+                new Money(BigDecimal.valueOf(12), Currency.getInstance("PLN")),
+                new Money(BigDecimal.valueOf(11), Currency.getInstance("EUR")),
+                new Money(BigDecimal.valueOf(15), Currency.getInstance("PLN"))
+        );
+
+        this.customDistinctBy(money);
+        this.customReduceByGatherer(money);
+        this.customMaxByGatherer(money);
+        this.customMinByGatherer(money);
 
         this.logger.exit();
     }
@@ -203,16 +209,14 @@ final class StreamGatherersDemo implements Demo {
     /**
      * A custom distinct-by gatherer.
      *
-     * @since 0.4.0
+     * @param   money   java.util.List&lt;net.jmp.demo.java22.records.Money&gt;
+     * @since           0.4.0
      */
-    private void customDistinctBy() {
-        this.logger.entry();
+    private void customDistinctBy(final List<Money> money) {
+        this.logger.entry(money);
 
-        final List<Money> money = List.of(
-                new Money(BigDecimal.valueOf(12), Currency.getInstance("PLN")),
-                new Money(BigDecimal.valueOf(11), Currency.getInstance("EUR")),
-                new Money(BigDecimal.valueOf(15), Currency.getInstance("PLN"))
-        );
+        assert money != null;
+        assert !money.isEmpty();
 
         money.stream()
                 .gather(GatherersFactory.distinctBy(Money::currency))
@@ -224,16 +228,14 @@ final class StreamGatherersDemo implements Demo {
     /**
      * A custom reduce-by gatherer.
      *
-     * @since 0.4.0
+     * @param   money   java.util.List&lt;net.jmp.demo.java22.records.Money&gt;
+     * @since           0.4.0
      */
-    private void customReduceByGatherer() {
-        this.logger.entry();
+    private void customReduceByGatherer(final List<Money> money) {
+        this.logger.entry(money);
 
-        final List<Money> money = List.of(
-                new Money(BigDecimal.valueOf(12), Currency.getInstance("PLN")),
-                new Money(BigDecimal.valueOf(11), Currency.getInstance("EUR")),
-                new Money(BigDecimal.valueOf(15), Currency.getInstance("PLN"))
-        );
+        assert money != null;
+        assert !money.isEmpty();
 
         money.stream()
                 .gather(GatherersFactory.reduceBy(Money::currency, Money::add))
@@ -245,16 +247,14 @@ final class StreamGatherersDemo implements Demo {
     /**
      * A custom max-by gatherer.
      *
-     * @since 0.4.0
+     * @param   money   java.util.List&lt;net.jmp.demo.java22.records.Money&gt;
+     * @since           0.4.0
      */
-    private void customMaxByGatherer() {
-        this.logger.entry();
+    private void customMaxByGatherer(final List<Money> money) {
+        this.logger.entry(money);
 
-        final List<Money> money = List.of(
-                new Money(BigDecimal.valueOf(12), Currency.getInstance("PLN")),
-                new Money(BigDecimal.valueOf(11), Currency.getInstance("EUR")),
-                new Money(BigDecimal.valueOf(15), Currency.getInstance("PLN"))
-        );
+        assert money != null;
+        assert !money.isEmpty();
 
         money.stream()
                 .parallel()
@@ -267,16 +267,14 @@ final class StreamGatherersDemo implements Demo {
     /**
      * A custom min-by gatherer.
      *
-     * @since 0.4.0
+     * @param   money   java.util.List&lt;net.jmp.demo.java22.records.Money&gt;
+     * @since           0.4.0
      */
-    private void customMinByGatherer() {
-        this.logger.entry();
+    private void customMinByGatherer(final List<Money> money) {
+        this.logger.entry(money);
 
-        final List<Money> money = List.of(
-                new Money(BigDecimal.valueOf(12), Currency.getInstance("PLN")),
-                new Money(BigDecimal.valueOf(11), Currency.getInstance("EUR")),
-                new Money(BigDecimal.valueOf(15), Currency.getInstance("PLN"))
-        );
+        assert money != null;
+        assert !money.isEmpty();
 
         money.stream()
                 .parallel()
