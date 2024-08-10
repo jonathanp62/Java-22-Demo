@@ -1,14 +1,11 @@
 package net.jmp.demo.java22;
 
 /*
- * (#)Main.java 0.5.0   08/10/2024
- * (#)Main.java 0.3.0   08/07/2024
- * (#)Main.java 0.2.0   08/04/2024
- * (#)Main.java 0.1.0   08/02/2024
+ * (#)AppliedCollectionDemo.java    0.5.0   08/10/2024
  *
  * @author   Jonathan Parker
  * @version  0.5.0
- * @since    0.1.0
+ * @since    0.5.0
  *
  * MIT License
  *
@@ -33,73 +30,87 @@ package net.jmp.demo.java22;
  * SOFTWARE.
  */
 
-import java.util.List;
-import java.util.Objects;
+import java.util.function.Function;
+
+import net.jmp.demo.java22.util.AppliedQueue;
 
 import org.slf4j.LoggerFactory;
 
 import org.slf4j.ext.XLogger;
 
-/**
- * The main class.
- */
-final class Main implements Runnable {
-    /** The logger. */
+final class AppliedCollectionDemo implements Demo {
+    /**
+     * The logger.
+     */
     private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
 
-    /** The command line arguments. */
-    private final String[] arguments;
-
     /**
-     * A constructor that takes the
-     * command line arguments from
-     * the bootstrap class.
+     * The default constructor.
      */
-    Main(final String[] args) {
+    AppliedCollectionDemo() {
         super();
-
-        this.arguments = Objects.requireNonNull(args);
     }
 
     /**
-     * The run method.
+     * The demo method.
      */
     @Override
-    public void run() {
+    public void demo() {
         this.logger.entry();
 
-        if (this.logger.isInfoEnabled() || this.logger.isWarnEnabled() || this.logger.isErrorEnabled()) {
-            final String name = Name.NAME_STRING;
-            final String version = Version.VERSION_STRING;
-            final String greeting = STR."\{name} \{version}";
-
-            System.out.println(greeting);
-        } else {
-            this.logger.debug("{} {}", Name.NAME_STRING, Version.VERSION_STRING);
-        }
-
-        this.runDemos();
+        this.appliedQueue();
 
         this.logger.exit();
     }
 
     /**
-     * Method that runs the demo classes.
+     * Applied queue.
      */
-    private void runDemos() {
+    private void appliedQueue() {
         this.logger.entry();
 
-        List<Demo> demos = List.of(
-                new KeyedFunctionExecutorDemo(),
-                new AppliedCollectionDemo(),
-                new ScopedValueDemo(),
-                new StreamGatherersDemo(),
-                new StringTemplatesDemo(),
-                new BeforeSuperDemo(),
-                new UnnamedVariablesDemo()
-        );
+        final AppliedQueue<String> stringQueue = new AppliedQueue<>();
 
-        demos.forEach(Demo::demo);
+        stringQueue.offer("one");
+        stringQueue.offer("two");
+        stringQueue.offer("three");
+        stringQueue.offer("four");
+        stringQueue.offer("five");
+        stringQueue.offer("six");
+        stringQueue.offer("seven");
+        stringQueue.offer("eight");
+        stringQueue.offer("nine");
+        stringQueue.offer("ten");
+
+        stringQueue.start();
+
+        stringQueue.apply(e -> {
+            this.logger.info(STR."QE: \{e.toUpperCase()})");
+
+            return null;
+        });
+
+        stringQueue.stop();
+
+        final AppliedQueue<Integer> integerQueue = new AppliedQueue<>();
+
+        final Function<Integer, Integer> timesTwo = e -> {
+            final int i = e * 2;
+
+            this.logger.info(STR."QE: \{i}");
+
+            return i;
+        };
+
+        integerQueue.offer(1);
+        integerQueue.offer(2);
+        integerQueue.offer(3);
+        integerQueue.offer(4);
+        integerQueue.offer(5);
+
+        integerQueue.start();
+        integerQueue.apply(timesTwo);
+        integerQueue.stop();
 
         this.logger.exit();
     }

@@ -30,11 +30,16 @@ package net.jmp.demo.java22.util;
  * SOFTWARE.
  */
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Queue;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.Future;
 
 import java.util.function.Function;
+
+import javax.annotation.Nonnull;
 
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +50,7 @@ import org.slf4j.ext.XLogger;
  *
  * @param   <T> The type of element
  */
-public final class AppliedQueue<T> extends AbstractAppliedCollection<T> {
+public final class AppliedQueue<T> extends AbstractAppliedCollection<T> implements Queue<T> {
     /** The logger. */
     private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
 
@@ -61,8 +66,117 @@ public final class AppliedQueue<T> extends AbstractAppliedCollection<T> {
         this.queue = new ConcurrentLinkedQueue<>();
     }
 
+    /**
+     * Apply the function to all elements on the queue
+     *
+     * @param   function    java.util.function.Function&lt;T, ?&gt;
+     */
     @Override
-    public void apply(final Function<T, Void> function) {
+    public void apply(final Function<T, ?> function) {
+        this.logger.entry(function);
 
+        while (this.queue.peek() != null) {
+            final T element = this.queue.poll();
+            final Future<?> future = super.executor.submit(() -> function.apply(element));
+
+            super.futures.add(future);
+        }
+
+        this.logger.exit();
+    }
+
+    // Queue and Collection override methods
+
+    @Override
+    public int size() {
+        return this.queue.size();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return this.queue.isEmpty();
+    }
+
+    @Override
+    public boolean contains(Object o) {
+        return this.queue.contains(o);
+    }
+
+    @Override
+    @Nonnull
+    public Iterator<T> iterator() {
+        return this.queue.iterator();
+    }
+
+    @Override
+    @Nonnull
+    public Object[] toArray() {
+        return this.queue.toArray();
+    }
+
+    @Override
+    @Nonnull
+    public <T1> T1[] toArray(@Nonnull T1[] a) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean add(T t) {
+        return this.queue.add(t);
+    }
+
+    @Override
+    public boolean remove(Object o) {
+        return this.queue.remove(o);
+    }
+
+    @Override
+    public boolean containsAll(@Nonnull Collection<?> c) {
+        return this.queue.containsAll(c);
+    }
+
+    @Override
+    public boolean addAll(@Nonnull Collection<? extends T> c) {
+        return this.queue.addAll(c);
+    }
+
+    @Override
+    public boolean removeAll(@Nonnull Collection<?> c) {
+        return this.queue.removeAll(c);
+    }
+
+    @Override
+    public boolean retainAll(@Nonnull Collection<?> c) {
+        return this.queue.retainAll(c);
+    }
+
+    @Override
+    public void clear() {
+        this.queue.clear();
+    }
+
+    @Override
+    public boolean offer(T t) {
+        return this.queue.offer(t);
+    }
+
+    @Override
+    public T remove() {
+        return this.queue.remove();
+    }
+
+    @Override
+    public T poll() {
+        return this.queue.poll();
+    }
+
+    @Override
+    public T element() {
+        return this.queue.element();
+    }
+
+    @Override
+    public T peek() {
+        return this.queue.peek();
     }
 }

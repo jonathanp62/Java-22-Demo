@@ -56,10 +56,10 @@ public abstract class AbstractAppliedCollection<T> {
     private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
 
     /** The executor service. */
-    private final ExecutorService executor;
+    protected final ExecutorService executor;
 
     /** A list of runnable futures. */
-    private final List<Future<Void>> futures = new ArrayList<>();
+    protected final List<Future<?>> futures = new ArrayList<>();
 
     /** True once the start method has been invoked. */
     private boolean isStarted;
@@ -90,7 +90,7 @@ public abstract class AbstractAppliedCollection<T> {
     /**
      * Start the executor.
      */
-    protected void start() {
+    public void start() {
         this.logger.entry();
 
         this.isStarted = true;
@@ -101,7 +101,7 @@ public abstract class AbstractAppliedCollection<T> {
     /**
      * Stop the executor.
      */
-    protected void stop() {
+    public void stop() {
         this.logger.entry();
 
         this.futures.forEach(future -> {
@@ -130,7 +130,7 @@ public abstract class AbstractAppliedCollection<T> {
     /**
      * Apply the function to each element in the collection.
      *
-     * @param   function    java.util.function.Function&lt;T, java.lang.Void&gt;
+     * @param   function    java.util.function.Function&lt;T, ?&gt;
      */
-    protected abstract void apply(final Function<T, Void> function);
+    protected abstract void apply(final Function<T, ?> function);
 }
