@@ -111,10 +111,21 @@ public final class GatherersFactory {
      * A find first gatherer.
      *
      * @param   predicate   java.util.function.Predicate&lt;T&gt;
-     * @return          net.jmp.demo.java22.gatherers.FindFirstGatherer&lt;T&gt;
-     * @param   <T>     The type of input elements to the gathering operation
+     * @return              net.jmp.demo.java22.gatherers.FindFirstGatherer&lt;T&gt;
+     * @param   <T>         The type of input elements to the gathering operation
      */
     public static <T> FindFirstGatherer<T> findFirst(final Predicate<T> predicate) {
         return new FindFirstGatherer<>(predicate);
+    }
+
+    /**
+     * A find last gatherer.
+     *
+     * @param   predicate   java.util.function.Predicate&lt;T&gt;
+     * @return              net.jmp.demo.java22.gatherers.FindFirstGatherer&lt;T&gt;
+     * @param   <T>         The type of input elements to the gathering operation
+     */
+    public static <T> FindLastGatherer<T> findLast(final Predicate<T> predicate) {
+        return new FindLastGatherer<>(predicate);
     }
 }

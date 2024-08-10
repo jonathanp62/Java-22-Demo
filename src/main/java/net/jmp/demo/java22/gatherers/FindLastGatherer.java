@@ -30,11 +30,11 @@ package net.jmp.demo.java22.gatherers;
  * SOFTWARE.
  */
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
+import java.util.function.BiConsumer;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import java.util.stream.Gatherer;
 
@@ -43,9 +43,8 @@ import java.util.stream.Gatherer;
  * The optional combiner operation is not present in this gatherer.
  *
  * @param   <T> The type of input elements to the gathering operation
- * @param   <A> The potentially mutable state type of the gathering operation
  */
-public final class FindLastGatherer<T, A> {
+public final class FindLastGatherer<T>  implements Gatherer<T, List<T>, T> {
     /** The predicate function. */
     private final Predicate<T> predicate;
 
@@ -56,5 +55,61 @@ public final class FindLastGatherer<T, A> {
      */
     public FindLastGatherer(final Predicate<T> predicate) {
         this.predicate = Objects.requireNonNull(predicate);
+    }
+
+    /**
+     * A function that produces an instance of the intermediate
+     * state used for this gathering operation.
+     *
+     * @return  java.util.function.Supplier&lt;java.util.List&lt;A&gt;&gt;
+     */
+    @Override
+    public Supplier<List<T>> initializer() {
+        return ArrayList::new;
+    }
+
+    /**
+     * A function which integrates provided elements,
+     * potentially using the provided intermediate state,
+     * optionally producing output to the provided
+     * downstream type.
+     *
+     * @return  java.util.stream.Gatherer.Integrator&lt;java.util.List&lt;T&gt;, T, T&gt;
+     */
+    @Override
+    public Integrator<List<T>, T, T> integrator() {
+        /*
+         * Greedy integrators consume all their input,
+         * and may only relay that the downstream does
+         * not want more elements. The greedy lambda is
+         * the state (A), the element type (T), and the
+         * result type (R).
+         */
+
+        return Integrator.ofGreedy((state, item, _) -> {
+            if (this.predicate.test(item)) {
+                state.add(item);
+            }
+
+            return true;    // True if subsequent integration is desired
+        });
+    }
+
+    /**
+     * A function which accepts the final intermediate state and a
+     * downstream object, allowing to perform a final action at the
+     * end of input elements. The lambda is the state (A) and the
+     * result type (R).
+     *
+     * @return  java.util.function.BiConsumer&lt;java.util.List&lt;T&gt;, java.util.stream.Gatherer.Downstream&gt;
+     */
+    @Override
+    public BiConsumer<List<T>, Downstream<? super T>> finisher () {
+        return (state, downstream) -> {
+            final int count = state.size();
+            final T lastItem = state.get(count - 1);
+
+            downstream.push(lastItem);
+        };
     }
 }

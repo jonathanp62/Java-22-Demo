@@ -205,6 +205,7 @@ final class StreamGatherersDemo implements Demo {
         this.customMinByGatherer(money);
         this.customMapNotNullGatherer();
         this.customFindFirstGatherer(money);
+        this.customFindLastGatherer(money);
 
         this.logger.exit();
     }
@@ -328,6 +329,25 @@ final class StreamGatherersDemo implements Demo {
 
         money.stream()
                 .gather(GatherersFactory.findFirst(m -> m.currency().equals(Currency.getInstance("PLN"))))
+                .forEach(e -> this.logger.info(e.toString()));
+
+        this.logger.exit();
+    }
+
+    /**
+     * A custom find-last gatherer.
+     *
+     * @param   money   java.util.List&lt;net.jmp.demo.java22.records.Money&gt;
+     * @since           0.4.0
+     */
+    private void customFindLastGatherer(final List<Money> money) {
+        this.logger.entry(money);
+
+        assert money != null;
+        assert !money.isEmpty();
+
+        money.stream()
+                .gather(GatherersFactory.findLast(m -> m.currency().equals(Currency.getInstance("PLN"))))
                 .forEach(e -> this.logger.info(e.toString()));
 
         this.logger.exit();
