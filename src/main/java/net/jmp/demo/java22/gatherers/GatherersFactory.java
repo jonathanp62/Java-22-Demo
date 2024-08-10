@@ -86,4 +86,16 @@ public class GatherersFactory {
     public static <T, C extends Comparable<C>> MinByGatherer<T, C> minBy(final Function<T, C> selector) {
         return new MinByGatherer<>(selector);
     }
+
+    /**
+     * A map not null gatherer.
+     *
+     * @param   mapper  java.util.function.Function&lt;T, R&gt;
+     * @return          net.jmp.demo.java22.gatherers.MapNotNullGatherer&lt;T, R&gt;
+     * @param   <T>     The type of input elements to the gathering operation
+     * @param   <R>     The type of output elements from the gatherer operation
+     */
+    public static <T, R> MapNotNullGatherer<T, R> mapNotNull(Function<T, R> mapper) {
+        return new MapNotNullGatherer<>(mapper);
+    }
 }

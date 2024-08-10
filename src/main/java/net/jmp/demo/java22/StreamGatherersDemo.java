@@ -33,6 +33,7 @@ package net.jmp.demo.java22;
 
 import java.math.BigDecimal;
 
+import java.util.Arrays;
 import java.util.Currency;
 import java.util.List;
 
@@ -202,6 +203,7 @@ final class StreamGatherersDemo implements Demo {
         this.customReduceByGatherer(money);
         this.customMaxByGatherer(money);
         this.customMinByGatherer(money);
+        this.customMapNotNullGatherer();
 
         this.logger.exit();
     }
@@ -279,6 +281,33 @@ final class StreamGatherersDemo implements Demo {
         money.stream()
                 .parallel()
                 .gather(GatherersFactory.minBy(Money::amount))
+                .forEach(e -> this.logger.info(e.toString()));
+
+        this.logger.exit();
+    }
+
+    /**
+     * A custom map not-null gatherer.
+     *
+     * @since   0.4.0
+     */
+    private void customMapNotNullGatherer() {
+        this.logger.entry();
+
+        // Cannot add nulls in List.of()
+
+        final List<Money> money = Arrays.asList(
+                null,
+                new Money(BigDecimal.valueOf(12), Currency.getInstance("PLN")),
+                null,
+                new Money(BigDecimal.valueOf(11), Currency.getInstance("EUR")),
+                null,
+                new Money(BigDecimal.valueOf(15), Currency.getInstance("PLN")),
+                null
+        );
+
+        money.stream()
+                .gather(GatherersFactory.mapNotNull(m -> m.multiply(BigDecimal.TWO)))
                 .forEach(e -> this.logger.info(e.toString()));
 
         this.logger.exit();
