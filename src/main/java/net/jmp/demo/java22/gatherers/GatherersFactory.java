@@ -32,11 +32,19 @@ package net.jmp.demo.java22.gatherers;
 
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * A factory class for gatherers.
  */
-public class GatherersFactory {
+public final class GatherersFactory {
+    /**
+     * The default constructor.
+     */
+    private GatherersFactory() {
+        super();
+    }
+
     /**
      * A distinct-by gatherer.
      *
@@ -85,5 +93,39 @@ public class GatherersFactory {
      */
     public static <T, C extends Comparable<C>> MinByGatherer<T, C> minBy(final Function<T, C> selector) {
         return new MinByGatherer<>(selector);
+    }
+
+    /**
+     * A map not null gatherer.
+     *
+     * @param   mapper  java.util.function.Function&lt;T, R&gt;
+     * @return          net.jmp.demo.java22.gatherers.MapNotNullGatherer&lt;T, R&gt;
+     * @param   <T>     The type of input elements to the gathering operation
+     * @param   <R>     The type of output elements from the gatherer operation
+     */
+    public static <T, R> MapNotNullGatherer<T, R> mapNotNull(final Function<T, R> mapper) {
+        return new MapNotNullGatherer<>(mapper);
+    }
+
+    /**
+     * A find first gatherer.
+     *
+     * @param   predicate   java.util.function.Predicate&lt;T&gt;
+     * @return              net.jmp.demo.java22.gatherers.FindFirstGatherer&lt;T&gt;
+     * @param   <T>         The type of input elements to the gathering operation
+     */
+    public static <T> FindFirstGatherer<T> findFirst(final Predicate<T> predicate) {
+        return new FindFirstGatherer<>(predicate);
+    }
+
+    /**
+     * A find last gatherer.
+     *
+     * @param   predicate   java.util.function.Predicate&lt;T&gt;
+     * @return              net.jmp.demo.java22.gatherers.FindFirstGatherer&lt;T&gt;
+     * @param   <T>         The type of input elements to the gathering operation
+     */
+    public static <T> FindLastGatherer<T> findLast(final Predicate<T> predicate) {
+        return new FindLastGatherer<>(predicate);
     }
 }

@@ -33,11 +33,13 @@ package net.jmp.demo.java22;
 
 import java.math.BigDecimal;
 
+import java.util.Arrays;
 import java.util.Currency;
 import java.util.List;
 
 import java.util.function.Function;
 
+import java.util.stream.Gatherer;
 import java.util.stream.Gatherers;
 import java.util.stream.Stream;
 
@@ -54,6 +56,7 @@ import org.slf4j.ext.XLogger;
  * as well as composing custom ones.
  *
  * <a href="https://softwaremill.com/stream-gatherers-in-practice-part-1/">Stream Gatherers in practice Part 1</a>
+ * <a href="https://softwaremill.com/stream-gatherers-in-practice-part-2/">Stream Gatherers in practice Part 2</a>
  * <a href="https://github.com/lukaszrola/java-stream-gather-example">java-stream-gather-example</a>
  */
 final class StreamGatherersDemo implements Demo {
@@ -192,10 +195,20 @@ final class StreamGatherersDemo implements Demo {
     private void custom() {
         this.logger.entry();
 
-        this.customDistinctBy();
-        this.customReduceByGatherer();
-        this.customMaxByGatherer();
-        this.customMinByGatherer();
+        final List<Money> money = List.of(
+                new Money(BigDecimal.valueOf(12), Currency.getInstance("PLN")),
+                new Money(BigDecimal.valueOf(11), Currency.getInstance("EUR")),
+                new Money(BigDecimal.valueOf(15), Currency.getInstance("PLN"))
+        );
+
+        this.customDistinctBy(money);
+        this.customReduceByGatherer(money);
+        this.customMaxByGatherer(money);
+        this.customMinByGatherer(money);
+        this.customMapNotNullGatherer();
+        this.customFindFirstGatherer(money);
+        this.customFindLastGatherer(money);
+        this.customGatherAndThen();
 
         this.logger.exit();
     }
@@ -203,16 +216,14 @@ final class StreamGatherersDemo implements Demo {
     /**
      * A custom distinct-by gatherer.
      *
-     * @since 0.4.0
+     * @param   money   java.util.List&lt;net.jmp.demo.java22.records.Money&gt;
+     * @since           0.4.0
      */
-    private void customDistinctBy() {
-        this.logger.entry();
+    private void customDistinctBy(final List<Money> money) {
+        this.logger.entry(money);
 
-        final List<Money> money = List.of(
-                new Money(BigDecimal.valueOf(12), Currency.getInstance("PLN")),
-                new Money(BigDecimal.valueOf(11), Currency.getInstance("EUR")),
-                new Money(BigDecimal.valueOf(15), Currency.getInstance("PLN"))
-        );
+        assert money != null;
+        assert !money.isEmpty();
 
         money.stream()
                 .gather(GatherersFactory.distinctBy(Money::currency))
@@ -224,16 +235,14 @@ final class StreamGatherersDemo implements Demo {
     /**
      * A custom reduce-by gatherer.
      *
-     * @since 0.4.0
+     * @param   money   java.util.List&lt;net.jmp.demo.java22.records.Money&gt;
+     * @since           0.4.0
      */
-    private void customReduceByGatherer() {
-        this.logger.entry();
+    private void customReduceByGatherer(final List<Money> money) {
+        this.logger.entry(money);
 
-        final List<Money> money = List.of(
-                new Money(BigDecimal.valueOf(12), Currency.getInstance("PLN")),
-                new Money(BigDecimal.valueOf(11), Currency.getInstance("EUR")),
-                new Money(BigDecimal.valueOf(15), Currency.getInstance("PLN"))
-        );
+        assert money != null;
+        assert !money.isEmpty();
 
         money.stream()
                 .gather(GatherersFactory.reduceBy(Money::currency, Money::add))
@@ -245,16 +254,14 @@ final class StreamGatherersDemo implements Demo {
     /**
      * A custom max-by gatherer.
      *
-     * @since 0.4.0
+     * @param   money   java.util.List&lt;net.jmp.demo.java22.records.Money&gt;
+     * @since           0.4.0
      */
-    private void customMaxByGatherer() {
-        this.logger.entry();
+    private void customMaxByGatherer(final List<Money> money) {
+        this.logger.entry(money);
 
-        final List<Money> money = List.of(
-                new Money(BigDecimal.valueOf(12), Currency.getInstance("PLN")),
-                new Money(BigDecimal.valueOf(11), Currency.getInstance("EUR")),
-                new Money(BigDecimal.valueOf(15), Currency.getInstance("PLN"))
-        );
+        assert money != null;
+        assert !money.isEmpty();
 
         money.stream()
                 .parallel()
@@ -267,16 +274,14 @@ final class StreamGatherersDemo implements Demo {
     /**
      * A custom min-by gatherer.
      *
-     * @since 0.4.0
+     * @param   money   java.util.List&lt;net.jmp.demo.java22.records.Money&gt;
+     * @since           0.4.0
      */
-    private void customMinByGatherer() {
-        this.logger.entry();
+    private void customMinByGatherer(final List<Money> money) {
+        this.logger.entry(money);
 
-        final List<Money> money = List.of(
-                new Money(BigDecimal.valueOf(12), Currency.getInstance("PLN")),
-                new Money(BigDecimal.valueOf(11), Currency.getInstance("EUR")),
-                new Money(BigDecimal.valueOf(15), Currency.getInstance("PLN"))
-        );
+        assert money != null;
+        assert !money.isEmpty();
 
         money.stream()
                 .parallel()
@@ -284,5 +289,109 @@ final class StreamGatherersDemo implements Demo {
                 .forEach(e -> this.logger.info(e.toString()));
 
         this.logger.exit();
+    }
+
+    /**
+     * A custom map not-null gatherer.
+     *
+     * @since   0.4.0
+     */
+    private void customMapNotNullGatherer() {
+        this.logger.entry();
+
+        final List<Money> money = this.getMoneyWithNulls();
+
+        money.stream()
+                .gather(GatherersFactory.mapNotNull(m -> m.multiply(BigDecimal.TWO)))
+                .forEach(e -> this.logger.info(e.toString()));
+
+        this.logger.exit();
+    }
+
+    /**
+     * A custom find-first gatherer.
+     *
+     * @param   money   java.util.List&lt;net.jmp.demo.java22.records.Money&gt;
+     * @since           0.4.0
+     */
+    private void customFindFirstGatherer(final List<Money> money) {
+        this.logger.entry(money);
+
+        assert money != null;
+        assert !money.isEmpty();
+
+        money.stream()
+                .gather(GatherersFactory.findFirst(m -> m.currency().equals(Currency.getInstance("PLN"))))
+                .forEach(e -> this.logger.info(e.toString()));
+
+        this.logger.exit();
+    }
+
+    /**
+     * A custom find-last gatherer.
+     *
+     * @param   money   java.util.List&lt;net.jmp.demo.java22.records.Money&gt;
+     * @since           0.4.0
+     */
+    private void customFindLastGatherer(final List<Money> money) {
+        this.logger.entry(money);
+
+        assert money != null;
+        assert !money.isEmpty();
+
+        money.stream()
+                .gather(GatherersFactory.findLast(m -> m.currency().equals(Currency.getInstance("PLN"))))
+                .forEach(e -> this.logger.info(e.toString()));
+
+        this.logger.exit();
+    }
+
+    /**
+     * Try two gatherers using andThen.
+     *
+     * @since   0.4.0
+     */
+    private void customGatherAndThen() {
+        this.logger.entry();
+
+        final List<Money> money = this.getMoneyWithNulls();
+
+        // Combine two gatherers using andThen()
+
+        final MapNotNullGatherer<Money, Money> mapNotNullGatherer = new MapNotNullGatherer<>(m -> m.multiply(BigDecimal.TWO));
+        final ReduceByGatherer<Money, Currency> reducerGatherer = new ReduceByGatherer<>(Money::currency, Money::add);
+
+        final Gatherer<Money, ?, ? super Money> gatherers = mapNotNullGatherer.andThen(reducerGatherer);
+
+        money.stream()
+                .gather(gatherers)
+                .forEach(e -> this.logger.info(e.toString()));
+
+        this.logger.exit();
+    }
+
+    /**
+     * Return a list of money with nulls interspersed.
+     *
+     * @return  java.util.List&lt;net.jmp.demo.java22.records.Money&gt;
+     */
+    private List<Money> getMoneyWithNulls() {
+        this.logger.entry();
+
+        // Cannot add nulls in List.of()
+
+        final List<Money> money = Arrays.asList(
+                null,
+                new Money(BigDecimal.valueOf(12), Currency.getInstance("PLN")),
+                null,
+                new Money(BigDecimal.valueOf(11), Currency.getInstance("EUR")),
+                null,
+                new Money(BigDecimal.valueOf(15), Currency.getInstance("PLN")),
+                null
+        );
+
+        this.logger.exit(money);
+
+        return money;
     }
 }
