@@ -1,10 +1,11 @@
 package net.jmp.demo.java22.util;
 
 /*
+ * (#)AbstractAppliedCollection.java    0.5.0   08/10/2024
  * (#)AbstractAppliedCollection.java    0.4.0   08/09/2024
  *
  * @author   Jonathan Parker
- * @version  0.4.0
+ * @version  0.5.0
  * @since    0.4.0
  *
  * MIT License
@@ -38,7 +39,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import java.util.function.Function;
+import java.util.function.Consumer;
 
 import org.slf4j.LoggerFactory;
 
@@ -128,9 +129,9 @@ public abstract class AbstractAppliedCollection<T> {
     }
 
     /**
-     * Apply the function to each element in the collection.
+     * Apply the consumer to each element in the collection.
      *
-     * @param   function    java.util.function.Function&lt;T, ?&gt;
+     * @param   consumer    java.util.function.Consumer&lt;T&gt;
      */
-    protected abstract void apply(final Function<T, ?> function);
+    protected abstract void apply(final Consumer<T> consumer);
 }

@@ -30,7 +30,7 @@ package net.jmp.demo.java22;
  * SOFTWARE.
  */
 
-import java.util.function.Function;
+import java.util.function.Consumer;
 
 import net.jmp.demo.java22.util.AppliedQueue;
 
@@ -84,22 +84,19 @@ final class AppliedCollectionDemo implements Demo {
 
         stringQueue.start();
 
-        stringQueue.apply(e -> {
+        stringQueue.peekAndApply(e -> {
             this.logger.info(STR."QE: \{e.toUpperCase()})");
-
-            return null;
         });
 
         stringQueue.stop();
 
+        assert !stringQueue.isEmpty();
+        assert stringQueue.size() == 10;
+
         final AppliedQueue<Integer> integerQueue = new AppliedQueue<>();
 
-        final Function<Integer, Integer> timesTwo = e -> {
-            final int i = e * 2;
-
-            this.logger.info(STR."QE: \{i}");
-
-            return i;
+        final Consumer<Integer> timesTwo = e -> {
+            this.logger.info(STR."QE: \{e * 2}");
         };
 
         integerQueue.offer(1);
@@ -109,8 +106,10 @@ final class AppliedCollectionDemo implements Demo {
         integerQueue.offer(5);
 
         integerQueue.start();
-        integerQueue.apply(timesTwo);
+        integerQueue.pollAndApply(timesTwo);
         integerQueue.stop();
+
+        assert integerQueue.isEmpty();
 
         this.logger.exit();
     }

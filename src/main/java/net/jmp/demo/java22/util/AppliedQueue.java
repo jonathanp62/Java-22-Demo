@@ -1,10 +1,11 @@
 package net.jmp.demo.java22.util;
 
 /*
+ * (#)AppliedQueue.java 0.5.0   08/10/2024
  * (#)AppliedQueue.java 0.4.0   08/09/2024
  *
  * @author   Jonathan Parker
- * @version  0.4.0
+ * @version  0.5.0
  * @since    0.4.0
  *
  * MIT License
@@ -37,7 +38,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Future;
 
-import java.util.function.Function;
+import java.util.function.Consumer;
 
 import javax.annotation.Nonnull;
 
@@ -67,17 +68,49 @@ public final class AppliedQueue<T> extends AbstractAppliedCollection<T> implemen
     }
 
     /**
-     * Apply the function to all elements on the queue
+     * Apply the consumer to each element in the collection.
      *
-     * @param   function    java.util.function.Function&lt;T, ?&gt;
+     * @param   consumer    java.util.function.Consumer&lt;T&gt;
      */
     @Override
-    public void apply(final Function<T, ?> function) {
-        this.logger.entry(function);
+    public void apply(final Consumer<T> consumer) {
+        this.logger.entry(consumer);
+
+        this.queue.forEach(e -> {
+            final Future<?> future = super.executor.submit(() -> consumer.accept(e));
+
+            super.futures.add(future);
+        });
+
+        this.logger.exit();
+    }
+
+    /**
+     * Apply the consumer to all elements on the queue
+     * while leaving the elements in place.
+     *
+     * @param   consumer    java.util.function.Consumer&lt;T&gt;
+     */
+    public void peekAndApply(final Consumer<T> consumer) {
+        this.logger.entry(consumer);
+
+        this.apply(consumer);
+
+        this.logger.exit();
+    }
+
+    /**
+     * Apply the consumer to all elements on the queue
+     * and remove each one as it is processed.
+     *
+     * @param   consumer    java.util.function.Consumer&lt;T&gt;
+     */
+    public void pollAndApply(final Consumer<T> consumer) {
+        this.logger.entry(consumer);
 
         while (this.queue.peek() != null) {
             final T element = this.queue.poll();
-            final Future<?> future = super.executor.submit(() -> function.apply(element));
+            final Future<?> future = super.executor.submit(() -> consumer.accept(element));
 
             super.futures.add(future);
         }
