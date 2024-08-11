@@ -132,10 +132,10 @@ tasks.withType(JavaExec).configureEach {
 }
 
 /*
- * Execute with - gradle exec... instead of gradle run
+ * Execute with - gradle execute instead of gradle run
  */
 
-tasks.register('execProgram', JavaExec) {
+tasks.register('execute', JavaExec) {
     allJvmArgs = [useAssertions, logConfigFile] as List<String>
     classpath = sourceSets.main.runtimeClasspath
     description = execDescription
