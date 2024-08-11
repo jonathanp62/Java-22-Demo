@@ -30,7 +30,9 @@ package net.jmp.demo.java22;
  * SOFTWARE.
  */
 
-import java.util.function.Consumer;
+import java.util.List;
+
+import java.util.function.Function;
 
 import net.jmp.demo.java22.util.AppliedQueue;
 
@@ -38,6 +40,9 @@ import org.slf4j.LoggerFactory;
 
 import org.slf4j.ext.XLogger;
 
+/**
+ * A demonstration class for applied collections.
+ */
 final class AppliedCollectionDemo implements Demo {
     /**
      * The logger.
@@ -58,55 +63,82 @@ final class AppliedCollectionDemo implements Demo {
     public void demo() {
         this.logger.entry();
 
-        this.appliedQueue();
+        this.appliedQueues();
 
         this.logger.exit();
     }
 
     /**
-     * Applied queue.
+     * Applied queues.
      */
-    private void appliedQueue() {
+    private void appliedQueues() {
+        this.logger.entry();
+
+        this.appliedStringQueue();
+        this.appliedIntegerQueue();
+
+        this.logger.exit();
+    }
+
+    /**
+     * An applied string queue.
+     */
+    private void appliedStringQueue() {
         this.logger.entry();
 
         final AppliedQueue<String> stringQueue = new AppliedQueue<>();
 
-        stringQueue.offer("one");
-        stringQueue.offer("two");
-        stringQueue.offer("three");
-        stringQueue.offer("four");
-        stringQueue.offer("five");
-        stringQueue.offer("six");
-        stringQueue.offer("seven");
-        stringQueue.offer("eight");
-        stringQueue.offer("nine");
-        stringQueue.offer("ten");
+        final Function<String, String> capitalizer = string -> {
+            final String firstLetter = string.substring(0, 1).toUpperCase();
+
+            return firstLetter + string.substring(1);
+        };
+
+        final List<String> words = List.of("one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten");
+
+        words.forEach(word -> {
+            if (!stringQueue.offerAndApply(word, capitalizer)) {
+                this.logger.warn("Failed to offer word: {}", word);
+            }
+        });
 
         stringQueue.start();
 
-        stringQueue.peekAndApply(e -> {
-            this.logger.info(STR."QE: \{e.toUpperCase()})");
-        });
+        while (!stringQueue.isEmpty()) {
+            final String word = stringQueue.pollAndApply(e -> {
+                this.logger.info(STR."QE: \{e.toUpperCase()})");
+            });
+
+            this.logger.info("The polled word: {}", word);
+        }
 
         stringQueue.stop();
 
-        assert !stringQueue.isEmpty();
-        assert stringQueue.size() == 10;
+        assert stringQueue.isEmpty();
+
+        this.logger.exit();
+    }
+
+    /**
+     * An applied integer queue.
+     */
+    private void appliedIntegerQueue() {
+        this.logger.entry();
 
         final AppliedQueue<Integer> integerQueue = new AppliedQueue<>();
 
-        final Consumer<Integer> timesTwo = e -> {
-            this.logger.info(STR."QE: \{e * 2}");
-        };
-
-        integerQueue.offer(1);
-        integerQueue.offer(2);
-        integerQueue.offer(3);
-        integerQueue.offer(4);
-        integerQueue.offer(5);
+        var _ = integerQueue.addAndApply(1, i -> i * 10);
+        var _ = integerQueue.addAndApply(2, i -> i * 11);
+        var _ = integerQueue.addAndApply(3, i -> i * 12);
+        var _ = integerQueue.addAndApply(4, i -> i * 13);
+        var _ = integerQueue.addAndApply(5, i -> i * 14);
 
         integerQueue.start();
-        integerQueue.pollAndApply(timesTwo);
+
+        while (integerQueue.peekAndApply(e -> this.logger.info("Peeked: {}", e)) != null) {
+            final int _ = integerQueue.removeAndApply(e -> this.logger.info("Removed: {}", e));
+        }
+
         integerQueue.stop();
 
         assert integerQueue.isEmpty();

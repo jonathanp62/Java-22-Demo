@@ -40,6 +40,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Future;
 
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import javax.annotation.Nonnull;
 
@@ -53,6 +54,9 @@ import org.slf4j.ext.XLogger;
  * @param   <T> The type of element
  */
 public final class AppliedQueue<T> extends BaseAppliedCollection<T> implements Queue<T> {
+    /** Applied queue not started message text. */
+    private static final String NOT_STARTED = "AppliedQueue has not been started";
+
     /** The logger. */
     private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
 
@@ -69,6 +73,42 @@ public final class AppliedQueue<T> extends BaseAppliedCollection<T> implements Q
     }
 
     /**
+     * Inserts the element into the queue after applying the mapper function.
+     *
+     * @param   t       T
+     * @param   mapper  java.util.function.Function&lt;T, T&gt;
+     * @return          boolean
+     */
+    public boolean offerAndApply(final T t, final Function<? super T, ? extends T> mapper) {
+        this.logger.entry(t, mapper);
+
+        final T mappedValue = mapper.apply(t);
+        final boolean result = this.queue.offer(mappedValue);
+
+        this.logger.exit(result);
+
+        return result;
+    }
+
+    /**
+     * Inserts the element into the queue after applying the mapper function.
+     *
+     * @param   t       T
+     * @param   mapper  java.util.function.Function&lt;T, T&gt;
+     * @return          boolean
+     */
+    public boolean addAndApply(final T t, final Function<? super T, ? extends T> mapper) {
+        this.logger.entry(t, mapper);
+
+        final T mappedValue = mapper.apply(t);
+        final boolean result = this.queue.add(mappedValue);
+
+        this.logger.exit(result);
+
+        return result;
+    }
+
+    /**
      * Retrieves, but does not remove, the head of this queue. This method differs
      * from peekAndApply only in that it throws an exception if this queue is empty.
      * Apply the consumer to the retrieved element.
@@ -80,7 +120,7 @@ public final class AppliedQueue<T> extends BaseAppliedCollection<T> implements Q
         this.logger.entry(consumer);
 
         if (super.isStarted()) {
-            throw new IllegalStateException("AppliedQueue has not been started");
+            throw new IllegalStateException(NOT_STARTED);
         }
 
         if (this.queue.isEmpty()) {
@@ -109,7 +149,7 @@ public final class AppliedQueue<T> extends BaseAppliedCollection<T> implements Q
         this.logger.entry(consumer);
 
         if (super.isStarted()) {
-            throw new IllegalStateException("AppliedQueue has not been started");
+            throw new IllegalStateException(NOT_STARTED);
         }
 
         final T element = this.queue.peek();
@@ -135,10 +175,10 @@ public final class AppliedQueue<T> extends BaseAppliedCollection<T> implements Q
         this.logger.entry(consumer);
 
         if (super.isStarted()) {
-            throw new IllegalStateException("AppliedQueue has not been started");
+            throw new IllegalStateException(NOT_STARTED);
         }
 
-        final T element = this.queue.peek();
+        final T element = this.queue.poll();
 
         if (element != null) {
             final Future<?> future = super.executor.submit(() -> consumer.accept(element));
@@ -151,7 +191,43 @@ public final class AppliedQueue<T> extends BaseAppliedCollection<T> implements Q
         return element;
     }
 
-    // Queue and Collection override methods
+    /**
+     * Retrieves and removes the head of this queue, or throw an exception if this queue is empty.
+     * Apply the consumer to the retrieved element if it is not null.
+     *
+     * @param   consumer    java.util.function.Consumer&lt;T&gt;
+     */
+    public T removeAndApply(final Consumer<T> consumer) throws NoSuchElementException {
+        this.logger.entry(consumer);
+
+        if (super.isStarted()) {
+            throw new IllegalStateException(NOT_STARTED);
+        }
+
+        if (this.queue.isEmpty()) {
+            throw new NoSuchElementException();
+        }
+
+        final T element = this.queue.remove();
+
+        if (element != null) {
+            final Future<?> future = super.executor.submit(() -> consumer.accept(element));
+
+            super.futures.add(future);
+        }
+
+        this.logger.exit(element);
+
+        return element;
+    }
+
+    // @todo
+    // removeIfAndApply
+    // addAllAndApply
+    // removeAllAndApply
+    // Unit tests
+
+    /* Queue and Collection method overrides */
 
     @Override
     public int size() {
