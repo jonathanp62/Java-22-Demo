@@ -79,7 +79,7 @@ public final class AppliedQueue<T> extends BaseAppliedCollection<T> implements Q
      * @param   mapper  java.util.function.Function&lt;T, T&gt;
      * @return          boolean
      */
-    public boolean offerAndApply(final T t, final Function<? super T, ? extends T> mapper) {
+    public boolean applyAndOffer(final T t, final Function<? super T, ? extends T> mapper) {
         this.logger.entry(t, mapper);
 
         final T mappedValue = mapper.apply(t);
@@ -97,7 +97,7 @@ public final class AppliedQueue<T> extends BaseAppliedCollection<T> implements Q
      * @param   mapper  java.util.function.Function&lt;T, T&gt;
      * @return          boolean
      */
-    public boolean addAndApply(final T t, final Function<? super T, ? extends T> mapper) {
+    public boolean applyAndAdd(final T t, final Function<? super T, ? extends T> mapper) {
         this.logger.entry(t, mapper);
 
         final T mappedValue = mapper.apply(t);
@@ -221,10 +221,45 @@ public final class AppliedQueue<T> extends BaseAppliedCollection<T> implements Q
         return element;
     }
 
+    /**
+     * Removes all of this collection's elements that are also contained in the specified
+     * collection (optional operation). After this call returns, this collection will contain
+     * no elements in common with the specified collection.
+     * Apply the consumer to each removed element.
+     *
+     * @param   c           java.util.Collection&lt;T&gt;
+     * @param   consumer    java.util.function.Consumer&lt;T&gt;
+     * @return              boolean
+     */
+    public boolean removeAllAndApply(@Nonnull final Collection<T> c, final Consumer<T> consumer) {
+        this.logger.entry(c);
+
+        if (super.isStarted()) {
+            throw new IllegalStateException(NOT_STARTED);
+        }
+
+        boolean result = false;
+
+        if (!c.isEmpty()) {
+            for (final T e : c) {
+                if (this.queue.contains(e) && this.queue.remove(e)) {
+                    final Future<?> future = super.executor.submit(() -> consumer.accept(e));
+
+                    super.futures.add(future);
+
+                    result = true;
+                }
+            }
+        }
+
+        this.logger.exit(result);
+
+        return result;
+    }
+
     // @todo
     // removeIfAndApply
     // addAllAndApply
-    // removeAllAndApply
     // Unit tests
 
     /* Queue and Collection method overrides */
