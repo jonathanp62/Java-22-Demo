@@ -1,12 +1,26 @@
 Java-22-Demo
 ------------
 
-A program that demonstrates the new features of Java 22.
+A program that demonstrates the new features of Java 22 along with some other application features that make use of some of the Java 22 preview capabilities.
 
 Logging
 ~~~~~~~
 
 Logging is achieved using the SLF4J facade over Logback. The logging configuration is supplied in *config/logback.xml*. It can be overriden with a java system property, i.e. *-Dlogback.configurationFile=config/logback.xml*
+
+== Demonstrated Concepts
+
+* Scoped Values
+* Statements before super()
+* Stream Gatherers
+* String Templates
+* Structured Concurrency
+* Unnamed Variables
+
+== Additional Features
+
+* Applied Queue
+* Keyed Function Executor
 
 Gradle JavaExec Tasks
 ~~~~~~~~~~~~~~~~~~~~~
@@ -14,7 +28,7 @@ Gradle JavaExec Tasks
 [options="header"]
 |=======================
 |Task Name              |Application Invocation
-|execProgram            |No arguments
+|execute                |No arguments
 |=======================
 
 Current version: 0.5.0.
