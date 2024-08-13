@@ -297,4 +297,29 @@ public final class TestAppliedQueue {
         final List<String> list = new ArrayList<>();
         final var _ = queue.removeAllAndApply(list, System.out::println);
     }
+
+    @Test
+    public void testApplyAndAddAll() {
+        final AppliedQueue<String> queue = new AppliedQueue<>();
+        final List<String> values = List.of("value 1", "value 2", "value 3");
+
+        final boolean result = queue.applyAndAddAll(values, e -> e.toUpperCase());
+
+        assertTrue(result);
+        assertEquals(3, queue.size());
+        assertTrue(queue.contains("VALUE 1"));
+        assertTrue(queue.contains("VALUE 2"));
+        assertTrue(queue.contains("VALUE 3"));
+    }
+
+    @Test
+    public void testApplyAndAddAllOnEmptyCollection() {
+        final AppliedQueue<String> queue = new AppliedQueue<>();
+
+        final boolean result = queue.applyAndAddAll(new ArrayList<>(), x -> x);
+
+        assertFalse(result);
+        assertEquals(0, queue.size());
+    }
+
 }
