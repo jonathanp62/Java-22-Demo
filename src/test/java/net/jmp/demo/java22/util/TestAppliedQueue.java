@@ -30,6 +30,8 @@ package net.jmp.demo.java22.util;
  * SOFTWARE.
  */
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import java.util.concurrent.TimeUnit;
@@ -48,6 +50,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public final class TestAppliedQueue {
+    public static final int AWAIT_TIME = 500;
+
     @Test
     public void testApplyAndOffer() {
         final AppliedQueue<Integer> queue = new AppliedQueue<>();
@@ -97,7 +101,7 @@ public final class TestAppliedQueue {
         assertEquals("value", value);
         assertEquals(1, queue.size());
 
-        await().atMost(500, TimeUnit.MILLISECONDS)
+        await().atMost(AWAIT_TIME, TimeUnit.MILLISECONDS)
                 .untilAsserted(
                         () -> assertThat(consumerSwitch.get())
                                 .isTrue()
@@ -138,7 +142,7 @@ public final class TestAppliedQueue {
         assertEquals("value", value);
         assertEquals(1, queue.size());
 
-        await().atMost(500, TimeUnit.MILLISECONDS)
+        await().atMost(AWAIT_TIME, TimeUnit.MILLISECONDS)
                 .untilAsserted(
                         () -> assertThat(consumerSwitch.get())
                                 .isTrue()
@@ -170,7 +174,7 @@ public final class TestAppliedQueue {
         assertEquals("value", value);
         assertEquals(0, queue.size());
 
-        await().atMost(500, TimeUnit.MILLISECONDS)
+        await().atMost(AWAIT_TIME, TimeUnit.MILLISECONDS)
                 .untilAsserted(
                         () -> assertThat(consumerSwitch.get())
                                 .isTrue()
@@ -202,7 +206,7 @@ public final class TestAppliedQueue {
         assertEquals("value", value);
         assertEquals(0, queue.size());
 
-        await().atMost(500, TimeUnit.MILLISECONDS)
+        await().atMost(AWAIT_TIME, TimeUnit.MILLISECONDS)
                 .untilAsserted(
                         () -> assertThat(consumerSwitch.get())
                                 .isTrue()
@@ -224,5 +228,39 @@ public final class TestAppliedQueue {
         queue.start();
 
         final var _ = queue.removeAndApply(System.out::println);
+    }
+
+    @Test
+    public void testRemoveAllAndApply() {
+        final AppliedQueue<String> queue = new AppliedQueue<>();
+        final AtomicBoolean consumerSwitch = new AtomicBoolean(false);
+        final List<String> values = List.of("value 1", "value 2", "value 3");
+
+        values.forEach(queue::offer);
+
+        queue.start();
+
+        final boolean result = queue.removeAllAndApply(values, e -> {
+            System.out.println(STR."testRemoveAllAndApply: \{e}");
+            consumerSwitch.set(true);
+        });
+
+        assertTrue(result);
+        assertEquals(0, queue.size());
+
+        await().atMost(AWAIT_TIME, TimeUnit.MILLISECONDS)
+                .untilAsserted(
+                        () -> assertThat(consumerSwitch.get())
+                                .isTrue()
+                );
+
+        queue.stop();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testRemoveAllAndApplyWhenNotStarted() {
+        final AppliedQueue<String> queue = new AppliedQueue<>();
+        final List<String> list = new ArrayList<>();
+        final var _ = queue.removeAllAndApply(list, System.out::println);
     }
 }

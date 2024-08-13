@@ -258,9 +258,8 @@ public final class AppliedQueue<T> extends BaseAppliedCollection<T> implements Q
     }
 
     // @todo
-    // removeIfAndApply
+    // removeIfAndApply ?
     // addAllAndApply
-    // Unit tests
 
     /* Queue and Collection method overrides */
 
