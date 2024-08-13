@@ -85,6 +85,8 @@ dependencies {
     implementation      libs.org.slf4j.slf4j.api
     implementation      libs.org.slf4j.slf4j.ext
     testImplementation  libs.junit.junit
+    testImplementation  libs.org.assertj.assertj.core
+    testImplementation  libs.org.awaitility.awaitility
 }
 
 group = 'net.jmp.demo.java22'
@@ -128,6 +130,10 @@ tasks.withType(Javadoc).configureEach {
 }
 
 tasks.withType(JavaExec).configureEach {
+    jvmArgs += '--enable-preview'
+}
+
+tasks.withType(Test).configureEach {
     jvmArgs += '--enable-preview'
 }
 

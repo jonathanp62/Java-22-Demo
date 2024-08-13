@@ -1,9 +1,10 @@
 #
+# (#)libs.versions.toml 0.5.0   08/13/2024
 # (#)libs.versions.toml 0.2.0   08/07/2024
 # (#)libs.versions.toml 0.1.0   08/02/2024
 #
 #  @author   Jonathan Parker
-#  @version  0.2.0
+#  @version  0.5.0
 #  @since    0.1.0
 #
 #  MIT License
@@ -31,17 +32,19 @@
 [versions]
 ch-qos-logback-logback-classic = "1.5.6"
 ch-qos-logback-logback-core = "1.5.6"
-com-google-code-gson-gson = "2.10.1"
 com-google-guava-guava = "33.2.1-jre"
 junit-junit = "4.13.2"
+org-assertj-assertj-core = "3.24.2"
+org-awaitility-awaitility = "4.2.0"
 org-slf4j-slf4j-api = "2.0.11"
 org-slf4j-slf4j-ext = "2.0.11"
 
 [libraries]
 ch-qos-logback-logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "ch-qos-logback-logback-classic" }
 ch-qos-logback-logback-core = { module = "ch.qos.logback:logback-core", version.ref = "ch-qos-logback-logback-core" }
-com-google-code-gson-gson = { module = "com.google.code.gson:gson", version.ref = "com-google-code-gson-gson" }
 com-google-guava-guava = { module = "com.google.guava:guava", version.ref = "com-google-guava-guava" }
 junit-junit = { module = "junit:junit", version.ref = "junit-junit" }
+org-assertj-assertj-core = { module = "org.assertj:assertj-core", version.ref = "org-assertj-assertj-core" }
+org-awaitility-awaitility = { module = "org.awaitility:awaitility", version.ref = "org-awaitility-awaitility" }
 org-slf4j-slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "org-slf4j-slf4j-api" }
 org-slf4j-slf4j-ext = { module = "org.slf4j:slf4j-ext", version.ref = "org-slf4j-slf4j-ext" }
