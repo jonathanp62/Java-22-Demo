@@ -41,6 +41,7 @@ import java.util.concurrent.Future;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import javax.annotation.Nonnull;
 
@@ -283,8 +284,38 @@ public final class AppliedQueue<T> extends BaseAppliedCollection<T> implements Q
         return result;
     }
 
-    // @todo
-    // removeIfAndApply ?
+    /**
+     * Removes all of the elements of this collection that satisfy the given predicate.
+     *
+     * @param   filter      java.util.function.Predicate&lt;? super T&gt;
+     * @param   consumer    java.util.function.Consumer&lt;&gt;
+     * @return              boolean
+     */
+    public boolean removeIfAndApply(@Nonnull final Predicate<? super T> filter, @Nonnull final Consumer<T> consumer) {
+        this.logger.entry(filter, consumer);
+
+        if (super.isStarted()) {
+            throw new IllegalStateException(NOT_STARTED);
+        }
+
+        boolean result = false;
+
+        if (!this.queue.isEmpty()) {
+            for (final T e : this.queue) {
+                if (this.queue.removeIf(filter)) {
+                    final Future<?> future = super.executor.submit(() -> consumer.accept(e));
+
+                    super.futures.add(future);
+
+                    result = true;
+                }
+            }
+        }
+
+        this.logger.exit(result);
+
+        return result;
+    }
 
     /* Queue and Collection method overrides */
 

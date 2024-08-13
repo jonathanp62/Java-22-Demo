@@ -39,6 +39,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import static org.awaitility.Awaitility.await;
 
@@ -322,4 +323,77 @@ public final class TestAppliedQueue {
         assertEquals(0, queue.size());
     }
 
+    @Test
+    public void testRemoveIfAndApply() {
+        final AppliedQueue<String> queue = new AppliedQueue<>();
+        final AtomicBoolean consumerSwitch = new AtomicBoolean(false);
+
+        queue.offer("value 1");
+        queue.offer("value 2");
+        queue.offer("value 3");
+
+        queue.start();
+
+        final boolean result = queue.removeIfAndApply(
+                x -> x.startsWith("value"),
+                e -> {
+                    System.out.println(STR."testRemoveIfAndApply: \{e}");
+                    consumerSwitch.set(true);
+                }
+        );
+
+        assertTrue(result);
+        assertEquals(0, queue.size());
+
+        await().atMost(AWAIT_TIME, TimeUnit.MILLISECONDS)
+                .untilAsserted(
+                        () -> assertThat(consumerSwitch.get())
+                                .isTrue()
+                );
+
+        queue.stop();
+    }
+
+    @Test
+    public void testRemoveIfAndApplyNoPredicateMatches() {
+        final AppliedQueue<String> queue = new AppliedQueue<>();
+        final AtomicBoolean consumerSwitch = new AtomicBoolean(false);
+
+        queue.offer("value 1");
+        queue.offer("value 2");
+        queue.offer("value 3");
+
+        queue.start();
+
+        final boolean result = queue.removeIfAndApply(
+                x -> x.endsWith("value"),
+                e -> {
+                    System.out.println(STR."testRemoveIfAndApply: \{e}");
+                    consumerSwitch.set(true);
+                }
+        );
+
+        assertFalse(result);
+        assertEquals(3, queue.size());
+
+        queue.stop();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testRemoveIfAndApplyWhenNotStarted() {
+        final AppliedQueue<String> queue = new AppliedQueue<>();
+        final Predicate<String> p = String::isEmpty;
+        final var _ = queue.removeIfAndApply(p, System.out::println);
+    }
+
+    @Test
+    public void testRemoveIfAndApplyOnEmptyQueue() {
+        final AppliedQueue<String> queue = new AppliedQueue<>();
+
+        queue.start();
+
+        final var result = queue.removeIfAndApply(String::isEmpty, System.out::println);
+
+        assertFalse(result);
+    }
 }
