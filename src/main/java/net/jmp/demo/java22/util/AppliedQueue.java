@@ -76,7 +76,7 @@ public final class AppliedQueue<T> extends BaseAppliedCollection<T> implements Q
      * Inserts the element into the queue after applying the mapper function.
      *
      * @param   t       T
-     * @param   mapper  java.util.function.Function&lt;T, T&gt;
+     * @param   mapper  java.util.function.Function&lt;? super T,? extends T&gt;
      * @return          boolean
      */
     public boolean applyAndOffer(final T t, final Function<? super T, ? extends T> mapper) {
@@ -94,7 +94,7 @@ public final class AppliedQueue<T> extends BaseAppliedCollection<T> implements Q
      * Inserts the element into the queue after applying the mapper function.
      *
      * @param   t       T
-     * @param   mapper  java.util.function.Function&lt;T, T&gt;
+     * @param   mapper  java.util.function.Function&lt;? super T, ? extends T&gt;
      * @return          boolean
      */
     public boolean applyAndAdd(final T t, final Function<? super T, ? extends T> mapper) {
@@ -102,6 +102,32 @@ public final class AppliedQueue<T> extends BaseAppliedCollection<T> implements Q
 
         final T mappedValue = mapper.apply(t);
         final boolean result = this.queue.add(mappedValue);
+
+        this.logger.exit(result);
+
+        return result;
+    }
+
+    /**
+     * Adds all the elements in the specified collection to this queue.
+     * Apply the mapper function to each element before adding it.
+     *
+     * @param   c       java.util.Collection&lt;? extends T&gt;
+     * @param   mapper  java.util.function.Function&lt;? super T, ? extends T&gt;
+     * @return          boolean
+     */
+    public boolean applyAndAddAll(@Nonnull final Collection<? extends T> c, final Function<? super T, ? extends T> mapper) {
+        this.logger.entry(c, mapper);
+
+        boolean result = false;
+
+        if (!c.isEmpty()) {
+            for (final T e : c) {
+                this.queue.add(mapper.apply(e));
+
+                result = true;
+            }
+        }
 
         this.logger.exit(result);
 
@@ -227,11 +253,11 @@ public final class AppliedQueue<T> extends BaseAppliedCollection<T> implements Q
      * no elements in common with the specified collection.
      * Apply the consumer to each removed element.
      *
-     * @param   c           java.util.Collection&lt;T&gt;
+     * @param   c           java.util.Collection&lt;? extends T&gt;
      * @param   consumer    java.util.function.Consumer&lt;T&gt;
      * @return              boolean
      */
-    public boolean removeAllAndApply(@Nonnull final Collection<T> c, final Consumer<T> consumer) {
+    public boolean removeAllAndApply(@Nonnull final Collection<? extends T> c, final Consumer<T> consumer) {
         this.logger.entry(c);
 
         if (super.isStarted()) {
@@ -259,7 +285,6 @@ public final class AppliedQueue<T> extends BaseAppliedCollection<T> implements Q
 
     // @todo
     // removeIfAndApply ?
-    // addAllAndApply
 
     /* Queue and Collection method overrides */
 
