@@ -44,10 +44,9 @@ import static org.awaitility.Awaitility.await;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import static org.junit.Assert.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 
 public final class TestAppliedQueue {
     public static final int AWAIT_TIME = 500;
@@ -255,6 +254,41 @@ public final class TestAppliedQueue {
                 );
 
         queue.stop();
+    }
+
+    @Test
+    public void testRemoveAllAndApplyOnEmptyCollection() {
+        final AppliedQueue<String> queue = new AppliedQueue<>();
+        final List<String> values = List.of("value 1", "value 2", "value 3");
+
+        values.forEach(queue::offer);
+
+        queue.start();
+
+        final boolean result = queue.removeAllAndApply(new ArrayList<>(), e -> {
+            System.out.println(STR."testRemoveAllAndApply: \{e}");
+        });
+
+        assertFalse(result);
+        assertEquals(3, queue.size());
+    }
+
+    @Test
+    public void testRemoveAllAndApplyOnNonMatchingCollection() {
+        final AppliedQueue<String> queue = new AppliedQueue<>();
+        final List<String> values = List.of("value 1", "value 2", "value 3");
+        final List<String> removals = List.of("value 4", "value 5");
+
+        values.forEach(queue::offer);
+
+        queue.start();
+
+        final boolean result = queue.removeAllAndApply(removals, e -> {
+            System.out.println(STR."testRemoveAllAndApply: \{e}");
+        });
+
+        assertFalse(result);
+        assertEquals(3, queue.size());
     }
 
     @Test(expected = IllegalStateException.class)
