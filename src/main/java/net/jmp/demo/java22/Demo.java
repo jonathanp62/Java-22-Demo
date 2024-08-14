@@ -1,10 +1,11 @@
 package net.jmp.demo.java22;
 
 /*
+ * (#)Demo.java 0.5.0   08/14/2024
  * (#)Demo.java 0.1.0   08/04/2024
  *
  * @author   Jonathan Parker
- * @version  0.1.0
+ * @version  0.5.0
  * @since    0.1.0
  *
  * MIT License
@@ -33,6 +34,7 @@ package net.jmp.demo.java22;
 /**
  * The demo interface.
  */
+@FunctionalInterface
 public interface Demo {
     /**
      * The demo method.

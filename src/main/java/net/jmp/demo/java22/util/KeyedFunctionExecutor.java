@@ -1,11 +1,12 @@
 package net.jmp.demo.java22.util;
 
 /*
+ * (#)KeyedFunctionExecutor.java    0.5.0   08/14/2024
  * (#)KeyedFunctionExecutor.java    0.4.0   08/09/2024
  * (#)KeyedFunctionExecutor.java    0.2.0   08/07/2024
  *
  * @author   Jonathan Parker
- * @version  0.4.0
+ * @version  0.5.0
  * @since    0.2.0
  *
  * MIT License
@@ -54,7 +55,7 @@ import org.slf4j.ext.XLogger;
  *
  * @param   <T> The type of value
  */
-public final class KeyedFunctionExecutor<T> {
+public final class KeyedFunctionExecutor<T> implements AutoCloseable {
     private static final int DEFAULT_NUMBER_OF_THREADS = Runtime.getRuntime().availableProcessors();
 
     /** The logger. */
@@ -71,9 +72,6 @@ public final class KeyedFunctionExecutor<T> {
 
     /** Control access to the map. */
     private final Striped<ReadWriteLock> locks = Striped.readWriteLock(64);
-
-    /** True once the start method has been invoked. */
-    private boolean isStarted;
 
     /**
      * The default constructor.
@@ -99,27 +97,29 @@ public final class KeyedFunctionExecutor<T> {
     }
 
     /**
-     * Start the executor.
+     * Close any resources.
      */
-    public void start() {
+    @Override
+    public void close() {
         this.logger.entry();
 
-        this.isStarted = true;
+        this.waitForFutures();
+        this.executor.shutdown();
 
         this.logger.exit();
     }
 
     /**
-     * Stop the executor.
+     * Wait for any futures to complete.
      */
-    public void stop() {
+    private void waitForFutures() {
         this.logger.entry();
 
         this.futures.forEach(future -> {
             if (!future.isDone()) {
                 try {
                     future.get();
-                } catch (InterruptedException | ExecutionException e) {
+                } catch (final InterruptedException | ExecutionException e) {
                     this.logger.catching(e);
 
                     if (e instanceof InterruptedException) {
@@ -130,10 +130,6 @@ public final class KeyedFunctionExecutor<T> {
         });
 
         this.futures.clear();
-
-        this.executor.shutdown();
-
-        this.isStarted = false;
 
         this.logger.exit();
     }
@@ -151,10 +147,6 @@ public final class KeyedFunctionExecutor<T> {
         Objects.requireNonNull(function);
         Objects.requireNonNull(key);
         Objects.requireNonNull(value);
-
-        if (!this.isStarted) {
-            throw new IllegalStateException("This KeyedFunctionExecutor was not started");
-        }
 
         this.map.put(key, value);
 

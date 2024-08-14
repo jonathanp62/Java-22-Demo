@@ -1,10 +1,11 @@
 package net.jmp.demo.java22;
 
 /*
+ * (#)KeyedFunctionExecutorDemo.java    0.5.0   08/14/2024
  * (#)KeyedFunctionExecutorDemo.java    0.2.0   08/07/2024
  *
  * @author   Jonathan Parker
- * @version  0.2.0
+ * @version  0.5.0
  * @since    0.2.0
  *
  * MIT License
@@ -63,26 +64,22 @@ final class KeyedFunctionExecutorDemo implements Demo {
     public void demo() {
         this.logger.entry();
 
-        final KeyedFunctionExecutor<String> keyedFunctionExecutor = new KeyedFunctionExecutor<>();
+        try (final KeyedFunctionExecutor<String> keyedFunctionExecutor = new KeyedFunctionExecutor<>()) {
+            final Function<String, Void> function = s -> {
+                logger.info("Function processed value: {}", s);
 
-        final Function<String, Void> function = s -> {
-            logger.info("Function processed value: {}", s);
+                return null;
+            };
 
-            return null;
-        };
+            final List<String> elements =
+                    IntStream.rangeClosed(1, 50)
+                            .mapToObj(i -> STR."Item \{i}")
+                            .toList();
 
-        keyedFunctionExecutor.start();
-
-        final List<String> elements =
-                IntStream.rangeClosed(1, 50)
-                        .mapToObj(i -> STR."Item \{i}")
-                        .toList();
-
-        elements.forEach(e -> {
-            keyedFunctionExecutor.process(function, e, STR."Value for \{e}");
-        });
-
-        keyedFunctionExecutor.stop();
+            elements.forEach(e -> {
+                keyedFunctionExecutor.process(function, e, STR."Value for \{e}");
+            });
+        }
 
         this.logger.exit();
     }
