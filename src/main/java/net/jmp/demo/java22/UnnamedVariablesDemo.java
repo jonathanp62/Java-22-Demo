@@ -1,10 +1,11 @@
 package net.jmp.demo.java22;
 
 /*
+ * (#)UnnamedVariablesDemo.java 0.6.0   08/15/2024
  * (#)UnnamedVariablesDemo.java 0.3.0   08/07/2024
  *
  * @author   Jonathan Parker
- * @version  0.3.0
+ * @version  0.6.0
  * @since    0.3.0
  *
  * MIT License
@@ -34,6 +35,8 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 
 import java.util.*;
+
+import net.jmp.demo.java22.util.AppliedQueue;
 
 import org.slf4j.LoggerFactory;
 
@@ -104,10 +107,8 @@ final class UnnamedVariablesDemo implements Demo {
 
         // Try with resources
 
-        try (var _ = new OutputStreamWriter(System.out)) {
-
-        } catch (final IOException _) {
-            this.logger.error("Error writing to System.out");
+        try (var _ = new AppliedQueue<String>()) {
+            this.logger.info("Opened an applied queue");
         }
 
         this.logger.exit();

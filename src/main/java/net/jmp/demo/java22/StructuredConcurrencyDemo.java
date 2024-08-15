@@ -30,6 +30,11 @@ package net.jmp.demo.java22;
  * SOFTWARE.
  */
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.StructuredTaskScope;
+
+import java.util.function.Supplier;
+
 import org.slf4j.LoggerFactory;
 
 import org.slf4j.ext.XLogger;
@@ -55,6 +60,59 @@ final class StructuredConcurrencyDemo implements Demo {
     public void demo() {
         this.logger.entry();
 
+        try {
+            final Response response = this.getResponse();
+
+            this.logger.info("User: {}; Order: {}", response.user, response.orderNumber);
+        } catch (final ExecutionException | InterruptedException e) {
+            this.logger.catching(e);
+        }
+
         this.logger.exit();
     }
+
+    /**
+     * Create and return a response object.
+     *
+     * @return  net.jmp.demo.java22.StructuredConcurrencyDemo.Response
+     * @throws  java.util.concurrent.ExecutionException
+     * @throws  java.lang.InterruptedException
+     */
+    private Response getResponse() throws ExecutionException, InterruptedException {
+        try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
+            final Supplier<String> user = scope.fork(() -> findUser());
+            final Supplier<Integer> orderNumber = scope.fork(() -> findOrderNumber());
+
+            scope.join()                // Wait for both subtasks
+                    .throwIfFailed();   // Propagate exceptions
+
+            return new Response(user.get(), orderNumber.get());
+        }
+    }
+
+    /**
+     * Return the user.
+     *
+     * @return  java.lang.String
+     */
+    private String findUser() {
+        return "Jonathan";
+    }
+
+    /**
+     * Return the order number.
+     *
+     * @return  java.lang.Integer
+     */
+    private Integer findOrderNumber() {
+        return 123;
+    }
+
+    /**
+     * A response record.
+     *
+     * @param   user        java.lang.String
+     * @param   orderNumber java.lang.Integer
+     */
+    record Response(String user, Integer orderNumber) {}
 }

@@ -63,16 +63,16 @@
     <logger name="net.jmp.demo.java22.Main" additivity="false" level="info">
         <appender-ref ref="MAIN" />
     </logger>
-    <logger name="net.jmp.demo.java22.ScopedValueDemo" additivity="false" level="debug">
+    <logger name="net.jmp.demo.java22.ScopedValueDemo" additivity="false" level="info">
         <appender-ref ref="MAIN" />
     </logger>
-    <logger name="net.jmp.demo.java22.StreamGatherersDemo" additivity="false" level="debug">
+    <logger name="net.jmp.demo.java22.StreamGatherersDemo" additivity="false" level="info">
         <appender-ref ref="MAIN" />
     </logger>
-    <logger name="net.jmp.demo.java22.StringTemplatesDemo" additivity="false" level="debug">
+    <logger name="net.jmp.demo.java22.StringTemplatesDemo" additivity="false" level="info">
         <appender-ref ref="MAIN" />
     </logger>
-    <logger name="net.jmp.demo.java22.StructuredConcurrencyDemo" additivity="false" level="debug">
+    <logger name="net.jmp.demo.java22.StructuredConcurrencyDemo" additivity="false" level="info">
         <appender-ref ref="MAIN" />
     </logger>
     <logger name="net.jmp.demo.java22.UnnamedVariablesDemo" additivity="false" level="info">
