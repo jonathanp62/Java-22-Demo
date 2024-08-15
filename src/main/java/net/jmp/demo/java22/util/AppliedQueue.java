@@ -54,10 +54,7 @@ import org.slf4j.ext.XLogger;
  *
  * @param   <T> The type of element
  */
-public final class AppliedQueue<T> extends BaseAppliedCollection<T> implements Queue<T> {
-    /** Applied queue not started message text. */
-    private static final String NOT_STARTED = "AppliedQueue has not been started";
-
+public final class AppliedQueue<T> extends BaseAppliedCollection<T> implements Queue<T>, AutoCloseable {
     /** The logger. */
     private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
 
@@ -71,6 +68,18 @@ public final class AppliedQueue<T> extends BaseAppliedCollection<T> implements Q
         super();
 
         this.queue = new ConcurrentLinkedQueue<>();
+    }
+
+    /**
+     * Close any resources.
+     */
+    @Override
+    public void close() {
+        this.logger.entry();
+
+        super.close();
+
+        this.logger.exit();
     }
 
     /**
@@ -146,10 +155,6 @@ public final class AppliedQueue<T> extends BaseAppliedCollection<T> implements Q
     public T elementAndApply(final Consumer<T> consumer) throws NoSuchElementException {
         this.logger.entry(consumer);
 
-        if (super.isStarted()) {
-            throw new IllegalStateException(NOT_STARTED);
-        }
-
         if (this.queue.isEmpty()) {
             throw new NoSuchElementException();
         }
@@ -175,10 +180,6 @@ public final class AppliedQueue<T> extends BaseAppliedCollection<T> implements Q
     public T peekAndApply(final Consumer<T> consumer) {
         this.logger.entry(consumer);
 
-        if (super.isStarted()) {
-            throw new IllegalStateException(NOT_STARTED);
-        }
-
         final T element = this.queue.peek();
 
         if (element != null) {
@@ -201,10 +202,6 @@ public final class AppliedQueue<T> extends BaseAppliedCollection<T> implements Q
     public T pollAndApply(final Consumer<T> consumer) {
         this.logger.entry(consumer);
 
-        if (super.isStarted()) {
-            throw new IllegalStateException(NOT_STARTED);
-        }
-
         final T element = this.queue.poll();
 
         if (element != null) {
@@ -226,10 +223,6 @@ public final class AppliedQueue<T> extends BaseAppliedCollection<T> implements Q
      */
     public T removeAndApply(final Consumer<T> consumer) throws NoSuchElementException {
         this.logger.entry(consumer);
-
-        if (super.isStarted()) {
-            throw new IllegalStateException(NOT_STARTED);
-        }
 
         if (this.queue.isEmpty()) {
             throw new NoSuchElementException();
@@ -261,10 +254,6 @@ public final class AppliedQueue<T> extends BaseAppliedCollection<T> implements Q
     public boolean removeAllAndApply(@Nonnull final Collection<? extends T> c, final Consumer<T> consumer) {
         this.logger.entry(c);
 
-        if (super.isStarted()) {
-            throw new IllegalStateException(NOT_STARTED);
-        }
-
         boolean result = false;
 
         if (!c.isEmpty()) {
@@ -293,10 +282,6 @@ public final class AppliedQueue<T> extends BaseAppliedCollection<T> implements Q
      */
     public boolean removeIfAndApply(@Nonnull final Predicate<? super T> filter, @Nonnull final Consumer<T> consumer) {
         this.logger.entry(filter, consumer);
-
-        if (super.isStarted()) {
-            throw new IllegalStateException(NOT_STARTED);
-        }
 
         boolean result = false;
 
@@ -349,7 +334,7 @@ public final class AppliedQueue<T> extends BaseAppliedCollection<T> implements Q
     @Override
     @Nonnull
     public <T1> T1[] toArray(@Nonnull T1[] a) {
-        throw new UnsupportedOperationException();
+        return this.queue.toArray(a);
     }
 
     @Override

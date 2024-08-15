@@ -39,7 +39,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 import static org.awaitility.Awaitility.await;
 
@@ -54,346 +53,282 @@ public final class TestAppliedQueue {
 
     @Test
     public void testApplyAndOffer() {
-        final AppliedQueue<Integer> queue = new AppliedQueue<>();
-        final Function<Integer, Integer> function = x -> x + 1;
+        try (final AppliedQueue<Integer> queue = new AppliedQueue<>()) {
+            final Function<Integer, Integer> function = x -> x + 1;
 
-        queue.applyAndOffer(1, function);
-        queue.applyAndOffer(2, function);
-        queue.applyAndOffer(3, function);
+            queue.applyAndOffer(1, function);
+            queue.applyAndOffer(2, function);
+            queue.applyAndOffer(3, function);
 
-        assertEquals(3, queue.size());
+            assertEquals(3, queue.size());
 
-        assertTrue(queue.contains(2));
-        assertTrue(queue.contains(3));
-        assertTrue(queue.contains(4));
+            assertTrue(queue.contains(2));
+            assertTrue(queue.contains(3));
+            assertTrue(queue.contains(4));
+        }
     }
 
     @Test
     public void testApplyAndAdd() {
-        final AppliedQueue<Integer> queue = new AppliedQueue<>();
-        final Function<Integer, Integer> function = x -> x + 1;
+        try (final AppliedQueue<Integer> queue = new AppliedQueue<>()) {
+            final Function<Integer, Integer> function = x -> x + 1;
 
-        queue.applyAndOffer(1, function);
-        queue.applyAndOffer(2, function);
-        queue.applyAndOffer(3, function);
+            queue.applyAndOffer(1, function);
+            queue.applyAndOffer(2, function);
+            queue.applyAndOffer(3, function);
 
-        assertEquals(3, queue.size());
+            assertEquals(3, queue.size());
 
-        assertTrue(queue.contains(2));
-        assertTrue(queue.contains(3));
-        assertTrue(queue.contains(4));
+            assertTrue(queue.contains(2));
+            assertTrue(queue.contains(3));
+            assertTrue(queue.contains(4));
+        }
     }
 
     @Test
     public void testElementAndApply() {
-        final AppliedQueue<String> queue = new AppliedQueue<>();
-        final AtomicBoolean consumerSwitch = new AtomicBoolean(false);
+        try (final AppliedQueue<String> queue = new AppliedQueue<>()) {
+            final AtomicBoolean consumerSwitch = new AtomicBoolean(false);
 
-        queue.offer("value");
+            queue.offer("value");
 
-        queue.start();
+            final String value = queue.elementAndApply(e -> {
+                System.out.println(STR."testElementAndApply: \{e}");
+                consumerSwitch.set(true);
+            });
 
-        final String value = queue.elementAndApply(e -> {
-            System.out.println(STR."testElementAndApply: \{e}");
-            consumerSwitch.set(true);
-        });
+            assertEquals("value", value);
+            assertEquals(1, queue.size());
 
-        assertEquals("value", value);
-        assertEquals(1, queue.size());
-
-        await().atMost(AWAIT_TIME, TimeUnit.MILLISECONDS)
-                .untilAsserted(
-                        () -> assertThat(consumerSwitch.get())
-                                .isTrue()
-                );
-
-        queue.stop();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void testElementAndApplyWhenNotStarted() {
-        final AppliedQueue<String> queue = new AppliedQueue<>();
-        final var _ = queue.elementAndApply(System.out::println);
+            await().atMost(AWAIT_TIME, TimeUnit.MILLISECONDS)
+                    .untilAsserted(
+                            () -> assertThat(consumerSwitch.get())
+                                    .isTrue()
+                    );
+        }
     }
 
     @Test(expected = NoSuchElementException.class)
     public void testElementAndApplyOnEmptyQueue() {
-        final AppliedQueue<String> queue = new AppliedQueue<>();
-
-        queue.start();
-
-        final var _ = queue.elementAndApply(System.out::println);
+        try (final AppliedQueue<String> queue = new AppliedQueue<>()) {
+            final var _ = queue.elementAndApply(System.out::println);
+        }
     }
 
     @Test
     public void testPeekAndApply() {
-        final AppliedQueue<String> queue = new AppliedQueue<>();
-        final AtomicBoolean consumerSwitch = new AtomicBoolean(false);
+        try (final AppliedQueue<String> queue = new AppliedQueue<>()) {
+            final AtomicBoolean consumerSwitch = new AtomicBoolean(false);
 
-        queue.offer("value");
+            queue.offer("value");
 
-        queue.start();
+            final String value = queue.peekAndApply(e -> {
+                System.out.println(STR."testPeekAndApply: \{e}");
+                consumerSwitch.set(true);
+            });
 
-        final String value = queue.peekAndApply(e -> {
-            System.out.println(STR."testPeekAndApply: \{e}");
-            consumerSwitch.set(true);
-        });
+            assertEquals("value", value);
+            assertEquals(1, queue.size());
 
-        assertEquals("value", value);
-        assertEquals(1, queue.size());
-
-        await().atMost(AWAIT_TIME, TimeUnit.MILLISECONDS)
-                .untilAsserted(
-                        () -> assertThat(consumerSwitch.get())
-                                .isTrue()
-                );
-
-        queue.stop();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void testPeekAndApplyWhenNotStarted() {
-        final AppliedQueue<String> queue = new AppliedQueue<>();
-        final var _ = queue.peekAndApply(System.out::println);
+            await().atMost(AWAIT_TIME, TimeUnit.MILLISECONDS)
+                    .untilAsserted(
+                            () -> assertThat(consumerSwitch.get())
+                                    .isTrue()
+                    );
+        }
     }
 
     @Test
     public void testPollAndApply() {
-        final AppliedQueue<String> queue = new AppliedQueue<>();
-        final AtomicBoolean consumerSwitch = new AtomicBoolean(false);
+        try (final AppliedQueue<String> queue = new AppliedQueue<>()) {
+            final AtomicBoolean consumerSwitch = new AtomicBoolean(false);
 
-        queue.offer("value");
+            queue.offer("value");
 
-        queue.start();
+            final String value = queue.pollAndApply(e -> {
+                System.out.println(STR."testPollAndApply: \{e}");
+                consumerSwitch.set(true);
+            });
 
-        final String value = queue.pollAndApply(e -> {
-            System.out.println(STR."testPollAndApply: \{e}");
-            consumerSwitch.set(true);
-        });
+            assertEquals("value", value);
+            assertEquals(0, queue.size());
 
-        assertEquals("value", value);
-        assertEquals(0, queue.size());
-
-        await().atMost(AWAIT_TIME, TimeUnit.MILLISECONDS)
-                .untilAsserted(
-                        () -> assertThat(consumerSwitch.get())
-                                .isTrue()
-                );
-
-        queue.stop();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void testPollAndApplyWhenNotStarted() {
-        final AppliedQueue<String> queue = new AppliedQueue<>();
-        final var _ = queue.pollAndApply(System.out::println);
+            await().atMost(AWAIT_TIME, TimeUnit.MILLISECONDS)
+                    .untilAsserted(
+                            () -> assertThat(consumerSwitch.get())
+                                    .isTrue()
+                    );
+        }
     }
 
     @Test
     public void testRemoveAndApply() {
-        final AppliedQueue<String> queue = new AppliedQueue<>();
-        final AtomicBoolean consumerSwitch = new AtomicBoolean(false);
+        try (final AppliedQueue<String> queue = new AppliedQueue<>()) {
+            final AtomicBoolean consumerSwitch = new AtomicBoolean(false);
 
-        queue.offer("value");
+            queue.offer("value");
 
-        queue.start();
+            final String value = queue.removeAndApply(e -> {
+                System.out.println(STR."testRemoveAndApply: \{e}");
+                consumerSwitch.set(true);
+            });
 
-        final String value = queue.removeAndApply(e -> {
-            System.out.println(STR."testRemoveAndApply: \{e}");
-            consumerSwitch.set(true);
-        });
+            assertEquals("value", value);
+            assertEquals(0, queue.size());
 
-        assertEquals("value", value);
-        assertEquals(0, queue.size());
-
-        await().atMost(AWAIT_TIME, TimeUnit.MILLISECONDS)
-                .untilAsserted(
-                        () -> assertThat(consumerSwitch.get())
-                                .isTrue()
-                );
-
-        queue.stop();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void testRemoveAndApplyWhenNotStarted() {
-        final AppliedQueue<String> queue = new AppliedQueue<>();
-        final var _ = queue.pollAndApply(System.out::println);
+            await().atMost(AWAIT_TIME, TimeUnit.MILLISECONDS)
+                    .untilAsserted(
+                            () -> assertThat(consumerSwitch.get())
+                                    .isTrue()
+                    );
+        }
     }
 
     @Test(expected = NoSuchElementException.class)
     public void testRemoveAndApplyOnEmptyQueue() {
-        final AppliedQueue<String> queue = new AppliedQueue<>();
-
-        queue.start();
-
-        final var _ = queue.removeAndApply(System.out::println);
+        try (final AppliedQueue<String> queue = new AppliedQueue<>()) {
+            final var _ = queue.removeAndApply(System.out::println);
+        }
     }
 
     @Test
     public void testRemoveAllAndApply() {
-        final AppliedQueue<String> queue = new AppliedQueue<>();
-        final AtomicBoolean consumerSwitch = new AtomicBoolean(false);
-        final List<String> values = List.of("value 1", "value 2", "value 3");
+        try (final AppliedQueue<String> queue = new AppliedQueue<>()) {
+            final AtomicBoolean consumerSwitch = new AtomicBoolean(false);
+            final List<String> values = List.of("value 1", "value 2", "value 3");
 
-        values.forEach(queue::offer);
+            values.forEach(queue::offer);
 
-        queue.start();
+            final boolean result = queue.removeAllAndApply(values, e -> {
+                System.out.println(STR."testRemoveAllAndApply: \{e}");
+                consumerSwitch.set(true);
+            });
 
-        final boolean result = queue.removeAllAndApply(values, e -> {
-            System.out.println(STR."testRemoveAllAndApply: \{e}");
-            consumerSwitch.set(true);
-        });
+            assertTrue(result);
+            assertEquals(0, queue.size());
 
-        assertTrue(result);
-        assertEquals(0, queue.size());
-
-        await().atMost(AWAIT_TIME, TimeUnit.MILLISECONDS)
-                .untilAsserted(
-                        () -> assertThat(consumerSwitch.get())
-                                .isTrue()
-                );
-
-        queue.stop();
+            await().atMost(AWAIT_TIME, TimeUnit.MILLISECONDS)
+                    .untilAsserted(
+                            () -> assertThat(consumerSwitch.get())
+                                    .isTrue()
+                    );
+        }
     }
 
     @Test
     public void testRemoveAllAndApplyOnEmptyCollection() {
-        final AppliedQueue<String> queue = new AppliedQueue<>();
-        final List<String> values = List.of("value 1", "value 2", "value 3");
+        try (final AppliedQueue<String> queue = new AppliedQueue<>()) {
+            final List<String> values = List.of("value 1", "value 2", "value 3");
 
-        values.forEach(queue::offer);
+            values.forEach(queue::offer);
 
-        queue.start();
+            final boolean result = queue.removeAllAndApply(new ArrayList<>(), e -> {
+                System.out.println(STR."testRemoveAllAndApply: \{e}");
+            });
 
-        final boolean result = queue.removeAllAndApply(new ArrayList<>(), e -> {
-            System.out.println(STR."testRemoveAllAndApply: \{e}");
-        });
-
-        assertFalse(result);
-        assertEquals(3, queue.size());
+            assertFalse(result);
+            assertEquals(3, queue.size());
+        }
     }
 
     @Test
     public void testRemoveAllAndApplyOnNonMatchingCollection() {
-        final AppliedQueue<String> queue = new AppliedQueue<>();
-        final List<String> values = List.of("value 1", "value 2", "value 3");
-        final List<String> removals = List.of("value 4", "value 5");
+        try (final AppliedQueue<String> queue = new AppliedQueue<>()) {
+            final List<String> values = List.of("value 1", "value 2", "value 3");
+            final List<String> removals = List.of("value 4", "value 5");
 
-        values.forEach(queue::offer);
+            values.forEach(queue::offer);
 
-        queue.start();
+            final boolean result = queue.removeAllAndApply(removals, e -> {
+                System.out.println(STR."testRemoveAllAndApply: \{e}");
+            });
 
-        final boolean result = queue.removeAllAndApply(removals, e -> {
-            System.out.println(STR."testRemoveAllAndApply: \{e}");
-        });
-
-        assertFalse(result);
-        assertEquals(3, queue.size());
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void testRemoveAllAndApplyWhenNotStarted() {
-        final AppliedQueue<String> queue = new AppliedQueue<>();
-        final List<String> list = new ArrayList<>();
-        final var _ = queue.removeAllAndApply(list, System.out::println);
+            assertFalse(result);
+            assertEquals(3, queue.size());
+        }
     }
 
     @Test
     public void testApplyAndAddAll() {
-        final AppliedQueue<String> queue = new AppliedQueue<>();
-        final List<String> values = List.of("value 1", "value 2", "value 3");
+        try (final AppliedQueue<String> queue = new AppliedQueue<>()) {
+            final List<String> values = List.of("value 1", "value 2", "value 3");
 
-        final boolean result = queue.applyAndAddAll(values, e -> e.toUpperCase());
+            final boolean result = queue.applyAndAddAll(values, e -> e.toUpperCase());
 
-        assertTrue(result);
-        assertEquals(3, queue.size());
-        assertTrue(queue.contains("VALUE 1"));
-        assertTrue(queue.contains("VALUE 2"));
-        assertTrue(queue.contains("VALUE 3"));
+            assertTrue(result);
+            assertEquals(3, queue.size());
+            assertTrue(queue.contains("VALUE 1"));
+            assertTrue(queue.contains("VALUE 2"));
+            assertTrue(queue.contains("VALUE 3"));
+        }
     }
 
     @Test
     public void testApplyAndAddAllOnEmptyCollection() {
-        final AppliedQueue<String> queue = new AppliedQueue<>();
+        try (final AppliedQueue<String> queue = new AppliedQueue<>()) {
+            final boolean result = queue.applyAndAddAll(new ArrayList<>(), x -> x);
 
-        final boolean result = queue.applyAndAddAll(new ArrayList<>(), x -> x);
-
-        assertFalse(result);
-        assertEquals(0, queue.size());
+            assertFalse(result);
+            assertEquals(0, queue.size());
+        }
     }
 
     @Test
     public void testRemoveIfAndApply() {
-        final AppliedQueue<String> queue = new AppliedQueue<>();
-        final AtomicBoolean consumerSwitch = new AtomicBoolean(false);
+        try (final AppliedQueue<String> queue = new AppliedQueue<>()) {
+            final AtomicBoolean consumerSwitch = new AtomicBoolean(false);
 
-        queue.offer("value 1");
-        queue.offer("value 2");
-        queue.offer("value 3");
+            queue.offer("value 1");
+            queue.offer("value 2");
+            queue.offer("value 3");
 
-        queue.start();
+            final boolean result = queue.removeIfAndApply(
+                    x -> x.startsWith("value"),
+                    e -> {
+                        System.out.println(STR."testRemoveIfAndApply: \{e}");
+                        consumerSwitch.set(true);
+                    }
+            );
 
-        final boolean result = queue.removeIfAndApply(
-                x -> x.startsWith("value"),
-                e -> {
-                    System.out.println(STR."testRemoveIfAndApply: \{e}");
-                    consumerSwitch.set(true);
-                }
-        );
+            assertTrue(result);
+            assertEquals(0, queue.size());
 
-        assertTrue(result);
-        assertEquals(0, queue.size());
-
-        await().atMost(AWAIT_TIME, TimeUnit.MILLISECONDS)
-                .untilAsserted(
-                        () -> assertThat(consumerSwitch.get())
-                                .isTrue()
-                );
-
-        queue.stop();
+            await().atMost(AWAIT_TIME, TimeUnit.MILLISECONDS)
+                    .untilAsserted(
+                            () -> assertThat(consumerSwitch.get())
+                                    .isTrue()
+                    );
+        }
     }
 
     @Test
     public void testRemoveIfAndApplyNoPredicateMatches() {
-        final AppliedQueue<String> queue = new AppliedQueue<>();
-        final AtomicBoolean consumerSwitch = new AtomicBoolean(false);
+        try (final AppliedQueue<String> queue = new AppliedQueue<>()) {
+            final AtomicBoolean consumerSwitch = new AtomicBoolean(false);
 
-        queue.offer("value 1");
-        queue.offer("value 2");
-        queue.offer("value 3");
+            queue.offer("value 1");
+            queue.offer("value 2");
+            queue.offer("value 3");
 
-        queue.start();
+            final boolean result = queue.removeIfAndApply(
+                    x -> x.endsWith("value"),
+                    e -> {
+                        System.out.println(STR."testRemoveIfAndApply: \{e}");
+                        consumerSwitch.set(true);
+                    }
+            );
 
-        final boolean result = queue.removeIfAndApply(
-                x -> x.endsWith("value"),
-                e -> {
-                    System.out.println(STR."testRemoveIfAndApply: \{e}");
-                    consumerSwitch.set(true);
-                }
-        );
-
-        assertFalse(result);
-        assertEquals(3, queue.size());
-
-        queue.stop();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void testRemoveIfAndApplyWhenNotStarted() {
-        final AppliedQueue<String> queue = new AppliedQueue<>();
-        final Predicate<String> p = String::isEmpty;
-        final var _ = queue.removeIfAndApply(p, System.out::println);
+            assertFalse(result);
+            assertEquals(3, queue.size());
+        }
     }
 
     @Test
     public void testRemoveIfAndApplyOnEmptyQueue() {
-        final AppliedQueue<String> queue = new AppliedQueue<>();
+        try (final AppliedQueue<String> queue = new AppliedQueue<>()) {
+            final var result = queue.removeIfAndApply(String::isEmpty, System.out::println);
 
-        queue.start();
-
-        final var result = queue.removeIfAndApply(String::isEmpty, System.out::println);
-
-        assertFalse(result);
+            assertFalse(result);
+        }
     }
 }

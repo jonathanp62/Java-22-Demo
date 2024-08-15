@@ -60,9 +60,6 @@ public class BaseAppliedCollection<T> {
     /** A list of runnable futures. */
     protected final List<Future<?>> futures = new ArrayList<>();
 
-    /** True once the start method has been invoked. */
-    private boolean isStarted;
-
     /**
      * The default constructor.
      */
@@ -87,20 +84,23 @@ public class BaseAppliedCollection<T> {
     }
 
     /**
-     * Start the executor.
+     * Close any resources. In this case wait
+     * for futures to complete and shut down
+     * the eecutor service.
      */
-    public void start() {
+    protected void close() {
         this.logger.entry();
 
-        this.isStarted = true;
+        this.waitForFutures();
+        this.executor.shutdown();
 
         this.logger.exit();
     }
 
     /**
-     * Stop the executor.
+     * Wait for any futures to complete.
      */
-    public void stop() {
+    private void waitForFutures() {
         this.logger.entry();
 
         this.futures.forEach(future -> {
@@ -119,17 +119,6 @@ public class BaseAppliedCollection<T> {
 
         this.futures.clear();
 
-        this.executor.shutdown();
-
-        this.isStarted = false;
-
         this.logger.exit();
     }
-
-    /**
-     * Return true if the applied collection has been started.
-     */
-    protected boolean isStarted() {
-        return !this.isStarted;
-    };
 }

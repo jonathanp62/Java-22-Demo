@@ -89,35 +89,31 @@ final class AppliedCollectionDemo implements Demo {
     private void offerAndPoll() {
         this.logger.entry();
 
-        final AppliedQueue<String> stringQueue = new AppliedQueue<>();
+        try (final AppliedQueue<String> stringQueue = new AppliedQueue<>()) {
+            final Function<String, String> capitalizer = string -> {
+                final String firstLetter = string.substring(0, 1).toUpperCase();
 
-        final Function<String, String> capitalizer = string -> {
-            final String firstLetter = string.substring(0, 1).toUpperCase();
+                return firstLetter + string.substring(1);
+            };
 
-            return firstLetter + string.substring(1);
-        };
+            final List<String> words = List.of("one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten");
 
-        final List<String> words = List.of("one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten");
-
-        words.forEach(word -> {
-            if (!stringQueue.applyAndOffer(word, capitalizer)) {
-                this.logger.warn("Failed to offer word: {}", word);
-            }
-        });
-
-        stringQueue.start();
-
-        while (!stringQueue.isEmpty()) {
-            final String word = stringQueue.pollAndApply(e -> {
-                this.logger.info(STR."QE: \{e.toUpperCase()})");
+            words.forEach(word -> {
+                if (!stringQueue.applyAndOffer(word, capitalizer)) {
+                    this.logger.warn("Failed to offer word: {}", word);
+                }
             });
 
-            this.logger.info("The polled word: {}", word);
+            while (!stringQueue.isEmpty()) {
+                final String word = stringQueue.pollAndApply(e -> {
+                    this.logger.info(STR."QE: \{e.toUpperCase()})");
+                });
+
+                this.logger.info("The polled word: {}", word);
+            }
+
+            assert stringQueue.isEmpty();
         }
-
-        stringQueue.stop();
-
-        assert stringQueue.isEmpty();
 
         this.logger.exit();
     }
@@ -128,23 +124,19 @@ final class AppliedCollectionDemo implements Demo {
     private void peekAndRemove() {
         this.logger.entry();
 
-        final AppliedQueue<Integer> integerQueue = new AppliedQueue<>();
+        try (final AppliedQueue<Integer> integerQueue = new AppliedQueue<>()) {
+            var _ = integerQueue.applyAndAdd(1, i -> i * 10);
+            var _ = integerQueue.applyAndAdd(2, i -> i * 11);
+            var _ = integerQueue.applyAndAdd(3, i -> i * 12);
+            var _ = integerQueue.applyAndAdd(4, i -> i * 13);
+            var _ = integerQueue.applyAndAdd(5, i -> i * 14);
 
-        var _ = integerQueue.applyAndAdd(1, i -> i * 10);
-        var _ = integerQueue.applyAndAdd(2, i -> i * 11);
-        var _ = integerQueue.applyAndAdd(3, i -> i * 12);
-        var _ = integerQueue.applyAndAdd(4, i -> i * 13);
-        var _ = integerQueue.applyAndAdd(5, i -> i * 14);
+            while (integerQueue.peekAndApply(e -> this.logger.info("Peeked: {}", e)) != null) {
+                final int _ = integerQueue.removeAndApply(e -> this.logger.info("Removed: {}", e));
+            }
 
-        integerQueue.start();
-
-        while (integerQueue.peekAndApply(e -> this.logger.info("Peeked: {}", e)) != null) {
-            final int _ = integerQueue.removeAndApply(e -> this.logger.info("Removed: {}", e));
+            assert integerQueue.isEmpty();
         }
-
-        integerQueue.stop();
-
-        assert integerQueue.isEmpty();
 
         this.logger.exit();
     }
@@ -155,23 +147,19 @@ final class AppliedCollectionDemo implements Demo {
     private void addAndRemoveAll() {
         this.logger.entry();
 
-        final AppliedQueue<Integer> integerQueue = new AppliedQueue<>();
+        try (final AppliedQueue<Integer> integerQueue = new AppliedQueue<>()) {
+            IntStream.rangeClosed(1, 10).forEach(i -> integerQueue.applyAndAdd(i, j -> j * 10));
 
-        IntStream.rangeClosed(1, 10).forEach(i -> integerQueue.applyAndAdd(i, j -> j * 10));
+            final var odds = List.of(10, 30, 50, 70, 90);
 
-        final var odds = List.of(10, 30, 50, 70, 90);
+            if (integerQueue.removeAllAndApply(odds, e -> this.logger.info("Removed: {}", e))) {
+                this.logger.info("Odd numbers removed");
+            }
 
-        integerQueue.start();
-
-        if (integerQueue.removeAllAndApply(odds, e -> this.logger.info("Removed: {}", e))) {
-            this.logger.info("Odd numbers removed");
+            if (!integerQueue.removeAllAndApply(odds, e -> this.logger.info("Removed: {}", e))) {
+                this.logger.info("Odd numbers were not removed");
+            }
         }
-
-        if (!integerQueue.removeAllAndApply(odds, e -> this.logger.info("Removed: {}", e))) {
-            this.logger.info("Odd numbers were not removed");
-        }
-
-        integerQueue.stop();
 
         this.logger.exit();
     }
