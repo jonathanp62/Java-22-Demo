@@ -1,13 +1,14 @@
 package net.jmp.demo.java22;
 
 /*
+ * (#)Main.java 0.6.0   08/15/2024
  * (#)Main.java 0.5.0   08/10/2024
  * (#)Main.java 0.3.0   08/07/2024
  * (#)Main.java 0.2.0   08/04/2024
  * (#)Main.java 0.1.0   08/02/2024
  *
  * @author   Jonathan Parker
- * @version  0.5.0
+ * @version  0.6.0
  * @since    0.1.0
  *
  * MIT License
@@ -96,7 +97,8 @@ final class Main implements Runnable {
                 new StreamGatherersDemo(),
                 new StringTemplatesDemo(),
                 new BeforeSuperDemo(),
-                new UnnamedVariablesDemo()
+                new UnnamedVariablesDemo(),
+                new StructuredConcurrencyDemo()
         );
 
         demos.forEach(Demo::demo);
