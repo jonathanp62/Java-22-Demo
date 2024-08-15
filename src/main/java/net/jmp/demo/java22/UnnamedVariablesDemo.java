@@ -31,9 +31,6 @@ package net.jmp.demo.java22;
  * SOFTWARE.
  */
 
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-
 import java.util.*;
 
 import net.jmp.demo.java22.util.AppliedQueue;
