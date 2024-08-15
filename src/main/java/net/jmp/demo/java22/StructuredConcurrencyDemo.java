@@ -66,6 +66,10 @@ final class StructuredConcurrencyDemo implements Demo {
             this.logger.info("User: {}; Order: {}", response.user, response.orderNumber);
         } catch (final ExecutionException | InterruptedException e) {
             this.logger.catching(e);
+
+            if (e instanceof InterruptedException) {
+                Thread.currentThread().interrupt();
+            }
         }
 
         this.logger.exit();
