@@ -54,7 +54,7 @@ import org.slf4j.ext.XLogger;
  *
  * @param   <T> The type of element
  */
-public final class AppliedQueue<T> extends BaseAppliedCollection<T> implements Queue<T>, AutoCloseable {
+public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Queue<T>, AutoCloseable {
     /** The logger. */
     private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
 

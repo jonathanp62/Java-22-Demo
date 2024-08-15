@@ -1,8 +1,8 @@
 package net.jmp.demo.java22.util;
 
 /*
- * (#)BaseAppliedCollection.java    0.5.0   08/10/2024
- * (#)BaseAppliedCollection.java    0.4.0   08/09/2024
+ * (#)AppliedBaseCollection.java    0.5.0   08/10/2024
+ * (#)AppliedBaseCollection.java    0.4.0   08/09/2024
  *
  * @author   Jonathan Parker
  * @version  0.5.0
@@ -48,7 +48,7 @@ import org.slf4j.ext.XLogger;
  *
  * @param   <T> The type of element
  */
-public class BaseAppliedCollection<T> {
+public class AppliedBaseCollection<T> {
     private static final int DEFAULT_NUMBER_OF_THREADS = Runtime.getRuntime().availableProcessors();
 
     /** The logger. */
@@ -63,7 +63,7 @@ public class BaseAppliedCollection<T> {
     /**
      * The default constructor.
      */
-    protected BaseAppliedCollection() {
+    protected AppliedBaseCollection() {
         super();
 
         this.executor = Executors.newFixedThreadPool(DEFAULT_NUMBER_OF_THREADS);
@@ -73,7 +73,7 @@ public class BaseAppliedCollection<T> {
      * A constructor that takes
      * the number of threads to use.
      */
-    protected BaseAppliedCollection(final int numberOfThreads) {
+    protected AppliedBaseCollection(final int numberOfThreads) {
         if (numberOfThreads <= 0) {
             throw new IllegalArgumentException("Number of threads must be greater than 0");
         }
@@ -86,7 +86,7 @@ public class BaseAppliedCollection<T> {
     /**
      * Close any resources. In this case wait
      * for futures to complete and shut down
-     * the eecutor service.
+     * the executor service.
      */
     protected void close() {
         this.logger.entry();
