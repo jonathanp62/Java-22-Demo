@@ -30,8 +30,15 @@ package net.jmp.demo.java22;
  * SOFTWARE.
  */
 
+import java.time.Instant;
+
+import java.util.List;
+import java.util.UUID;
+
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.StructuredTaskScope;
+import java.util.concurrent.TimeoutException;
 
 import java.util.function.Supplier;
 
@@ -60,6 +67,18 @@ final class StructuredConcurrencyDemo implements Demo {
     public void demo() {
         this.logger.entry();
 
+        this.shutdownOnFailure();
+        this.shutdownOnSuccess();
+
+        this.logger.exit();
+    }
+
+    /**
+     * Get the value or handle an exception.
+     */
+    private void shutdownOnFailure() {
+        this.logger.entry();
+
         try {
             final Response response = this.getResponse();
 
@@ -76,6 +95,63 @@ final class StructuredConcurrencyDemo implements Demo {
     }
 
     /**
+     * Get the value of the first callable that succeeds
+     */
+    private void shutdownOnSuccess() {
+        this.logger.entry();
+
+        final List<Callable<String>> tasks = List.of(
+                () -> UUID.randomUUID().toString(),
+                () -> "Jonathan",
+                () -> "Martin",
+                () -> "Parker"
+        );
+
+        try {
+            final var result = this.runAll(tasks, Instant.now().plusMillis(10));
+
+            this.logger.info("Result: {}", result);
+        } catch (final ExecutionException | InterruptedException | TimeoutException e) {
+            this.logger.catching(e);
+
+            if (e instanceof InterruptedException) {
+                Thread.currentThread().interrupt();
+            }
+        }
+
+        this.logger.exit();
+    }
+
+    /**
+     * Returns the value of the
+     * first callable that succeeds.
+     *
+     * @param   tasks
+     * @param   instant
+     * @return
+     * @throws  ExecutionException
+     * @throws  InterruptedException
+     * @throws  TimeoutException
+     */
+    private String runAll(final List<Callable<String>> tasks, final Instant instant) throws ExecutionException, InterruptedException, TimeoutException {
+        this.logger.entry(tasks, instant);
+
+        String result = null;
+
+        try (final var scope = new StructuredTaskScope.ShutdownOnSuccess<>()) {
+            for (final var task : tasks) {
+                scope.fork(task);
+            }
+
+            result = (String) scope.joinUntil(instant).result();
+        }
+
+        this.logger.exit(result);
+
+        return result;
+    }
+
+    /**
      * Create and return a response object.
      *
      * @return  net.jmp.demo.java22.StructuredConcurrencyDemo.Response
@@ -83,15 +159,23 @@ final class StructuredConcurrencyDemo implements Demo {
      * @throws  java.lang.InterruptedException
      */
     private Response getResponse() throws ExecutionException, InterruptedException {
-        try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
+        this.logger.entry();
+
+        Response response = null;
+
+        try (final var scope = new StructuredTaskScope.ShutdownOnFailure()) {
             final Supplier<String> user = scope.fork(() -> findUser());
             final Supplier<Integer> orderNumber = scope.fork(() -> findOrderNumber());
 
             scope.join()                // Wait for both subtasks
                     .throwIfFailed();   // Propagate exceptions
 
-            return new Response(user.get(), orderNumber.get());
+            response = new Response(user.get(), orderNumber.get());
         }
+
+        this.logger.exit(response);
+
+        return response;
     }
 
     /**
