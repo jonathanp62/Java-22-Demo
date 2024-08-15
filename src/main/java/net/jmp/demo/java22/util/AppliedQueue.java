@@ -71,6 +71,16 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
     }
 
     /**
+     * A constructor that takes
+     * the number of threads to use.
+     */
+    public AppliedQueue(final int numThreads) {
+        super(numThreads);
+
+        this.queue = new ConcurrentLinkedQueue<>();
+    }
+
+    /**
      * Close any resources.
      */
     @Override

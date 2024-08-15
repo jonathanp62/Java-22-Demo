@@ -51,6 +51,13 @@ import org.junit.Test;
 public final class TestAppliedQueue {
     public static final int AWAIT_TIME = 500;
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructWithZeroThreads() {
+        try (final var _ = new AppliedQueue<Integer>(0)) {
+            assertTrue(true);
+        }
+    }
+
     @Test
     public void testApplyAndOffer() {
         try (final AppliedQueue<Integer> queue = new AppliedQueue<>()) {
