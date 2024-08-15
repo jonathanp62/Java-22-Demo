@@ -79,6 +79,8 @@ final class StructuredConcurrencyDemo implements Demo {
     private void shutdownOnFailure() {
         this.logger.entry();
 
+        // First case
+
         try {
             final Response response = this.getResponse();
 
@@ -89,6 +91,27 @@ final class StructuredConcurrencyDemo implements Demo {
             if (e instanceof InterruptedException) {
                 Thread.currentThread().interrupt();
             }
+        }
+
+        // Second case
+
+        final List<Callable<String>> tasks = List.of(
+                () -> "Red",
+                () -> "Orange",
+                () -> "Yellow",
+                () -> "Green",
+                () -> "Blue",
+                () -> "Indigo",
+                () -> "Violet"
+        );
+
+        try {
+            final var results = this.runAll(tasks);
+
+            results.forEach(this.logger::info);
+        } catch (final InterruptedException ie) {
+            this.logger.catching(ie);
+            Thread.currentThread().interrupt();
         }
 
         this.logger.exit();
@@ -108,7 +131,7 @@ final class StructuredConcurrencyDemo implements Demo {
         );
 
         try {
-            final var result = this.runAll(tasks, Instant.now().plusMillis(10));
+            final var result = this.race(tasks, Instant.now().plusMillis(10));
 
             this.logger.info("Result: {}", result);
         } catch (final ExecutionException | InterruptedException | TimeoutException e) {
@@ -126,17 +149,17 @@ final class StructuredConcurrencyDemo implements Demo {
      * Returns the value of the
      * first callable that succeeds.
      *
-     * @param   tasks
-     * @param   instant
-     * @return
-     * @throws  ExecutionException
-     * @throws  InterruptedException
-     * @throws  TimeoutException
+     * @param   tasks   java.util.List&lt;java.util.Callable&lt;java.lang.String&gt;&gt;
+     * @param   instant java.time.Instant
+     * @return          java.lang.String
+     * @throws          java.util.concurrent.ExecutionException
+     * @throws          java.lang.InterruptedException
+     * @throws          java.util.concurrent.TimeoutException
      */
-    private String runAll(final List<Callable<String>> tasks, final Instant instant) throws ExecutionException, InterruptedException, TimeoutException {
+    private String race(final List<Callable<String>> tasks, final Instant instant) throws ExecutionException, InterruptedException, TimeoutException {
         this.logger.entry(tasks, instant);
 
-        String result = null;
+        String result;
 
         try (final var scope = new StructuredTaskScope.ShutdownOnSuccess<>()) {
             for (final var task : tasks) {
@@ -152,7 +175,47 @@ final class StructuredConcurrencyDemo implements Demo {
     }
 
     /**
-     * Create and return a response object.
+     * Return the results of all the tasks failing
+     * if one of them should fail.
+     *
+     * @param   tasks   java.util.List&lt;java.util.Callable&lt;java.lang.String&gt;&gt;
+     * @return          java.util.List&lt;java.lang.String&gt;
+     * @throws          java.lang.InterruptedException
+     */
+    private List<String> runAll(final List<Callable<String>> tasks) throws InterruptedException {
+        this.logger.entry(tasks);
+
+        List<String> results;
+
+        try (final var scope = new StructuredTaskScope.ShutdownOnFailure()) {
+            final List<? extends Supplier<String>> suppliers = tasks
+                    .stream()
+                    .map(scope::fork)
+                    .toList();
+
+            // The IfFailed() function is invoked for the first subtask to fail
+            // The is known as a supplying function but it is not a supplier
+
+            scope.join().throwIfFailed(exception -> {
+                this.logger.catching(exception);
+
+                return new RuntimeException(exception.getMessage());
+            });
+
+            results = suppliers
+                    .stream()
+                    .map(Supplier::get)
+                    .toList();
+        }
+
+        this.logger.exit(results);
+
+        return results;
+    }
+
+    /**
+     * Create and return a response object or
+     * fail if any of the subtasks fail.
      *
      * @return  net.jmp.demo.java22.StructuredConcurrencyDemo.Response
      * @throws  java.util.concurrent.ExecutionException
