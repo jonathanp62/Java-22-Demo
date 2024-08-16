@@ -35,10 +35,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.StructuredTaskScope;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
 
 import java.util.function.Supplier;
 
@@ -48,6 +45,8 @@ import org.slf4j.ext.XLogger;
 
 /**
  * A class the demonstrates using structured concurrency.
+ *
+ * <a href="https://openjdk.org/jeps/462">JEP 462: Structured Concurrency (Second Preview)</a>
  */
 final class StructuredConcurrencyDemo implements Demo {
     /** The logger. */
@@ -69,8 +68,97 @@ final class StructuredConcurrencyDemo implements Demo {
 
         this.shutdownOnFailure();
         this.shutdownOnSuccess();
+        this.noShutdownPolicy();
 
         this.logger.exit();
+    }
+
+    /**
+     * No shutdown policy. Collect a list
+     * of each task's respective success
+     * or failure.
+     */
+    private void noShutdownPolicy() {
+        this.logger.entry();
+
+        final List<Callable<Integer>> tasks = List.of(
+                () -> 1 + 0,
+                () -> 2 - 0,
+                () -> 1 / 0,
+                () -> 3 * 0
+        );
+
+        try {
+            final List<Future<Integer>> futures = this.executeAll(tasks);
+
+            futures.forEach(future -> {
+                try {
+                    this.logger.info("Future: {}", future.get());
+                } catch (final ExecutionException | InterruptedException e) {
+                    this.logger.error("Future: {}", e.getMessage());
+
+                    if (e instanceof InterruptedException) {
+                        Thread.currentThread().interrupt();
+                    }
+                }
+            });
+        } catch (final InterruptedException e) {
+            this.logger.catching(e);
+            Thread.currentThread().interrupt();
+        }
+
+        this.logger.exit();
+    }
+
+    /**
+     * If the scope owner processes subtask exceptions to produce a composite
+     * result, rather than use a shutdown policy, then exceptions can be
+     * returned as values from the subtasks. For example, here is a method
+     * that runs a list of tasks in parallel and returns a list of completed
+     * Futures containing each task's respective successful or exceptional result.
+     *
+     * @param   tasks   java.util.List&lt;java.util.concurrent.Callable&lt;java.lang.Integer&gt;&gt;
+     * @return          java.util.List&lt;java.util.concurrent.Future&lt;java.lang.Integer&gt;&gt;
+     * @throws          java.lang.InterruptedException
+     */
+    private List<Future<Integer>> executeAll(final List<Callable<Integer>> tasks) throws InterruptedException {
+        this.logger.entry(tasks);
+
+        List<Future<Integer>> results;
+
+        try (final var scope = new StructuredTaskScope<Future<Integer>>()) {
+            final List<? extends Supplier<Future<Integer>>> futures = tasks.stream()
+                    .map(task -> taskAsFuture(task))
+                    .map(scope::fork)
+                    .toList();
+
+            scope.join();
+
+            results = futures.stream()
+                    .map(Supplier::get)
+                    .toList();
+        }
+
+        this.logger.exit(results);
+
+        return results;
+    }
+
+    /**
+     * Convert a callable task into a completable future.
+     *
+     * @param   <T>     The type of callable
+     * @param   task    java.util.concurrent.Callable
+     * @return          java.util.concurrent.Callable&lt;java.util.concurrent.Future&lt;T&gt;&gt;
+     */
+    static <T> Callable<Future<T>> taskAsFuture(final Callable<T> task) {
+        return () -> {
+            try {
+                return CompletableFuture.completedFuture(task.call());
+            } catch (final Exception ex) {
+                return CompletableFuture.failedFuture(ex);
+            }
+        };
     }
 
     /**
@@ -161,6 +249,9 @@ final class StructuredConcurrencyDemo implements Demo {
 
         String result;
 
+        // Avoid processing subtask results returned by fork()
+        // using the shutdown on success policy
+
         try (final var scope = new StructuredTaskScope.ShutdownOnSuccess<>()) {
             for (final var task : tasks) {
                 scope.fork(task);
@@ -175,8 +266,8 @@ final class StructuredConcurrencyDemo implements Demo {
     }
 
     /**
-     * Return the results of all the tasks failing
-     * if one of them should fail.
+     * Return the results of all the tasks
+     * only failing if one of them should fail.
      *
      * @param   tasks   java.util.List&lt;java.util.Callable&lt;java.lang.String&gt;&gt;
      * @return          java.util.List&lt;java.lang.String&gt;
@@ -187,6 +278,8 @@ final class StructuredConcurrencyDemo implements Demo {
 
         List<String> results;
 
+        // Note that the return type of fork is a supplier
+
         try (final var scope = new StructuredTaskScope.ShutdownOnFailure()) {
             final List<? extends Supplier<String>> suppliers = tasks
                     .stream()
@@ -194,7 +287,7 @@ final class StructuredConcurrencyDemo implements Demo {
                     .toList();
 
             // The IfFailed() function is invoked for the first subtask to fail
-            // The is known as a supplying function but it is not a supplier
+            // This is known as a supplying function, but it is not a supplier
 
             scope.join().throwIfFailed(exception -> {
                 this.logger.catching(exception);
@@ -225,6 +318,8 @@ final class StructuredConcurrencyDemo implements Demo {
         this.logger.entry();
 
         Response response = null;
+
+        // Note that the return type of fork is a supplier
 
         try (final var scope = new StructuredTaskScope.ShutdownOnFailure()) {
             final Supplier<String> user = scope.fork(() -> findUser());

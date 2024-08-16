@@ -1,11 +1,12 @@
 package net.jmp.demo.java22.util;
 
 /*
+ * (#)AppliedBaseCollection.java    0.6.0   08/16/2024
  * (#)AppliedBaseCollection.java    0.5.0   08/10/2024
  * (#)AppliedBaseCollection.java    0.4.0   08/09/2024
  *
  * @author   Jonathan Parker
- * @version  0.5.0
+ * @version  0.6.0
  * @since    0.4.0
  *
  * MIT License
@@ -93,6 +94,20 @@ public class AppliedBaseCollection<T> {
 
         this.waitForFutures();
         this.executor.shutdown();
+
+        this.logger.exit();
+    }
+
+    /**
+     * Run the task by submitting the
+     * runnable to the executor service.
+     *
+     * @param   task    java.lang.Runnable
+     */
+    protected void runTask(final Runnable task) {
+        this.logger.entry(task);
+
+        this.futures.add(this.executor.submit(task));
 
         this.logger.exit();
     }

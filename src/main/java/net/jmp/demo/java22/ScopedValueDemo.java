@@ -206,6 +206,10 @@ final class ScopedValueDemo implements Demo {
         };
 
         ScopedValue.runWhere(NAME, "Duke", () -> {
+            // This scope does not use a shutdown policy which makes it
+            // different from those in the structured concurrency demo
+            // Variables returned by fork() should be typed as suppliers.
+
             try (final var scope = new StructuredTaskScope<String>()) {
                 final StructuredTaskScope.Subtask<String> subtask1 = scope.fork(childTask1);
                 final StructuredTaskScope.Subtask<String> subtask2 = scope.fork(childTask2);

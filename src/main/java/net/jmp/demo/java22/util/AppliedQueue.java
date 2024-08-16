@@ -1,11 +1,12 @@
 package net.jmp.demo.java22.util;
 
 /*
+ * (#)AppliedQueue.java 0.6.0   08/16/2024
  * (#)AppliedQueue.java 0.5.0   08/10/2024
  * (#)AppliedQueue.java 0.4.0   08/09/2024
  *
  * @author   Jonathan Parker
- * @version  0.5.0
+ * @version  0.6.0
  * @since    0.4.0
  *
  * MIT License
@@ -170,7 +171,7 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
 
         final T element = this.queue.element();
 
-        this.runTask(() -> consumer.accept(element));
+        super.runTask(() -> consumer.accept(element));
 
         this.logger.exit(element);
 
@@ -191,7 +192,7 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
         final T element = this.queue.peek();
 
         if (element != null) {
-            this.runTask(() -> consumer.accept(element));
+            super.runTask(() -> consumer.accept(element));
         }
 
         this.logger.exit(element);
@@ -211,7 +212,7 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
         final T element = this.queue.poll();
 
         if (element != null) {
-            this.runTask(() -> consumer.accept(element));
+            super.runTask(() -> consumer.accept(element));
         }
 
         this.logger.exit(element);
@@ -235,7 +236,7 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
         final T element = this.queue.remove();
 
         if (element != null) {
-            this.runTask(() -> consumer.accept(element));
+            super.runTask(() -> consumer.accept(element));
         }
 
         this.logger.exit(element);
@@ -261,7 +262,7 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
         if (!c.isEmpty()) {
             c.forEach(e -> {
                 if (this.queue.contains(e) && this.queue.remove(e)) {
-                    this.runTask(() -> consumer.accept(e));
+                    super.runTask(() -> consumer.accept(e));
                     result.set(true);
                 }
             });
@@ -287,7 +288,7 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
         if (!this.queue.isEmpty()) {
             this.queue.forEach(e -> {
                 if (this.queue.removeIf(filter)) {
-                    this.runTask(() -> consumer.accept(e));
+                    super.runTask(() -> consumer.accept(e));
                     result.set(true);
                 }
             });
@@ -296,20 +297,6 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
         this.logger.exit(result.get());
 
         return result.get();
-    }
-
-    /**
-     * Run the task by submitting the
-     * runnable to the executor service.
-     *
-     * @param   task    java.lang.Runnable
-     */
-    private void runTask(final Runnable task) {
-        this.logger.entry(task);
-
-        super.futures.add(super.executor.submit(task));
-
-        this.logger.exit();
     }
 
     /* Queue and Collection method overrides */
