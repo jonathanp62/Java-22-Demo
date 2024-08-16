@@ -36,8 +36,6 @@ import java.util.NoSuchElementException;
 
 import java.util.concurrent.TimeUnit;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import java.util.function.Function;
 
 import static org.awaitility.Awaitility.await;
@@ -95,13 +93,13 @@ public final class TestAppliedQueue {
     @Test
     public void testElementAndApply() {
         try (final AppliedQueue<String> queue = new AppliedQueue<>()) {
-            final AtomicBoolean consumerSwitch = new AtomicBoolean(false);
+            final WrappedObject<Boolean> consumed = new WrappedObject<>(false);
 
             queue.offer("value");
 
             final String value = queue.elementAndApply(e -> {
                 System.out.println(STR."testElementAndApply: \{e}");
-                consumerSwitch.set(true);
+                consumed.set(true);
             });
 
             assertEquals("value", value);
@@ -109,7 +107,7 @@ public final class TestAppliedQueue {
 
             await().atMost(AWAIT_TIME, TimeUnit.MILLISECONDS)
                     .untilAsserted(
-                            () -> assertThat(consumerSwitch.get())
+                            () -> assertThat(consumed.get())
                                     .isTrue()
                     );
         }
@@ -125,13 +123,13 @@ public final class TestAppliedQueue {
     @Test
     public void testPeekAndApply() {
         try (final AppliedQueue<String> queue = new AppliedQueue<>()) {
-            final AtomicBoolean consumerSwitch = new AtomicBoolean(false);
+            final WrappedObject<Boolean> consumed = new WrappedObject<>(false);
 
             queue.offer("value");
 
             final String value = queue.peekAndApply(e -> {
                 System.out.println(STR."testPeekAndApply: \{e}");
-                consumerSwitch.set(true);
+                consumed.set(true);
             });
 
             assertEquals("value", value);
@@ -139,7 +137,7 @@ public final class TestAppliedQueue {
 
             await().atMost(AWAIT_TIME, TimeUnit.MILLISECONDS)
                     .untilAsserted(
-                            () -> assertThat(consumerSwitch.get())
+                            () -> assertThat(consumed.get())
                                     .isTrue()
                     );
         }
@@ -148,13 +146,13 @@ public final class TestAppliedQueue {
     @Test
     public void testPollAndApply() {
         try (final AppliedQueue<String> queue = new AppliedQueue<>()) {
-            final AtomicBoolean consumerSwitch = new AtomicBoolean(false);
+            final WrappedObject<Boolean> consumed = new WrappedObject<>(false);
 
             queue.offer("value");
 
             final String value = queue.pollAndApply(e -> {
                 System.out.println(STR."testPollAndApply: \{e}");
-                consumerSwitch.set(true);
+                consumed.set(true);
             });
 
             assertEquals("value", value);
@@ -162,7 +160,7 @@ public final class TestAppliedQueue {
 
             await().atMost(AWAIT_TIME, TimeUnit.MILLISECONDS)
                     .untilAsserted(
-                            () -> assertThat(consumerSwitch.get())
+                            () -> assertThat(consumed.get())
                                     .isTrue()
                     );
         }
@@ -171,13 +169,13 @@ public final class TestAppliedQueue {
     @Test
     public void testRemoveAndApply() {
         try (final AppliedQueue<String> queue = new AppliedQueue<>()) {
-            final AtomicBoolean consumerSwitch = new AtomicBoolean(false);
+            final WrappedObject<Boolean> consumed = new WrappedObject<>(false);
 
             queue.offer("value");
 
             final String value = queue.removeAndApply(e -> {
                 System.out.println(STR."testRemoveAndApply: \{e}");
-                consumerSwitch.set(true);
+                consumed.set(true);
             });
 
             assertEquals("value", value);
@@ -185,7 +183,7 @@ public final class TestAppliedQueue {
 
             await().atMost(AWAIT_TIME, TimeUnit.MILLISECONDS)
                     .untilAsserted(
-                            () -> assertThat(consumerSwitch.get())
+                            () -> assertThat(consumed.get())
                                     .isTrue()
                     );
         }
@@ -201,14 +199,14 @@ public final class TestAppliedQueue {
     @Test
     public void testRemoveAllAndApply() {
         try (final AppliedQueue<String> queue = new AppliedQueue<>()) {
-            final AtomicBoolean consumerSwitch = new AtomicBoolean(false);
+            final WrappedObject<Boolean> consumed = new WrappedObject<>(false);
             final List<String> values = List.of("value 1", "value 2", "value 3");
 
             values.forEach(queue::offer);
 
             final boolean result = queue.removeAllAndApply(values, e -> {
                 System.out.println(STR."testRemoveAllAndApply: \{e}");
-                consumerSwitch.set(true);
+                consumed.set(true);
             });
 
             assertTrue(result);
@@ -216,7 +214,7 @@ public final class TestAppliedQueue {
 
             await().atMost(AWAIT_TIME, TimeUnit.MILLISECONDS)
                     .untilAsserted(
-                            () -> assertThat(consumerSwitch.get())
+                            () -> assertThat(consumed.get())
                                     .isTrue()
                     );
         }
@@ -283,7 +281,7 @@ public final class TestAppliedQueue {
     @Test
     public void testRemoveIfAndApply() {
         try (final AppliedQueue<String> queue = new AppliedQueue<>()) {
-            final AtomicBoolean consumerSwitch = new AtomicBoolean(false);
+            final WrappedObject<Boolean> consumed = new WrappedObject<>(false);
 
             queue.offer("value 1");
             queue.offer("value 2");
@@ -293,7 +291,7 @@ public final class TestAppliedQueue {
                     x -> x.startsWith("value"),
                     e -> {
                         System.out.println(STR."testRemoveIfAndApply: \{e}");
-                        consumerSwitch.set(true);
+                        consumed.set(true);
                     }
             );
 
@@ -302,7 +300,7 @@ public final class TestAppliedQueue {
 
             await().atMost(AWAIT_TIME, TimeUnit.MILLISECONDS)
                     .untilAsserted(
-                            () -> assertThat(consumerSwitch.get())
+                            () -> assertThat(consumed.get())
                                     .isTrue()
                     );
         }
@@ -311,7 +309,7 @@ public final class TestAppliedQueue {
     @Test
     public void testRemoveIfAndApplyNoPredicateMatches() {
         try (final AppliedQueue<String> queue = new AppliedQueue<>()) {
-            final AtomicBoolean consumerSwitch = new AtomicBoolean(false);
+            final WrappedObject<Boolean> consumed = new WrappedObject<>(false);
 
             queue.offer("value 1");
             queue.offer("value 2");
@@ -321,7 +319,7 @@ public final class TestAppliedQueue {
                     x -> x.endsWith("value"),
                     e -> {
                         System.out.println(STR."testRemoveIfAndApply: \{e}");
-                        consumerSwitch.set(true);
+                        consumed.set(true);
                     }
             );
 

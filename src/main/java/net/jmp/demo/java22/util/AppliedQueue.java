@@ -139,19 +139,18 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
     public boolean applyAndAddAll(@Nonnull final Collection<? extends T> c, final Function<? super T, ? extends T> mapper) {
         this.logger.entry(c, mapper);
 
-        boolean result = false;
+        final WrappedObject<Boolean> result = new WrappedObject<>(false);
 
         if (!c.isEmpty()) {
-            for (final T e : c) {
+            c.forEach(e -> {
                 this.queue.add(mapper.apply(e));
-
-                result = true;
-            }
+                result.set(true);
+            });
         }
 
-        this.logger.exit(result);
+        this.logger.exit(result.get());
 
-        return result;
+        return result.get();
     }
 
     /**
@@ -170,9 +169,8 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
         }
 
         final T element = this.queue.element();
-        final Future<?> future = super.executor.submit(() -> consumer.accept(element));
 
-        super.futures.add(future);
+        this.runTask(() -> consumer.accept(element));
 
         this.logger.exit(element);
 
@@ -193,9 +191,7 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
         final T element = this.queue.peek();
 
         if (element != null) {
-            final Future<?> future = super.executor.submit(() -> consumer.accept(element));
-
-            super.futures.add(future);
+            this.runTask(() -> consumer.accept(element));
         }
 
         this.logger.exit(element);
@@ -215,9 +211,7 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
         final T element = this.queue.poll();
 
         if (element != null) {
-            final Future<?> future = super.executor.submit(() -> consumer.accept(element));
-
-            super.futures.add(future);
+            this.runTask(() -> consumer.accept(element));
         }
 
         this.logger.exit(element);
@@ -241,9 +235,7 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
         final T element = this.queue.remove();
 
         if (element != null) {
-            final Future<?> future = super.executor.submit(() -> consumer.accept(element));
-
-            super.futures.add(future);
+            this.runTask(() -> consumer.accept(element));
         }
 
         this.logger.exit(element);
@@ -264,27 +256,24 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
     public boolean removeAllAndApply(@Nonnull final Collection<? extends T> c, final Consumer<T> consumer) {
         this.logger.entry(c);
 
-        boolean result = false;
+        final WrappedObject<Boolean> result = new WrappedObject<>(false);
 
         if (!c.isEmpty()) {
-            for (final T e : c) {
+            c.forEach(e -> {
                 if (this.queue.contains(e) && this.queue.remove(e)) {
-                    final Future<?> future = super.executor.submit(() -> consumer.accept(e));
-
-                    super.futures.add(future);
-
-                    result = true;
+                    this.runTask(() -> consumer.accept(e));
+                    result.set(true);
                 }
-            }
+            });
         }
 
-        this.logger.exit(result);
+        this.logger.exit(result.get());
 
-        return result;
+        return result.get();
     }
 
     /**
-     * Removes all of the elements of this collection that satisfy the given predicate.
+     * Removes all the elements of this collection that satisfy the given predicate.
      *
      * @param   filter      java.util.function.Predicate&lt;? super T&gt;
      * @param   consumer    java.util.function.Consumer&lt;&gt;
@@ -293,23 +282,34 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
     public boolean removeIfAndApply(@Nonnull final Predicate<? super T> filter, @Nonnull final Consumer<T> consumer) {
         this.logger.entry(filter, consumer);
 
-        boolean result = false;
+        final WrappedObject<Boolean> result = new WrappedObject<>(false);
 
         if (!this.queue.isEmpty()) {
-            for (final T e : this.queue) {
+            this.queue.forEach(e -> {
                 if (this.queue.removeIf(filter)) {
-                    final Future<?> future = super.executor.submit(() -> consumer.accept(e));
-
-                    super.futures.add(future);
-
-                    result = true;
+                    this.runTask(() -> consumer.accept(e));
+                    result.set(true);
                 }
-            }
+            });
         }
 
-        this.logger.exit(result);
+        this.logger.exit(result.get());
 
-        return result;
+        return result.get();
+    }
+
+    /**
+     * Run the task by submitting the
+     * runnable to the executor service.
+     *
+     * @param   task    java.lang.Runnable
+     */
+    private void runTask(final Runnable task) {
+        this.logger.entry(task);
+
+        super.futures.add(super.executor.submit(task));
+
+        this.logger.exit();
     }
 
     /* Queue and Collection method overrides */
