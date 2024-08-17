@@ -1,7 +1,7 @@
 package net.jmp.demo.java22.util;
 
 /*
- * (#)TestWrappedObject.java    0.6.0   08/15/2024
+ * (#)TestAppliedSet.java   0.6.0   08/17/2024
  *
  * @author   Jonathan Parker
  * @version  0.6.0
@@ -32,28 +32,11 @@ package net.jmp.demo.java22.util;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
-public final class TestWrappedObject {
+public final class TestAppliedSet {
     @Test
-    public void testEmptyConstructor() {
-        final WrappedObject<String> wrappedString = new WrappedObject<>();
-
-        assertNull(wrappedString.get());
-
-        wrappedString.set("Testing 1 2 3");
-
-        assertEquals("Testing 1 2 3", wrappedString.get());
-    }
-
-    @Test
-    public void testConstructor() {
-        final WrappedObject<Boolean> wrappedBoolean = new WrappedObject<>(false);
-
-        assertFalse(wrappedBoolean.get());
-
-        wrappedBoolean.set(true);
-
-        assertTrue(wrappedBoolean.get());
+    public void test() {
+        assertTrue(true);
     }
 }

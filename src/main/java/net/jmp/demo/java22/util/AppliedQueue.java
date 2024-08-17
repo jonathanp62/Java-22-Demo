@@ -38,7 +38,6 @@ import java.util.NoSuchElementException;
 import java.util.Queue;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.Future;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -394,6 +393,12 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
 
         return result.get();
     }
+
+    /*
+     * Methods to implement:
+     *   clearAndApply
+     *   retainAllAndApply
+     */
 
     /* Queue and Collection method overrides */
 
