@@ -1,10 +1,11 @@
 package net.jmp.demo.java22.util;
 
 /*
+ * (#)TestAppliedQueue.java 0.6.0   08/17/2024
  * (#)TestAppliedQueue.java 0.5.0   08/13/2024
  *
  * @author   Jonathan Parker
- * @version  0.5.0
+ * @version  0.6.0
  * @since    0.5.0
  *
  * MIT License
@@ -37,6 +38,9 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 
 import java.util.function.Function;
+import java.util.function.Predicate;
+
+import java.util.stream.IntStream;
 
 import static org.awaitility.Awaitility.await;
 
@@ -53,6 +57,84 @@ public final class TestAppliedQueue {
     public void testConstructWithZeroThreads() {
         try (final var _ = new AppliedQueue<Integer>(0)) {
             assertTrue(true);
+        }
+    }
+
+    @Test
+    public void testAddIf() {
+        try (final AppliedQueue<Integer> queue = new AppliedQueue<>()) {
+            final Predicate<Integer> isEven = i -> i % 2 == 0;
+
+            IntStream.rangeClosed(1, 6)
+                            .forEach(i -> {
+                                if (!queue.addIf(i, isEven))
+                                    fail(STR."Failed to add element \{i}");
+                            });
+
+            assertFalse(queue.isEmpty());
+            assertEquals(3, queue.size());
+            assertTrue(queue.contains(2));
+            assertTrue(queue.contains(4));
+            assertTrue(queue.contains(6));
+        }
+    }
+
+    @Test
+    public void testOfferIf() {
+        try (final AppliedQueue<Integer> queue = new AppliedQueue<>()) {
+            final Predicate<Integer> isEven = i -> i % 2 == 0;
+
+            IntStream.rangeClosed(1, 6)
+                    .forEach(i -> {
+                        if (!queue.offerIf(i, isEven))
+                            fail(STR."Failed to add element \{i}");
+                    });
+
+            assertFalse(queue.isEmpty());
+            assertEquals(3, queue.size());
+            assertTrue(queue.contains(2));
+            assertTrue(queue.contains(4));
+            assertTrue(queue.contains(6));
+        }
+    }
+
+    @Test
+    public void testApplyAndAddIf() {
+        try (final AppliedQueue<Integer> queue = new AppliedQueue<>()) {
+            final Function<Integer, Integer> timesTwo = x -> x * 2;
+            final Predicate<Integer> isOdd = i -> i % 2 != 0;
+
+            IntStream.rangeClosed(1, 6)
+                    .forEach(i -> {
+                        if (!queue.applyAndAddIf(i, timesTwo, isOdd))
+                            fail(STR."Failed to add element \{i}");
+                    });
+
+            assertFalse(queue.isEmpty());
+            assertEquals(3, queue.size());
+            assertTrue(queue.contains(2));
+            assertTrue(queue.contains(6));
+            assertTrue(queue.contains(10));
+        }
+    }
+
+    @Test
+    public void testApplyAndOfferIf() {
+        try (final AppliedQueue<Integer> queue = new AppliedQueue<>()) {
+            final Function<Integer, Integer> timesTwo = x -> x * 2;
+            final Predicate<Integer> isOdd = i -> i % 2 != 0;
+
+            IntStream.rangeClosed(1, 6)
+                    .forEach(i -> {
+                        if (!queue.applyAndOfferIf(i, timesTwo, isOdd))
+                            fail(STR."Failed to add element \{i}");
+                    });
+
+            assertFalse(queue.isEmpty());
+            assertEquals(3, queue.size());
+            assertTrue(queue.contains(2));
+            assertTrue(queue.contains(6));
+            assertTrue(queue.contains(10));
         }
     }
 

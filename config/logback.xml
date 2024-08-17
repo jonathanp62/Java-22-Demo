@@ -69,7 +69,7 @@
     <logger name="net.jmp.demo.java22.demos.UnnamedVariablesDemo" additivity="false" level="info">
         <appender-ref ref="MAIN" />
     </logger>
-    <logger name="net.jmp.demo.java22.util.AppliedCollection" additivity="false" level="info">
+    <logger name="net.jmp.demo.java22.util.AppliedBaseCollection" additivity="false" level="info">
         <appender-ref ref="MAIN" />
     </logger>
         <logger name="net.jmp.demo.java22.util.AppliedQueue" additivity="false" level="info">

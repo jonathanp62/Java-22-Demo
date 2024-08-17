@@ -94,6 +94,102 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
     }
 
     /**
+     * Inserts the element into the queue if the
+     * applied predicate function evaluates to true.
+     *
+     * @param   t       T
+     * @param   filter  java.util.function.Predicate&lt;? super T&gt;
+     * @return          boolean
+     */
+    public boolean addIf(final T t, @Nonnull final Predicate<? super T> filter) {
+        this.logger.entry(t, filter);
+
+        boolean result = true;  // Return true if the element was filtered out
+
+        if (filter.test(t)) {
+            result = this.queue.add(t);
+        }
+
+        this.logger.exit(result);
+
+        return result;
+    }
+
+    /**
+     * Inserts the element into the queue after applying
+     * the mapper function if the applied predicate
+     * function evaluates to true.
+     *
+     * @param   t       T
+     * @param   mapper  java.util.function.Function&lt;? super T,? extends T&gt;
+     * @param   filter  java.util.function.Predicate&lt;? super T&gt;
+     * @return          boolean
+     */
+    public boolean applyAndAddIf(final T t, final Function<? super T, ? extends T> mapper, @Nonnull final Predicate<? super T> filter) {
+        this.logger.entry(t, mapper, filter);
+
+        boolean result = true;  // Return true if the element was filtered out
+
+        if (filter.test(t)) {
+            final T mappedValue = mapper.apply(t);
+
+            result = this.queue.add(mappedValue);
+        }
+
+        this.logger.exit(result);
+
+        return result;
+    }
+
+    /**
+     * Inserts the element into the queue if the
+     * applied predicate function evaluates to true.
+     *
+     * @param   t       T
+     * @param   filter  java.util.function.Predicate&lt;? super T&gt;
+     * @return          boolean
+     */
+    public boolean offerIf(final T t, @Nonnull final Predicate<? super T> filter) {
+        this.logger.entry(t, filter);
+
+        boolean result = true;  // Return true if the element was filtered out
+
+        if (filter.test(t)) {
+            result = this.queue.offer(t);
+        }
+
+        this.logger.exit(result);
+
+        return result;
+    }
+
+    /**
+     * Inserts the element into the queue after applying
+     * the mapper function if the applied predicate
+     * function evaluates to true.
+     *
+     * @param   t       T
+     * @param   mapper  java.util.function.Function&lt;? super T,? extends T&gt;
+     * @param   filter  java.util.function.Predicate&lt;? super T&gt;
+     * @return          boolean
+     */
+    public boolean applyAndOfferIf(final T t, final Function<? super T, ? extends T> mapper, @Nonnull final Predicate<? super T> filter) {
+        this.logger.entry(t, mapper, filter);
+
+        boolean result = true;  // Return true if the element was filtered out
+
+        if (filter.test(t)) {
+            final T mappedValue = mapper.apply(t);
+
+            result = this.queue.offer(mappedValue);
+        }
+
+        this.logger.exit(result);
+
+        return result;
+    }
+
+    /**
      * Inserts the element into the queue after applying the mapper function.
      *
      * @param   t       T
