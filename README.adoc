@@ -19,7 +19,9 @@ Logging is achieved using the SLF4J facade over Logback. The logging configurati
 
 == Additional Features
 
+* Applied List
 * Applied Queue
+* Applied Set
 * Keyed Function Executor
 
 Gradle JavaExec Tasks
@@ -31,5 +33,5 @@ Gradle JavaExec Tasks
 |execute                |No arguments
 |=======================
 
-Current version: 0.6.0.
+Current version: 0.7.0.
 ~~~~~~~~~~~~~~~~~~~~~~~
