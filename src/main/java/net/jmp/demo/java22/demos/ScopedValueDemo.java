@@ -1,4 +1,4 @@
-package net.jmp.demo.java22;
+package net.jmp.demo.java22.demos;
 
 /*
  * (#)ScopedValueDemo.java  0.2.0   08/04/2024
@@ -52,7 +52,7 @@ import org.slf4j.ext.XLogger;
  * is set to private so that it cannot be directly accessed
  * by code in other classes.
  */
-final class ScopedValueDemo implements Demo {
+public final class ScopedValueDemo implements Demo {
     /** The logger. */
     private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
 
@@ -65,7 +65,7 @@ final class ScopedValueDemo implements Demo {
     /**
      * The default constructor.
      */
-    ScopedValueDemo() {
+    public ScopedValueDemo() {
         super();
     }
 

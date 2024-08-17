@@ -1,4 +1,4 @@
-package net.jmp.demo.java22;
+package net.jmp.demo.java22.demos;
 
 /*
  * (#)KeyedFunctionExecutorDemo.java    0.5.0   08/14/2024
@@ -46,14 +46,14 @@ import org.slf4j.ext.XLogger;
 /**
  * Class that demonstrates the keyed function executor.
  */
-final class KeyedFunctionExecutorDemo implements Demo {
+public final class KeyedFunctionExecutorDemo implements Demo {
     /** The logger. */
     private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
 
     /**
      * The default constructor.
      */
-    KeyedFunctionExecutorDemo() {
+    public KeyedFunctionExecutorDemo() {
         super();
     }
 

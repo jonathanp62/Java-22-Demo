@@ -1,4 +1,4 @@
-package net.jmp.demo.java22;
+package net.jmp.demo.java22.demos;
 
 /*
  * (#)Demo.java 0.5.0   08/14/2024

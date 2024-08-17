@@ -1,4 +1,4 @@
-package net.jmp.demo.java22;
+package net.jmp.demo.java22.demos;
 
 /*
  * (#)StructuredConcurrencyDemo.java    0.6.0   08/15/2024
@@ -48,14 +48,14 @@ import org.slf4j.ext.XLogger;
  *
  * <a href="https://openjdk.org/jeps/462">JEP 462: Structured Concurrency (Second Preview)</a>
  */
-final class StructuredConcurrencyDemo implements Demo {
+public final class StructuredConcurrencyDemo implements Demo {
     /** The logger. */
     private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
 
     /**
      * The default constructor.
      */
-    StructuredConcurrencyDemo() {
+    public StructuredConcurrencyDemo() {
         super();
     }
 
@@ -310,7 +310,7 @@ final class StructuredConcurrencyDemo implements Demo {
      * Create and return a response object or
      * fail if any of the subtasks fail.
      *
-     * @return  net.jmp.demo.java22.StructuredConcurrencyDemo.Response
+     * @return  net.jmp.demo.java22.demos.StructuredConcurrencyDemo.Response
      * @throws  java.util.concurrent.ExecutionException
      * @throws  java.lang.InterruptedException
      */

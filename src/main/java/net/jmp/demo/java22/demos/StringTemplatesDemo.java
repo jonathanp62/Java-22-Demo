@@ -1,4 +1,4 @@
-package net.jmp.demo.java22;
+package net.jmp.demo.java22.demos;
 
 /*
  * (#)StringTemplatesDemo.java  0.2.0   08/06/2024
@@ -49,14 +49,14 @@ import org.slf4j.ext.XLogger;
 /**
  * The class that demonstrates string templates.
  */
-final class StringTemplatesDemo implements Demo {
+public final class StringTemplatesDemo implements Demo {
     /** The logger. */
     private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
 
     /**
      * The default constructor.
      */
-    StringTemplatesDemo() {
+    public StringTemplatesDemo() {
         super();
     }
 

@@ -37,6 +37,8 @@ package net.jmp.demo.java22;
 import java.util.List;
 import java.util.Objects;
 
+import net.jmp.demo.java22.demos.*;
+
 import org.slf4j.LoggerFactory;
 
 import org.slf4j.ext.XLogger;

@@ -1,4 +1,4 @@
-package net.jmp.demo.java22;
+package net.jmp.demo.java22.demos;
 
 /*
  * (#)UnnamedVariablesDemo.java 0.6.0   08/15/2024
@@ -42,14 +42,14 @@ import org.slf4j.ext.XLogger;
 /**
  * A class the demonstrates using unnamed variables.
  */
-final class UnnamedVariablesDemo implements Demo {
+public final class UnnamedVariablesDemo implements Demo {
     /** The logger. */
     private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
 
     /**
      * The default constructor.
      */
-    UnnamedVariablesDemo() {
+    public UnnamedVariablesDemo() {
         super();
     }
 

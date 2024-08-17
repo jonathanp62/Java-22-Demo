@@ -1,4 +1,4 @@
-package net.jmp.demo.java22;
+package net.jmp.demo.java22.demos;
 
 /*
  * (#)AppliedCollectionDemo.java    0.5.0   08/10/2024
@@ -45,7 +45,7 @@ import org.slf4j.ext.XLogger;
 /**
  * A demonstration class for applied collections.
  */
-final class AppliedCollectionDemo implements Demo {
+public final class AppliedCollectionDemo implements Demo {
     /**
      * The logger.
      */
@@ -54,7 +54,7 @@ final class AppliedCollectionDemo implements Demo {
     /**
      * The default constructor.
      */
-    AppliedCollectionDemo() {
+    public AppliedCollectionDemo() {
         super();
     }
 

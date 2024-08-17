@@ -1,4 +1,4 @@
-package net.jmp.demo.java22;
+package net.jmp.demo.java22.demos;
 
 /*
  * (#)BeforeSuperDemo.java  0.3.0   08/07/2024
@@ -45,14 +45,14 @@ import org.slf4j.ext.XLogger;
  * access instance variables or execute methods and access to "this" is
  * prohibited.
  */
-final class BeforeSuperDemo implements Demo {
+public final class BeforeSuperDemo implements Demo {
     /** The logger. */
     private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
 
     /**
      * The default constructor.
      */
-    BeforeSuperDemo() {
+    public BeforeSuperDemo() {
         super();
     }
 

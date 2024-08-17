@@ -1,4 +1,4 @@
-package net.jmp.demo.java22;
+package net.jmp.demo.java22.demos;
 
 /*
  * (#)StreamGatherersDemo.java  0.4.0   08/09/2024
@@ -59,14 +59,14 @@ import org.slf4j.ext.XLogger;
  * <a href="https://softwaremill.com/stream-gatherers-in-practice-part-2/">Stream Gatherers in practice Part 2</a>
  * <a href="https://github.com/lukaszrola/java-stream-gather-example">java-stream-gather-example</a>
  */
-final class StreamGatherersDemo implements Demo {
+public final class StreamGatherersDemo implements Demo {
     /** The logger. */
     private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
 
     /**
      * The default constructor.
      */
-    StreamGatherersDemo() {
+    public StreamGatherersDemo() {
         super();
     }
 
