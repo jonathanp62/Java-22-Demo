@@ -128,7 +128,7 @@ public final class StructuredConcurrencyDemo implements Demo {
 
         try (final var scope = new StructuredTaskScope<Future<Integer>>()) {
             final List<? extends Supplier<Future<Integer>>> futures = tasks.stream()
-                    .map(task -> taskAsFuture(task))
+                    .map(this::taskAsFuture)
                     .map(scope::fork)
                     .toList();
 
@@ -151,7 +151,7 @@ public final class StructuredConcurrencyDemo implements Demo {
      * @param   task    java.util.concurrent.Callable
      * @return          java.util.concurrent.Callable&lt;java.util.concurrent.Future&lt;T&gt;&gt;
      */
-    static <T> Callable<Future<T>> taskAsFuture(final Callable<T> task) {
+    private <T> Callable<Future<T>> taskAsFuture(final Callable<T> task) {
         return () -> {
             try {
                 return CompletableFuture.completedFuture(task.call());
