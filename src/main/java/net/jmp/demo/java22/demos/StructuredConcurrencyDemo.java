@@ -39,6 +39,8 @@ import java.util.concurrent.*;
 
 import java.util.function.Supplier;
 
+import net.jmp.demo.java22.scopes.CustomScope;
+
 import org.slf4j.LoggerFactory;
 
 import org.slf4j.ext.XLogger;
@@ -69,8 +71,70 @@ public final class StructuredConcurrencyDemo implements Demo {
         this.shutdownOnFailure();
         this.shutdownOnSuccess();
         this.noShutdownPolicy();
+        this.customPolicy();
 
         this.logger.exit();
+    }
+
+    /**
+     * Use the custom scope as a policy.
+     */
+    private void customPolicy() {
+        this.logger.entry();
+
+        final List<Callable<Integer>> tasks = List.of(
+                () -> 1 + 0,
+                () -> 2 - 0,
+                () -> 3 / 0,
+                () -> 4 * 0,
+                () -> 5,
+                () -> 6 /0
+        );
+
+        try {
+            final var scopeResults = this.allResultsAndThrowables(tasks);
+
+            final var results = scopeResults.results;
+            final var throwables = scopeResults.throwables;
+
+            results.forEach(result -> this.logger.info("Custom result: {}", result));
+            throwables.forEach(throwable -> this.logger.info("Custom throwable: {}", throwable.getMessage()));
+        } catch (final InterruptedException ie) {
+            this.logger.catching(ie);
+            Thread.currentThread().interrupt();
+        }
+
+        this.logger.exit();
+    }
+
+    /**
+     * Gather all completed results and exceptions using a custom scope.
+     *
+     * @param   <T>     The type of result
+     * @param   tasks   java.util.concurrent.Callable&lt;T&gt;
+     * @return          net.jmp.demo.java22.SturcturedConcurrenyDemo.CustomScopeResultsAndThrowables
+     * @throws          java.lang.InterruptedException
+     */
+    private <T> CustomScopeResultsAndThrowables<T> allResultsAndThrowables(final List<Callable<T>> tasks) throws InterruptedException {
+        this.logger.entry();
+
+        List<T> results;
+        List<Throwable> throwables;
+
+        try (final var scope = new CustomScope<T>()) {
+            tasks.forEach(scope::fork);
+
+            scope.join();
+
+            results = scope.results().toList();
+            throwables = scope.throwables().toList();
+        }
+
+        final CustomScopeResultsAndThrowables<T> scopeResults = new CustomScopeResultsAndThrowables<>(results, throwables);
+
+        this.logger.exit(scopeResults);
+
+        return scopeResults;
     }
 
     /**
@@ -252,12 +316,12 @@ public final class StructuredConcurrencyDemo implements Demo {
         // Avoid processing subtask results returned by fork()
         // using the shutdown on success policy
 
-        try (final var scope = new StructuredTaskScope.ShutdownOnSuccess<>()) {
+        try (final var scope = new StructuredTaskScope.ShutdownOnSuccess<String>()) {
             for (final var task : tasks) {
                 scope.fork(task);
             }
 
-            result = (String) scope.joinUntil(instant).result();
+            result = scope.joinUntil(instant).result();
         }
 
         this.logger.exit(result);
@@ -361,4 +425,14 @@ public final class StructuredConcurrencyDemo implements Demo {
      * @param   orderNumber java.lang.Integer
      */
     record Response(String user, Integer orderNumber) {}
+
+    /**
+     * A record in which to return all the results
+     * and throwables collected by the custom scope.
+     *
+     * @param   <T>         The type of result
+     * @param   results     java.util.List&lt;T&gt;
+     * @param   throwables  java.util.List&lt;java.lang.Throwable&gt;
+     */
+    record CustomScopeResultsAndThrowables<T>(List<T> results, List<Throwable> throwables) {}
 }
