@@ -199,9 +199,11 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
         if (index >= 0) {
             final T element = this.list.get(index);
 
-            result = this.list.remove(element);
+            if (element != null) {
+                result = this.list.remove(element);
 
-            super.runTask(() -> consumer.accept(element));
+                super.runTask(() -> consumer.accept(element));
+            }
         }
 
         this.logger.exit(result);
@@ -222,7 +224,65 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
 
         final T element = this.list.remove(index);
 
-        super.runTask(() -> consumer.accept(element));
+        if (element != null) {
+            super.runTask(() -> consumer.accept(element));
+        }
+
+        this.logger.exit(element);
+
+        return element;
+    }
+
+    /**
+     * Removes the first occurrence of this element from the list if one exists
+     * and the applied predicate function evaluates to true.
+     * Apply the consumer to the removed element if it is not null.
+     *
+     * @param   object      T
+     * @param   matcher     java.util.function.Predicate&lt;? super T&gt;
+     * @param   consumer    java.util.function.Consumer&lt;T&gt;
+     * @return              boolean
+     */
+    public boolean removeIfAndApply(final T object, final Predicate<? super T> matcher, final Consumer<T> consumer) {
+        this.logger.entry(object, matcher, consumer);
+
+        final int index = this.list.indexOf(object);
+
+        boolean result = false;
+
+        if (index >= 0) {
+            final T element = this.list.get(index);
+
+            if (element != null && matcher.test(element)) {
+                result = this.list.remove(element);
+
+                super.runTask(() -> consumer.accept(element));
+            }
+        }
+
+        this.logger.exit(result);
+
+        return result;
+    }
+
+    /**
+     * Removes the element at the indexed position from the list if
+     * the applied predicate function evaluates to true.
+     * Apply the consumer to the removed element if it is not null.
+     *
+     * @param   index       int
+     * @param   matcher     java.util.function.Predicate&lt;? super T&gt;
+     * @param   consumer    java.util.function.Consumer&lt;T&gt;
+     * @return              T
+     */
+    public T removeIfAndApply(final int index, final Predicate<? super T> matcher, final Consumer<T> consumer) {
+        this.logger.entry(index, matcher, consumer);
+
+        final T element = this.list.remove(index);
+
+        if (element != null && matcher.test(element)) {
+            super.runTask(() -> consumer.accept(element));
+        }
 
         this.logger.exit(element);
 
@@ -233,7 +293,6 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
      * Implement methods:
      *   clearAndApply
      *   removeAllAndApply
-     *   removeIfAndApply
      *   retainAllAndApply
      */
 

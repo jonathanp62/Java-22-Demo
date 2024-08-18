@@ -175,24 +175,33 @@ public final class TestAppliedList {
     @Test
     public void testRemoveAndApplyByObjectNotFound() {
         try (final AppliedList<String> list = new AppliedList<>()) {
-            final WrappedObject<Boolean> consumed = WrappedObject.of(false);
-            final WrappedObject<String> removedElement = new WrappedObject<>();
-
             final List<String> values = List.of("value 1", "value 2", "value 3");
 
             list.addAll(values);
 
-            final Consumer<String> consumer = e -> {
-                removedElement.set(e.toUpperCase());
-                consumed.set(true);
-            };
-
-            final boolean result = list.removeAndApply("value 4", consumer);
+            final boolean result = list.removeAndApply("value 4", System.out::println);
 
             assertFalse(result);
             assertEquals(3, list.size());
             assertTrue(list.contains("value 1"));
             assertTrue(list.contains("value 2"));
+            assertTrue(list.contains("value 3"));
+        }
+    }
+
+    @Test
+    public void testRemoveAndApplyByNullObject() {
+        try (final AppliedList<String> list = new AppliedList<>()) {
+            list.add("value 1");
+            list.add(null);
+            list.add("value 3");
+
+            final boolean result = list.removeAndApply(null, System.out::println);
+
+            assertFalse(result);
+            assertEquals(3, list.size());
+            assertTrue(list.contains("value 1"));
+            assertTrue(list.contains(null));
             assertTrue(list.contains("value 3"));
         }
     }
@@ -229,20 +238,76 @@ public final class TestAppliedList {
         }
     }
 
+    @Test
+    public void testRemoveAndApplyByIndexedNull() {
+        try (final AppliedList<String> list = new AppliedList<>()) {
+            list.add("value 1");
+            list.add(null);
+            list.add("value 3");
+
+            final String result = list.removeAndApply(1, System.out::println);
+
+            assertNull(result);
+            assertEquals(2, list.size());
+            assertTrue(list.contains("value 1"));
+            assertTrue(list.contains("value 3"));
+        }
+    }
+
     @Test(expected = IndexOutOfBoundsException.class)
     public void testRemoveAndApplyByIndexNotFound() {
         try (final AppliedList<String> list = new AppliedList<>()) {
-            final WrappedObject<String> removedElement = new WrappedObject<>();
-
             final List<String> values = List.of("value 1", "value 2", "value 3");
 
             list.addAll(values);
 
-            final Consumer<String> consumer = e -> {
-                removedElement.set(e.toUpperCase());
-            };
+            final String _ = list.removeAndApply(3, System.out::println);
+        }
+    }
 
-            final String _ = list.removeAndApply(3, consumer);
+    @Test
+    public void testRemoveIfAndApplyByObjectFound() {
+
+    }
+
+    @Test
+    public void testRemoveIfAndApplyByObjectFoundNoMatch() {
+
+    }
+
+    @Test
+    public void testRemoveIfAndApplyByObjectNotFound() {
+
+    }
+
+    @Test
+    public void testRemoveIfAndApplyByNullObject() {
+
+    }
+
+    @Test
+    public void testRemoveIfAndApplyByIndexFound() {
+
+    }
+
+    @Test
+    public void testRemoveIfAndApplyByIndexFoundNoMatch() {
+
+    }
+
+    @Test
+    public void testRemoveIfAndApplyByIndexedNull() {
+
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testRemoveIfAndApplyByIndexNotFound() {
+        try (final AppliedList<String> list = new AppliedList<>()) {
+            final List<String> values = List.of("value 1", "value 2", "value 3");
+
+            list.addAll(values);
+
+            final String _ = list.removeIfAndApply(3, String::isEmpty, System.out::println);
         }
     }
 }

@@ -98,15 +98,15 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
      * applied predicate function evaluates to true.
      *
      * @param   t       T
-     * @param   filter  java.util.function.Predicate&lt;? super T&gt;
+     * @param   matcher java.util.function.Predicate&lt;? super T&gt;
      * @return          boolean
      */
-    public boolean addIf(final T t, @Nonnull final Predicate<? super T> filter) {
-        this.logger.entry(t, filter);
+    public boolean addIf(final T t, @Nonnull final Predicate<? super T> matcher) {
+        this.logger.entry(t, matcher);
 
-        boolean result = true;  // Return true if the element was filtered out
+        boolean result = true;  // Return true if the element did not match
 
-        if (filter.test(t)) {
+        if (matcher.test(t)) {
             result = this.queue.add(t);
         }
 
@@ -122,15 +122,15 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
      *
      * @param   t       T
      * @param   mapper  java.util.function.Function&lt;? super T,? extends T&gt;
-     * @param   filter  java.util.function.Predicate&lt;? super T&gt;
+     * @param   matcher java.util.function.Predicate&lt;? super T&gt;
      * @return          boolean
      */
-    public boolean applyAndAddIf(final T t, final Function<? super T, ? extends T> mapper, @Nonnull final Predicate<? super T> filter) {
-        this.logger.entry(t, mapper, filter);
+    public boolean applyAndAddIf(final T t, final Function<? super T, ? extends T> mapper, @Nonnull final Predicate<? super T> matcher) {
+        this.logger.entry(t, mapper, matcher);
 
-        boolean result = true;  // Return true if the element was filtered out
+        boolean result = true;  // Return true if the element did not match
 
-        if (filter.test(t)) {
+        if (matcher.test(t)) {
             final T mappedValue = mapper.apply(t);
 
             result = this.queue.add(mappedValue);
@@ -146,15 +146,15 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
      * applied predicate function evaluates to true.
      *
      * @param   t       T
-     * @param   filter  java.util.function.Predicate&lt;? super T&gt;
+     * @param   matcher java.util.function.Predicate&lt;? super T&gt;
      * @return          boolean
      */
-    public boolean offerIf(final T t, @Nonnull final Predicate<? super T> filter) {
-        this.logger.entry(t, filter);
+    public boolean offerIf(final T t, @Nonnull final Predicate<? super T> matcher) {
+        this.logger.entry(t, matcher);
 
-        boolean result = true;  // Return true if the element was filtered out
+        boolean result = true;  // Return true if the element did not match
 
-        if (filter.test(t)) {
+        if (matcher.test(t)) {
             result = this.queue.offer(t);
         }
 
@@ -170,15 +170,15 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
      *
      * @param   t       T
      * @param   mapper  java.util.function.Function&lt;? super T,? extends T&gt;
-     * @param   filter  java.util.function.Predicate&lt;? super T&gt;
+     * @param   matcher java.util.function.Predicate&lt;? super T&gt;
      * @return          boolean
      */
-    public boolean applyAndOfferIf(final T t, final Function<? super T, ? extends T> mapper, @Nonnull final Predicate<? super T> filter) {
-        this.logger.entry(t, mapper, filter);
+    public boolean applyAndOfferIf(final T t, final Function<? super T, ? extends T> mapper, @Nonnull final Predicate<? super T> matcher) {
+        this.logger.entry(t, mapper, matcher);
 
-        boolean result = true;  // Return true if the element was filtered out
+        boolean result = true;  // Return true if the element did not match
 
-        if (filter.test(t)) {
+        if (matcher.test(t)) {
             final T mappedValue = mapper.apply(t);
 
             result = this.queue.offer(mappedValue);
@@ -372,18 +372,18 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
     /**
      * Removes all the elements of this collection that satisfy the given predicate.
      *
-     * @param   filter      java.util.function.Predicate&lt;? super T&gt;
+     * @param   matcher     java.util.function.Predicate&lt;? super T&gt;
      * @param   consumer    java.util.function.Consumer&lt;&gt;
      * @return              boolean
      */
-    public boolean removeIfAndApply(@Nonnull final Predicate<? super T> filter, @Nonnull final Consumer<T> consumer) {
-        this.logger.entry(filter, consumer);
+    public boolean removeIfAndApply(@Nonnull final Predicate<? super T> matcher, @Nonnull final Consumer<T> consumer) {
+        this.logger.entry(matcher, consumer);
 
         final WrappedObject<Boolean> result = WrappedObject.of(false);
 
         if (!this.queue.isEmpty()) {
             this.queue.forEach(e -> {
-                if (this.queue.removeIf(filter)) {
+                if (this.queue.removeIf(matcher)) {
                     super.runTask(() -> consumer.accept(e));
                     result.set(true);
                 }
