@@ -33,12 +33,19 @@ package net.jmp.demo.java22.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.util.concurrent.TimeUnit;
+
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 import java.util.stream.IntStream;
 
 import org.junit.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import static org.awaitility.Awaitility.await;
 
 import static org.junit.Assert.*;
 
@@ -132,4 +139,72 @@ public final class TestAppliedList {
             assertEquals(0, list.size());
         }
     }
+
+    @Test
+    public void testRemoveAndApplyByObjectFound() {
+        try (final AppliedList<String> list = new AppliedList<>()) {
+            final WrappedObject<Boolean> consumed = WrappedObject.of(false);
+            final WrappedObject<String> removedElement = new WrappedObject<>();
+
+            final List<String> values = List.of("value 1", "value 2", "value 3");
+
+            list.addAll(values);
+
+            final Consumer<String> consumer = e -> {
+                removedElement.set(e.toUpperCase());
+                consumed.set(true);
+            };
+
+            final boolean result = list.removeAndApply("value 2", consumer);
+
+            assertTrue(result);
+            assertEquals(2, list.size());
+            assertTrue(list.contains("value 1"));
+            assertTrue(list.contains("value 3"));
+
+            await().atMost(AWAIT_TIME, TimeUnit.MILLISECONDS)
+                    .untilAsserted(
+                            () -> assertThat(consumed.get())
+                                    .isTrue()
+                    );
+
+            assertEquals("VALUE 2", removedElement.get());
+        }
+    }
+
+    @Test
+    public void testRemoveAndApplyByObjectNotFound() {
+        try (final AppliedList<String> list = new AppliedList<>()) {
+            final WrappedObject<Boolean> consumed = WrappedObject.of(false);
+            final WrappedObject<String> removedElement = new WrappedObject<>();
+
+            final List<String> values = List.of("value 1", "value 2", "value 3");
+
+            list.addAll(values);
+
+            final Consumer<String> consumer = e -> {
+                removedElement.set(e.toUpperCase());
+                consumed.set(true);
+            };
+
+            final boolean result = list.removeAndApply("value 4", consumer);
+
+            assertFalse(result);
+            assertEquals(3, list.size());
+            assertTrue(list.contains("value 1"));
+            assertTrue(list.contains("value 2"));
+            assertTrue(list.contains("value 3"));
+        }
+    }
+
+    @Test
+    public void testRemoveAndApplyByIndexFound() {
+
+    }
+
+    @Test
+    public void testRemoveAndApplyByIndexNotFound() {
+
+    }
+
 }

@@ -33,6 +33,7 @@ package net.jmp.demo.java22.util;
 
 import java.util.*;
 
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -52,7 +53,7 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
     private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
 
     /** The list. */
-    private List<T> list;
+    private final List<T> list;
 
     /**
      * The default constructor.
@@ -180,10 +181,37 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
         return result.get();
     }
 
+    /**
+     * Removes the first occurrence of this element from the list if one exists.
+     * Apply the consumer to the removed element if it is not null.
+     *
+     * @param   object      T
+     * @param   consumer    java.util.function.Consumer&lt;T&gt;
+     * @return              boolean
+     */
+    public boolean removeAndApply(final T object, final Consumer<T> consumer) {
+        this.logger.entry(object, consumer);
+
+        final int index = this.list.indexOf(object);
+
+        boolean result = false;
+
+        if (index >= 0) {
+            final T element = this.list.get(index);
+
+            result = this.list.remove(element);
+
+            super.runTask(() -> consumer.accept(element));
+        }
+
+        this.logger.exit(result);
+
+        return result;
+    }
+
     /*
      * Implement methods:
      *   clearAndApply
-     *   removeAndApply
      *   removeAllAndApply
      *   removeIfAndApply
      *   retainAllAndApply
