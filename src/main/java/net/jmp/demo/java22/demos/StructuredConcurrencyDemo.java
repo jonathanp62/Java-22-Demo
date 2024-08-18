@@ -1,10 +1,11 @@
 package net.jmp.demo.java22.demos;
 
 /*
+ * (#)StructuredConcurrencyDemo.java    0.7.0   08/18/2024
  * (#)StructuredConcurrencyDemo.java    0.6.0   08/15/2024
  *
  * @author   Jonathan Parker
- * @version  0.6.0
+ * @version  0.7.0
  * @since    0.6.0
  *
  * MIT License
@@ -38,6 +39,8 @@ import java.util.UUID;
 import java.util.concurrent.*;
 
 import java.util.function.Supplier;
+
+import java.util.stream.Stream;
 
 import net.jmp.demo.java22.scopes.CustomScope;
 
@@ -153,7 +156,7 @@ public final class StructuredConcurrencyDemo implements Demo {
         );
 
         try {
-            final List<Future<Integer>> futures = this.executeAll(tasks);
+            final Stream<Future<Integer>> futures = this.executeAll(tasks);
 
             futures.forEach(future -> {
                 try {
@@ -182,15 +185,17 @@ public final class StructuredConcurrencyDemo implements Demo {
      * Futures containing each task's respective successful or exceptional result.
      *
      * @param   tasks   java.util.List&lt;java.util.concurrent.Callable&lt;java.lang.Integer&gt;&gt;
-     * @return          java.util.List&lt;java.util.concurrent.Future&lt;java.lang.Integer&gt;&gt;
+     * @return          java.util.stream.Stream&lt;java.util.concurrent.Future&lt;java.lang.Integer&gt;&gt;
      * @throws          java.lang.InterruptedException
      */
-    private List<Future<Integer>> executeAll(final List<Callable<Integer>> tasks) throws InterruptedException {
+    private Stream<Future<Integer>> executeAll(final List<Callable<Integer>> tasks) throws InterruptedException {
         this.logger.entry(tasks);
 
-        List<Future<Integer>> results;
+        Stream<Future<Integer>> results;
 
         try (final var scope = new StructuredTaskScope<Future<Integer>>()) {
+            // If this list is converted to a stream then a task scope is closed illegal state exception occurs
+
             final List<? extends Supplier<Future<Integer>>> futures = tasks.stream()
                     .map(this::taskAsFuture)
                     .map(scope::fork)
@@ -198,9 +203,7 @@ public final class StructuredConcurrencyDemo implements Demo {
 
             scope.join();
 
-            results = futures.stream()
-                    .map(Supplier::get)
-                    .toList();
+            results = futures.stream().map(Supplier::get);
         }
 
         this.logger.exit(results);
@@ -258,7 +261,7 @@ public final class StructuredConcurrencyDemo implements Demo {
         );
 
         try {
-            final var results = this.runAll(tasks);
+            final Stream<String> results = this.runAll(tasks);
 
             results.forEach(this.logger::info);
         } catch (final InterruptedException ie) {
@@ -334,17 +337,19 @@ public final class StructuredConcurrencyDemo implements Demo {
      * only failing if one of them should fail.
      *
      * @param   tasks   java.util.List&lt;java.util.Callable&lt;java.lang.String&gt;&gt;
-     * @return          java.util.List&lt;java.lang.String&gt;
+     * @return          java.util.stream.Stream&lt;java.lang.String&gt;
      * @throws          java.lang.InterruptedException
      */
-    private List<String> runAll(final List<Callable<String>> tasks) throws InterruptedException {
+    private Stream<String> runAll(final List<Callable<String>> tasks) throws InterruptedException {
         this.logger.entry(tasks);
 
-        List<String> results;
+        Stream<String> results;
 
         // Note that the return type of fork is a supplier
 
         try (final var scope = new StructuredTaskScope.ShutdownOnFailure()) {
+            // If this list is converted to a stream then a task scope is closed illegal state exception occurs
+
             final List<? extends Supplier<String>> suppliers = tasks
                     .stream()
                     .map(scope::fork)
@@ -359,10 +364,7 @@ public final class StructuredConcurrencyDemo implements Demo {
                 return new RuntimeException(exception.getMessage());
             });
 
-            results = suppliers
-                    .stream()
-                    .map(Supplier::get)
-                    .toList();
+            results = suppliers.stream().map(Supplier::get);
         }
 
         this.logger.exit(results);

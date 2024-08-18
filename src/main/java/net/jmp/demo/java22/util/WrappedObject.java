@@ -1,10 +1,11 @@
 package net.jmp.demo.java22.util;
 
 /*
+ * (#)WrappedObject.java    0.7.0   08/18/2024
  * (#)WrappedObject.java    0.6.0   08/15/2024
  *
  * @author   Jonathan Parker
- * @version  0.6.0
+ * @version  0.7.0
  * @since    0.6.0
  *
  * MIT License
@@ -40,6 +41,9 @@ import java.util.Objects;
  * @param   <T> The type of object to wrap
  */
 public final class WrappedObject<T> {
+    /** Object is null message text. */
+    private static final String OBJECT_IS_NULL = "T 'object' is null";
+
     /** The object. */
     private T object;
 
@@ -58,7 +62,18 @@ public final class WrappedObject<T> {
     public WrappedObject(final T object) {
         super();
 
-        this.object = Objects.requireNonNull(object, () -> "T 'object' is null");
+        this.object = Objects.requireNonNull(object, () -> OBJECT_IS_NULL);
+    }
+
+    /**
+     * Construct and return a wrapped object of type T.
+     *
+     * @param   <T>     The type of object
+     * @param   object  java.lang.Object
+     * @return          net.jmp.demo.java22.util.WrappedObject&lt;T&gt;
+     */
+    public static <T> WrappedObject<T> of(final T object) {
+        return new WrappedObject<>(Objects.requireNonNull(object, () -> OBJECT_IS_NULL));
     }
 
     /**
@@ -67,7 +82,7 @@ public final class WrappedObject<T> {
      * @param   object  T
      */
     public void set(final T object) {
-        this.object = Objects.requireNonNull(object, () -> "T 'object' is null");
+        this.object = Objects.requireNonNull(object, () -> OBJECT_IS_NULL);
     }
 
     /**

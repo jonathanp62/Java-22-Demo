@@ -1,10 +1,11 @@
 package net.jmp.demo.java22.util;
 
 /*
+ * (#)TestWrappedObject.java    0.7.0   08/18/2024
  * (#)TestWrappedObject.java    0.6.0   08/15/2024
  *
  * @author   Jonathan Parker
- * @version  0.6.0
+ * @version  0.7.0
  * @since    0.6.0
  *
  * MIT License
@@ -55,5 +56,16 @@ public final class TestWrappedObject {
         wrappedBoolean.set(true);
 
         assertTrue(wrappedBoolean.get());
+    }
+
+    @Test
+    public void testOf() {
+        final WrappedObject<Integer> wrappedInteger = WrappedObject.of(17);
+
+        assertEquals(17, (long) wrappedInteger.get());
+
+        wrappedInteger.set(71);
+
+        assertEquals(71, (long) wrappedInteger.get());
     }
 }

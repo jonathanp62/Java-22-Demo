@@ -1,10 +1,11 @@
 package net.jmp.demo.java22.util;
 
 /*
+ * (#)AppliedList.java  0.7.0   08/18/2024
  * (#)AppliedList.java  0.6.0   08/17/2024
  *
  * @author   Jonathan Parker
- * @version  0.6.0
+ * @version  0.7.0
  * @since    0.6.0
  *
  * MIT License
@@ -32,10 +33,20 @@ package net.jmp.demo.java22.util;
 
 import java.util.*;
 
+import java.util.function.Function;
+import java.util.function.Predicate;
+
+import javax.annotation.Nonnull;
+
 import org.slf4j.LoggerFactory;
 
 import org.slf4j.ext.XLogger;
 
+/**
+ * An applied list.
+ *
+ * @param   <T> The type of element
+ */
 public final class AppliedList<T> extends AppliedBaseCollection<T> implements List<T>, AutoCloseable {
     /** The logger. */
     private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
@@ -74,18 +85,110 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
         this.logger.exit();
     }
 
+    /**
+     * Inserts the element into the list if the
+     * applied predicate function evaluates to true.
+     *
+     * @param   t       T
+     * @param   filter  java.util.function.Predicate&lt;? super T&gt;
+     * @return          boolean
+     */
+    public boolean addIf(final T t, @Nonnull final Predicate<? super T> filter) {
+        this.logger.entry(t, filter);
+
+        boolean result;
+
+        if (filter.test(t)) {
+            result = this.list.add(t);
+        } else {
+            result = true;
+        }
+
+        this.logger.exit(result);
+
+        return result;
+    }
+
+    /**
+     * Inserts the element into the list after applying
+     * the mapper function if the applied predicate
+     * function evaluates to true.
+     *
+     * @param   t       T
+     * @param   mapper  java.util.function.Function&lt;? super T,? extends T&gt;
+     * @param   filter  java.util.function.Predicate&lt;? super T&gt;
+     * @return          boolean
+     */
+    public boolean applyAndAddIf(final T t, final Function<? super T, ? extends T> mapper, @Nonnull final Predicate<? super T> filter) {
+        this.logger.entry(t, mapper, filter);
+
+        boolean result;
+
+        if (filter.test(t)) {
+            final T mappedValue = mapper.apply(t);
+
+            result = this.list.add(mappedValue);
+        } else {
+            result = true;
+        }
+
+        this.logger.exit(result);
+
+        return result;
+    }
+
+    /**
+     * Inserts the element into the list after applying the mapper function.
+     *
+     * @param   t       T
+     * @param   mapper  java.util.function.Function&lt;? super T, ? extends T&gt;
+     * @return          boolean
+     */
+    public boolean applyAndAdd(final T t, final Function<? super T, ? extends T> mapper) {
+        this.logger.entry(t, mapper);
+
+        final T mappedValue = mapper.apply(t);
+        final boolean result = this.list.add(mappedValue);
+
+        this.logger.exit(result);
+
+        return result;
+    }
+
+    /**
+     * Adds all the elements in the specified collection to this list.
+     * Apply the mapper function to each element before adding it.
+     *
+     * @param   c       java.util.Collection&lt;? extends T&gt;
+     * @param   mapper  java.util.function.Function&lt;? super T, ? extends T&gt;
+     * @return          boolean
+     */
+    public boolean applyAndAddAll(@Nonnull final Collection<? extends T> c, final Function<? super T, ? extends T> mapper) {
+        this.logger.entry(c, mapper);
+
+        final WrappedObject<Boolean> result = WrappedObject.of(false);
+
+        if (!c.isEmpty()) {
+            c.forEach(e -> {
+                this.list.add(mapper.apply(e));
+                result.set(true);
+            });
+        }
+
+        this.logger.exit(result.get());
+
+        return result.get();
+    }
+
     /*
      * Implement methods:
-     *   addIf
-     *   applyAndAdd
-     *   applyAndAddAll
-     *   applyAndAddIf
      *   clearAndApply
      *   removeAndApply
      *   removeAllAndApply
      *   removeIfAndApply
      *   retainAllAndApply
      */
+
     /* List and Collection method overrides */
 
     @Override

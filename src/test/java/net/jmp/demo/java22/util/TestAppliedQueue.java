@@ -1,11 +1,12 @@
 package net.jmp.demo.java22.util;
 
 /*
+ * (#)TestAppliedQueue.java 0.7.0   08/18/2024
  * (#)TestAppliedQueue.java 0.6.0   08/17/2024
  * (#)TestAppliedQueue.java 0.5.0   08/13/2024
  *
  * @author   Jonathan Parker
- * @version  0.6.0
+ * @version  0.7.0
  * @since    0.5.0
  *
  * MIT License
@@ -160,9 +161,9 @@ public final class TestAppliedQueue {
         try (final AppliedQueue<Integer> queue = new AppliedQueue<>()) {
             final Function<Integer, Integer> function = x -> x + 1;
 
-            queue.applyAndOffer(1, function);
-            queue.applyAndOffer(2, function);
-            queue.applyAndOffer(3, function);
+            queue.applyAndAdd(1, function);
+            queue.applyAndAdd(2, function);
+            queue.applyAndAdd(3, function);
 
             assertEquals(3, queue.size());
 

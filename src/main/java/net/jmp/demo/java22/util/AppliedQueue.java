@@ -1,12 +1,13 @@
 package net.jmp.demo.java22.util;
 
 /*
+ * (#)AppliedQueue.java 0.7.0   08/18/2024
  * (#)AppliedQueue.java 0.6.0   08/16/2024
  * (#)AppliedQueue.java 0.5.0   08/10/2024
  * (#)AppliedQueue.java 0.4.0   08/09/2024
  *
  * @author   Jonathan Parker
- * @version  0.6.0
+ * @version  0.7.0
  * @since    0.4.0
  *
  * MIT License
@@ -235,7 +236,7 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
     public boolean applyAndAddAll(@Nonnull final Collection<? extends T> c, final Function<? super T, ? extends T> mapper) {
         this.logger.entry(c, mapper);
 
-        final WrappedObject<Boolean> result = new WrappedObject<>(false);
+        final WrappedObject<Boolean> result = WrappedObject.of(false);
 
         if (!c.isEmpty()) {
             c.forEach(e -> {
@@ -352,7 +353,7 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
     public boolean removeAllAndApply(@Nonnull final Collection<? extends T> c, final Consumer<T> consumer) {
         this.logger.entry(c);
 
-        final WrappedObject<Boolean> result = new WrappedObject<>(false);
+        final WrappedObject<Boolean> result = WrappedObject.of(false);
 
         if (!c.isEmpty()) {
             c.forEach(e -> {
@@ -378,7 +379,7 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
     public boolean removeIfAndApply(@Nonnull final Predicate<? super T> filter, @Nonnull final Consumer<T> consumer) {
         this.logger.entry(filter, consumer);
 
-        final WrappedObject<Boolean> result = new WrappedObject<>(false);
+        final WrappedObject<Boolean> result = WrappedObject.of(false);
 
         if (!this.queue.isEmpty()) {
             this.queue.forEach(e -> {
