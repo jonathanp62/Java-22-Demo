@@ -199,9 +199,9 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
         if (index >= 0) {
             final T element = this.list.get(index);
 
-            if (element != null) {
-                result = this.list.remove(element);
+            result = this.list.remove(element);
 
+            if (element != null) {
                 super.runTask(() -> consumer.accept(element));
             }
         }
@@ -253,10 +253,12 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
         if (index >= 0) {
             final T element = this.list.get(index);
 
-            if (element != null && matcher.test(element)) {
+            if (matcher.test(element)) {
                 result = this.list.remove(element);
 
-                super.runTask(() -> consumer.accept(element));
+                if (element != null) {
+                    super.runTask(() -> consumer.accept(element));
+                }
             }
         }
 
@@ -278,15 +280,23 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
     public T removeIfAndApply(final int index, final Predicate<? super T> matcher, final Consumer<T> consumer) {
         this.logger.entry(index, matcher, consumer);
 
-        final T element = this.list.remove(index);
+        T result = null;
 
-        if (element != null && matcher.test(element)) {
-            super.runTask(() -> consumer.accept(element));
+        final T element = this.list.get(index);
+
+        if (matcher.test(element)) {
+            this.list.remove(index);
+
+            result = element;
+
+            if (element != null) {
+                super.runTask(() -> consumer.accept(element));
+            }
         }
 
-        this.logger.exit(element);
+        this.logger.exit(result);
 
-        return element;
+        return result;
     }
 
     /*

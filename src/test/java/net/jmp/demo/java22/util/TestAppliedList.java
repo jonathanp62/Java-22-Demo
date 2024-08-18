@@ -32,6 +32,7 @@ package net.jmp.demo.java22.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import java.util.concurrent.TimeUnit;
 
@@ -198,10 +199,9 @@ public final class TestAppliedList {
 
             final boolean result = list.removeAndApply(null, System.out::println);
 
-            assertFalse(result);
-            assertEquals(3, list.size());
+            assertTrue(result);
+            assertEquals(2, list.size());
             assertTrue(list.contains("value 1"));
-            assertTrue(list.contains(null));
             assertTrue(list.contains("value 3"));
         }
     }
@@ -267,37 +267,183 @@ public final class TestAppliedList {
 
     @Test
     public void testRemoveIfAndApplyByObjectFound() {
+        try (final AppliedList<String> list = new AppliedList<>()) {
+            final WrappedObject<Boolean> consumed = WrappedObject.of(false);
+            final WrappedObject<String> removedElement = new WrappedObject<>();
 
+            final List<String> values = List.of("value 1", "value 2", "value 3");
+
+            list.addAll(values);
+
+            final Consumer<String> consumer = e -> {
+                removedElement.set(e.toUpperCase());
+                consumed.set(true);
+            };
+
+            final boolean result = list.removeIfAndApply("value 2", s -> s.startsWith("value"), consumer);
+
+            assertTrue(result);
+            assertEquals(2, list.size());
+            assertTrue(list.contains("value 1"));
+            assertTrue(list.contains("value 3"));
+
+            await().atMost(AWAIT_TIME, TimeUnit.MILLISECONDS)
+                    .untilAsserted(
+                            () -> assertThat(consumed.get())
+                                    .isTrue()
+                    );
+
+            assertEquals("VALUE 2", removedElement.get());
+        }
     }
 
     @Test
     public void testRemoveIfAndApplyByObjectFoundNoMatch() {
+        try (final AppliedList<String> list = new AppliedList<>()) {
+            final List<String> values = List.of("value 1", "value 2", "value 3");
 
+            list.addAll(values);
+
+            final boolean result = list.removeIfAndApply("value 2", s -> s.isEmpty(), System.out::println);
+
+            assertFalse(result);
+            assertEquals(3, list.size());
+            assertTrue(list.contains("value 1"));
+            assertTrue(list.contains("value 2"));
+            assertTrue(list.contains("value 3"));
+        }
     }
 
     @Test
     public void testRemoveIfAndApplyByObjectNotFound() {
+        try (final AppliedList<String> list = new AppliedList<>()) {
+            final List<String> values = List.of("value 1", "value 2", "value 3");
 
+            list.addAll(values);
+
+            final boolean result = list.removeIfAndApply("value 4", s -> s.startsWith("value"), System.out::println);
+
+            assertFalse(result);
+            assertEquals(3, list.size());
+            assertTrue(list.contains("value 1"));
+            assertTrue(list.contains("value 2"));
+            assertTrue(list.contains("value 3"));
+        }
     }
 
     @Test
     public void testRemoveIfAndApplyByNullObject() {
+        try (final AppliedList<String> list = new AppliedList<>()) {
+            list.add("value 1");
+            list.add(null);
+            list.add("value 3");
 
+            final boolean result = list.removeIfAndApply(null, Objects::isNull, System.out::println);
+
+            assertTrue(result);
+            assertEquals(2, list.size());
+            assertTrue(list.contains("value 1"));
+            assertTrue(list.contains("value 3"));
+        }
+    }
+
+    @Test
+    public void testRemoveIfAndApplyByNullObjectNoMatch() {
+        try (final AppliedList<String> list = new AppliedList<>()) {
+            list.add("value 1");
+            list.add(null);
+            list.add("value 3");
+
+            final boolean result = list.removeIfAndApply(null, Objects::nonNull, System.out::println);
+
+            assertFalse(result);
+            assertEquals(3, list.size());
+            assertTrue(list.contains("value 1"));
+            assertTrue(list.contains(null));
+            assertTrue(list.contains("value 3"));
+        }
     }
 
     @Test
     public void testRemoveIfAndApplyByIndexFound() {
+        try (final AppliedList<String> list = new AppliedList<>()) {
+            final WrappedObject<Boolean> consumed = WrappedObject.of(false);
+            final WrappedObject<String> removedElement = new WrappedObject<>();
 
+            final List<String> values = List.of("value 1", "value 2", "value 3");
+
+            list.addAll(values);
+
+            final Consumer<String> consumer = e -> {
+                removedElement.set(e.toUpperCase());
+                consumed.set(true);
+            };
+
+            final String result = list.removeIfAndApply(1, s -> s.startsWith("value"), consumer);
+
+            assertNotNull(result);
+            assertEquals(2, list.size());
+            assertTrue(list.contains("value 1"));
+            assertTrue(list.contains("value 3"));
+
+            await().atMost(AWAIT_TIME, TimeUnit.MILLISECONDS)
+                    .untilAsserted(
+                            () -> assertThat(consumed.get())
+                                    .isTrue()
+                    );
+
+            assertEquals("VALUE 2", removedElement.get());
+        }
     }
 
     @Test
     public void testRemoveIfAndApplyByIndexFoundNoMatch() {
+        try (final AppliedList<String> list = new AppliedList<>()) {
+            final List<String> values = List.of("value 1", "value 2", "value 3");
 
+            list.addAll(values);
+
+            final String result = list.removeIfAndApply(1, String::isEmpty, System.out::println);
+
+            assertNull(result);
+            assertEquals(3, list.size());
+            assertTrue(list.contains("value 1"));
+            assertTrue(list.contains("value 2"));
+            assertTrue(list.contains("value 3"));
+        }
     }
 
     @Test
     public void testRemoveIfAndApplyByIndexedNull() {
+        try (final AppliedList<String> list = new AppliedList<>()) {
+            list.add("value 1");
+            list.add(null);
+            list.add("value 3");
 
+            final String result = list.removeIfAndApply(1, Objects::isNull, System.out::println);
+
+            assertNull(result);
+            assertEquals(2, list.size());
+            assertTrue(list.contains("value 1"));
+            assertTrue(list.contains("value 3"));
+        }
+    }
+
+    @Test
+    public void testRemoveIfAndApplyByIndexedNullNoMatch() {
+        try (final AppliedList<String> list = new AppliedList<>()) {
+            list.add("value 1");
+            list.add(null);
+            list.add("value 3");
+
+            final String result = list.removeIfAndApply(1, Objects::nonNull, System.out::println);
+
+            assertNull(result);
+            assertEquals(3, list.size());
+            assertTrue(list.contains("value 1"));
+            assertTrue(list.contains(null));
+            assertTrue(list.contains("value 3"));
+        }
     }
 
     @Test(expected = IndexOutOfBoundsException.class)
