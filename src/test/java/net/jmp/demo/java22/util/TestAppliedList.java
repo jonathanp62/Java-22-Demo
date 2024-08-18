@@ -199,12 +199,50 @@ public final class TestAppliedList {
 
     @Test
     public void testRemoveAndApplyByIndexFound() {
+        try (final AppliedList<String> list = new AppliedList<>()) {
+            final WrappedObject<Boolean> consumed = WrappedObject.of(false);
+            final WrappedObject<String> removedElement = new WrappedObject<>();
 
+            final List<String> values = List.of("value 1", "value 2", "value 3");
+
+            list.addAll(values);
+
+            final Consumer<String> consumer = e -> {
+                removedElement.set(e.toUpperCase());
+                consumed.set(true);
+            };
+
+            final String result = list.removeAndApply(1, consumer);
+
+            assertNotNull(result);
+            assertEquals(2, list.size());
+            assertTrue(list.contains("value 1"));
+            assertTrue(list.contains("value 3"));
+
+            await().atMost(AWAIT_TIME, TimeUnit.MILLISECONDS)
+                    .untilAsserted(
+                            () -> assertThat(consumed.get())
+                                    .isTrue()
+                    );
+
+            assertEquals("VALUE 2", removedElement.get());
+        }
     }
 
-    @Test
+    @Test(expected = IndexOutOfBoundsException.class)
     public void testRemoveAndApplyByIndexNotFound() {
+        try (final AppliedList<String> list = new AppliedList<>()) {
+            final WrappedObject<String> removedElement = new WrappedObject<>();
 
+            final List<String> values = List.of("value 1", "value 2", "value 3");
+
+            list.addAll(values);
+
+            final Consumer<String> consumer = e -> {
+                removedElement.set(e.toUpperCase());
+            };
+
+            final String _ = list.removeAndApply(3, consumer);
+        }
     }
-
 }

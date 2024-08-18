@@ -209,6 +209,26 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
         return result;
     }
 
+    /**
+     * Removes the element at the indexed position from the list.
+     * Apply the consumer to the removed element if it is not null.
+     *
+     * @param   index       int
+     * @param   consumer    java.util.function.Consumer&lt;T&gt;
+     * @return              T
+     */
+    public T removeAndApply(final int index, final Consumer<T> consumer) {
+        this.logger.entry(index, consumer);
+
+        final T element = this.list.remove(index);
+
+        super.runTask(() -> consumer.accept(element));
+
+        this.logger.exit(element);
+
+        return element;
+    }
+
     /*
      * Implement methods:
      *   clearAndApply
