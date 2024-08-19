@@ -75,6 +75,79 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
     }
 
     /**
+     * A constructor that takes a list
+     * and creates an unmodifiable object.
+     *
+     * @param   list    java.util.List&lt;T&gt;
+     */
+    private AppliedList(final List<T> list) {
+        super();
+
+        this.list = Collections.unmodifiableList(list);
+    }
+
+    /**
+     * Create an empty applied list.
+     *
+     * @param   <T> The type of element
+     * @return      net.jmp.demo.java22.util.AppliedList&lt;T&gt;
+     */
+    static <T> AppliedList<T> of() {
+        return new AppliedList<>(new ArrayList<>());
+    }
+
+    /**
+     * Create an applied list with one element.
+     *
+     * @param   <T> The type of element
+     * @param   t   T
+     * @return      net.jmp.demo.java22.util.AppliedList&lt;T&gt;
+     */
+    static <T> AppliedList<T> of(final T t) {
+        final AppliedList<T> list = new AppliedList<>();
+
+        list.add(Objects.requireNonNull(t));
+
+        return new AppliedList<>(list);
+    }
+
+    /**
+     * Create an applied list with two elements.
+     *
+     * @param   <T> The type of element
+     * @param   t1  T
+     * @param   t2  T
+     * @return      net.jmp.demo.java22.util.AppliedList&lt;T&gt;
+     */
+    static <T> AppliedList<T> of(final T t1, final T t2) {
+        final AppliedList<T> list = new AppliedList<>();
+
+        list.add(Objects.requireNonNull(t1));
+        list.add(Objects.requireNonNull(t2));
+
+        return new AppliedList<>(list);
+    }
+
+    /**
+     * Create an applied list with three elements.
+     *
+     * @param   <T> The type of element
+     * @param   t1  T
+     * @param   t2  T
+     * @param   t3  T
+     * @return      net.jmp.demo.java22.util.AppliedList&lt;T&gt;
+     */
+    static <T> AppliedList<T> of(final T t1, final T t2, final T t3) {
+        final AppliedList<T> list = new AppliedList<>();
+
+        list.add(Objects.requireNonNull(t1));
+        list.add(Objects.requireNonNull(t2));
+        list.add(Objects.requireNonNull(t3));
+
+        return new AppliedList<>(list);
+    }
+
+    /**
      * Close any resources.
      */
     @Override

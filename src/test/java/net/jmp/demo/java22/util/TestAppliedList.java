@@ -1,10 +1,11 @@
 package net.jmp.demo.java22.util;
 
 /*
+ * (#)TestAppliedList.java  0.7.0   08/19/2024
  * (#)TestAppliedList.java  0.6.0   08/17/2024
  *
  * @author   Jonathan Parker
- * @version  0.6.0
+ * @version  0.7.0
  * @since    0.6.0
  *
  * MIT License
@@ -57,6 +58,52 @@ public final class TestAppliedList {
     public void testConstructWithZeroThreads() {
         try (final var _ = new AppliedList<Integer>(0)) {
             assertTrue(true);
+        }
+    }
+
+    @Test
+    public void testOfEmpty() {
+        try (final AppliedList<Integer> list = AppliedList.of()) {
+            assertTrue(list.isEmpty());
+            assertThrows(UnsupportedOperationException.class, () -> list.add(0));
+        }
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testOfNull() {
+        final AppliedList<Integer> _ = AppliedList.of(null);
+    }
+
+    @Test
+    public void testOfOne() {
+        try (final AppliedList<Integer> list = AppliedList.of(1)) {
+            assertFalse(list.isEmpty());
+            assertEquals(1, list.size());
+            assertTrue(list.contains(1));
+            assertThrows(UnsupportedOperationException.class, () -> list.add(0));
+        }
+    }
+
+    @Test
+    public void testOfTwo() {
+        try (final AppliedList<Integer> list = AppliedList.of(1, 2)) {
+            assertFalse(list.isEmpty());
+            assertEquals(2, list.size());
+            assertTrue(list.contains(1));
+            assertTrue(list.contains(2));
+            assertThrows(UnsupportedOperationException.class, () -> list.add(0));
+        }
+    }
+
+    @Test
+    public void testOfThree() {
+        try (final AppliedList<Integer> list = AppliedList.of(1, 2, 3)) {
+            assertFalse(list.isEmpty());
+            assertEquals(3, list.size());
+            assertTrue(list.contains(1));
+            assertTrue(list.contains(2));
+            assertTrue(list.contains(3));
+            assertThrows(UnsupportedOperationException.class, () -> list.add(0));
         }
     }
 
