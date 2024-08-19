@@ -262,7 +262,7 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
      * @param   onEnd       java.lang.Runnable
      */
     public void clearAndApply(final Consumer<T> onElement, final Runnable onEnd) {
-        this.logger.entry(onElement);
+        this.logger.entry(onElement, onEnd);
 
         this.list.forEach(e -> {
             if (e != null) {
@@ -271,6 +271,26 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
         });
 
         this.list.clear();
+
+        onEnd.run();
+
+        this.logger.exit();
+    }
+
+    /**
+     * Consume all the elements in the list.
+     *
+     * @param   onElement   java.util.function.Consumer&lt;T&gt;
+     * @param   onEnd       java.lang.Runnable
+     */
+    public void consume(final Consumer<T> onElement, final Runnable onEnd) {
+        this.logger.entry(onElement, onEnd);
+
+        this.list.forEach(e -> {
+            if (e != null) {
+                super.runTask(() -> onElement.accept(e));
+            }
+        });
 
         onEnd.run();
 

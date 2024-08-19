@@ -215,6 +215,38 @@ public final class TestAppliedList {
     }
 
     @Test
+    public void testConsume() {
+        try (final AppliedList<String> list = new AppliedList<>()) {
+            final WrappedObject<Boolean> consumed = WrappedObject.of(false);
+            final List<String> values = List.of("value 1", "value 2", "value 3");
+
+            list.addAll(values);
+
+            assertFalse(list.isEmpty());
+            assertEquals(3, list.size());
+            assertTrue(list.contains("value 1"));
+            assertTrue(list.contains("value 2"));
+            assertTrue(list.contains("value 3"));
+
+            final List<String> results = new ArrayList<>();
+
+            list.consume(results::add, () -> consumed.set(true));
+
+            await().atMost(AWAIT_TIME, TimeUnit.MILLISECONDS)
+                    .untilAsserted(
+                            () -> assertThat(consumed.get())
+                                    .isTrue()
+                    );
+
+            assertFalse(results.isEmpty());
+            assertEquals(3, results.size());
+            assertTrue(results.contains("value 1"));
+            assertTrue(results.contains("value 2"));
+            assertTrue(results.contains("value 3"));
+        }
+    }
+
+    @Test
     public void testRemoveAndApplyByObjectFound() {
         try (final AppliedList<String> list = new AppliedList<>()) {
             final WrappedObject<Boolean> consumed = WrappedObject.of(false);
