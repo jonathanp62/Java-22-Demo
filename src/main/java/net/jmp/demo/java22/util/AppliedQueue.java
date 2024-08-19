@@ -251,6 +251,29 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
     }
 
     /**
+     * Apply the consumer to each element
+     * and then clear the queue.
+     *
+     * @param   onElement   java.util.function.Consumer&lt;T&gt;
+     * @param   onEnd       java.lang.Runnable
+     */
+    public void clearAndApply(final Consumer<T> onElement, final Runnable onEnd) {
+        this.logger.entry(onElement);
+
+        this.queue.forEach(e -> {
+            if (e != null) {
+                super.runTask(() -> onElement.accept(e));
+            }
+        });
+
+        this.queue.clear();
+
+        onEnd.run();
+
+        this.logger.exit();
+    }
+
+    /**
      * Retrieves, but does not remove, the head of this queue. This method differs
      * from peekAndApply only in that it throws an exception if this queue is empty.
      * Apply the consumer to the retrieved element.
@@ -344,25 +367,27 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
      * Removes all of this collection's elements that are also contained in the specified
      * collection (optional operation). After this call returns, this collection will contain
      * no elements in common with the specified collection.
-     * Apply the consumer to each removed element.
+     * Apply the onElement consumer to each removed element.
      *
      * @param   c           java.util.Collection&lt;? extends T&gt;
-     * @param   consumer    java.util.function.Consumer&lt;T&gt;
+     * @param   onElement   java.util.function.Consumer&lt;T&gt;
      * @return              boolean
      */
-    public boolean removeAllAndApply(@Nonnull final Collection<? extends T> c, final Consumer<T> consumer) {
-        this.logger.entry(c);
+    public boolean removeAllAndApply(@Nonnull final Collection<? extends T> c, final Consumer<T> onElement, final Runnable onEnd) {
+        this.logger.entry(c, onElement, onEnd);
 
         final WrappedObject<Boolean> result = WrappedObject.of(false);
 
         if (!c.isEmpty()) {
             c.forEach(e -> {
                 if (this.queue.contains(e) && this.queue.remove(e)) {
-                    super.runTask(() -> consumer.accept(e));
+                    super.runTask(() -> onElement.accept(e));
                     result.set(true);
                 }
             });
         }
+
+        onEnd.run();
 
         this.logger.exit(result.get());
 
@@ -397,7 +422,6 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
 
     /*
      * Methods to implement:
-     *   clearAndApply
      *   retainAllAndApply
      */
 

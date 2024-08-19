@@ -189,6 +189,32 @@ public final class TestAppliedList {
     }
 
     @Test
+    public void testClearAndApply() {
+        try (final AppliedList<String> list = new AppliedList<>()) {
+            final WrappedObject<Boolean> consumed = WrappedObject.of(false);
+            final List<String> values = List.of("value 1", "value 2", "value 3");
+
+            list.addAll(values);
+
+            assertFalse(list.isEmpty());
+            assertEquals(3, list.size());
+            assertTrue(list.contains("value 1"));
+            assertTrue(list.contains("value 2"));
+            assertTrue(list.contains("value 3"));
+
+            list.clearAndApply(e -> System.out.println(STR."Cleared: \{e}"), () -> consumed.set(true));
+
+            await().atMost(AWAIT_TIME, TimeUnit.MILLISECONDS)
+                    .untilAsserted(
+                            () -> assertThat(consumed.get())
+                                    .isTrue()
+                    );
+
+            assertTrue(list.isEmpty());
+        }
+    }
+
+    @Test
     public void testRemoveAndApplyByObjectFound() {
         try (final AppliedList<String> list = new AppliedList<>()) {
             final WrappedObject<Boolean> consumed = WrappedObject.of(false);

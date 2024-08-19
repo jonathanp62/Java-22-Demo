@@ -152,11 +152,11 @@ public final class AppliedCollectionDemo implements Demo {
 
             final var odds = List.of(10, 30, 50, 70, 90);
 
-            if (integerQueue.removeAllAndApply(odds, e -> this.logger.info("Removed: {}", e))) {
+            if (integerQueue.removeAllAndApply(odds, e -> this.logger.info("Removed: {}", e), () -> this.logger.info("Done OK"))) {
                 this.logger.info("Odd numbers removed");
             }
 
-            if (!integerQueue.removeAllAndApply(odds, e -> this.logger.info("Removed: {}", e))) {
+            if (!integerQueue.removeAllAndApply(odds, e -> this.logger.info("Removed: {}", e), () -> this.logger.info("Done not OK"))) {
                 this.logger.info("Odd numbers were not removed");
             }
         }

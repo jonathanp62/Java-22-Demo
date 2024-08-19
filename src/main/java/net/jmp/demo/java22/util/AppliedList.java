@@ -255,6 +255,29 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
     }
 
     /**
+     * Apply the onElement to each element
+     * and then clear the list.
+     *
+     * @param   onElement   java.util.function.Consumer&lt;T&gt;
+     * @param   onEnd       java.lang.Runnable
+     */
+    public void clearAndApply(final Consumer<T> onElement, final Runnable onEnd) {
+        this.logger.entry(onElement);
+
+        this.list.forEach(e -> {
+            if (e != null) {
+                super.runTask(() -> onElement.accept(e));
+            }
+        });
+
+        this.list.clear();
+
+        onEnd.run();
+
+        this.logger.exit();
+    }
+
+    /**
      * Removes the first occurrence of this element from the list if one exists.
      * Apply the consumer to the removed element if it is not null.
      *
@@ -374,7 +397,6 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
 
     /*
      * Implement methods:
-     *   clearAndApply
      *   removeAllAndApply
      *   retainAllAndApply
      */

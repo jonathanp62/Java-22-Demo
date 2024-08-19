@@ -174,6 +174,32 @@ public final class TestAppliedQueue {
     }
 
     @Test
+    public void testClearAndApply() {
+        try (final AppliedQueue<String> queue = new AppliedQueue<>()) {
+            final WrappedObject<Boolean> consumed = WrappedObject.of(false);
+            final List<String> values = List.of("value 1", "value 2", "value 3");
+
+            queue.addAll(values);
+
+            assertFalse(queue.isEmpty());
+            assertEquals(3, queue.size());
+            assertTrue(queue.contains("value 1"));
+            assertTrue(queue.contains("value 2"));
+            assertTrue(queue.contains("value 3"));
+
+            queue.clearAndApply(e -> System.out.println(STR."Cleared: \{e}"), () -> consumed.set(true));
+
+            await().atMost(AWAIT_TIME, TimeUnit.MILLISECONDS)
+                    .untilAsserted(
+                            () -> assertThat(consumed.get())
+                                    .isTrue()
+                    );
+
+            assertTrue(queue.isEmpty());
+        }
+    }
+
+    @Test
     public void testElementAndApply() {
         try (final AppliedQueue<String> queue = new AppliedQueue<>()) {
             final WrappedObject<Boolean> consumed = new WrappedObject<>(false);
@@ -287,19 +313,20 @@ public final class TestAppliedQueue {
 
             values.forEach(queue::offer);
 
-            final boolean result = queue.removeAllAndApply(values, e -> {
-                System.out.println(STR."testRemoveAllAndApply: \{e}");
-                consumed.set(true);
-            });
-
-            assertTrue(result);
-            assertEquals(0, queue.size());
+            final boolean result = queue.removeAllAndApply(
+                    values,
+                    e -> System.out.println(STR."testRemoveAllAndApply: \{e}"),
+                    () -> consumed.set(true)
+            );
 
             await().atMost(AWAIT_TIME, TimeUnit.MILLISECONDS)
                     .untilAsserted(
                             () -> assertThat(consumed.get())
                                     .isTrue()
                     );
+
+            assertTrue(result);
+            assertEquals(0, queue.size());
         }
     }
 
@@ -312,7 +339,7 @@ public final class TestAppliedQueue {
 
             final boolean result = queue.removeAllAndApply(new ArrayList<>(), e -> {
                 System.out.println(STR."testRemoveAllAndApply: \{e}");
-            });
+            }, System.out::println);
 
             assertFalse(result);
             assertEquals(3, queue.size());
@@ -327,9 +354,11 @@ public final class TestAppliedQueue {
 
             values.forEach(queue::offer);
 
-            final boolean result = queue.removeAllAndApply(removals, e -> {
-                System.out.println(STR."testRemoveAllAndApply: \{e}");
-            });
+            final boolean result = queue.removeAllAndApply(
+                    removals,
+                    e -> System.out.println(STR."testRemoveAllAndApply: \{e}"),
+                    System.out::println
+            );
 
             assertFalse(result);
             assertEquals(3, queue.size());
