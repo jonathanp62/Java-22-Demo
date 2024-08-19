@@ -1,10 +1,11 @@
 package net.jmp.demo.java22.demos;
 
 /*
+ * (#)AppliedCollectionDemo.java    0.7.0   08/19/2024
  * (#)AppliedCollectionDemo.java    0.5.0   08/10/2024
  *
  * @author   Jonathan Parker
- * @version  0.5.0
+ * @version  0.7.0
  * @since    0.5.0
  *
  * MIT License
@@ -152,11 +153,11 @@ public final class AppliedCollectionDemo implements Demo {
 
             final var odds = List.of(10, 30, 50, 70, 90);
 
-            if (integerQueue.removeAllAndApply(odds, e -> this.logger.info("Removed: {}", e), () -> this.logger.info("Done OK"))) {
+            if (integerQueue.removeAllAndApply(odds, e -> this.logger.info("Removed: {}", e), () -> {})) {
                 this.logger.info("Odd numbers removed");
             }
 
-            if (!integerQueue.removeAllAndApply(odds, e -> this.logger.info("Removed: {}", e), () -> this.logger.info("Done not OK"))) {
+            if (!integerQueue.removeAllAndApply(odds, e -> this.logger.info("Removed: {}", e), () -> {})) {
                 this.logger.info("Odd numbers were not removed");
             }
         }

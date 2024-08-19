@@ -339,7 +339,7 @@ public final class TestAppliedQueue {
 
             final boolean result = queue.removeAllAndApply(new ArrayList<>(), e -> {
                 System.out.println(STR."testRemoveAllAndApply: \{e}");
-            }, System.out::println);
+            }, () -> {});
 
             assertFalse(result);
             assertEquals(3, queue.size());
@@ -357,7 +357,7 @@ public final class TestAppliedQueue {
             final boolean result = queue.removeAllAndApply(
                     removals,
                     e -> System.out.println(STR."testRemoveAllAndApply: \{e}"),
-                    System.out::println
+                    () -> {}
             );
 
             assertFalse(result);
