@@ -371,6 +371,66 @@ public final class TestAppliedList {
     }
 
     @Test
+    public void testRemoveAllAndApply() {
+        try (final AppliedList<String> list = new AppliedList<>()) {
+            final WrappedObject<Boolean> consumed = new WrappedObject<>(false);
+            final List<String> values = List.of("value 1", "value 2", "value 3");
+
+            values.forEach(list::add);
+
+            final boolean result = list.removeAllAndApply(
+                    values,
+                    e -> System.out.println(STR."testRemoveAllAndApply: \{e}"),
+                    () -> consumed.set(true)
+            );
+
+            await().atMost(AWAIT_TIME, TimeUnit.MILLISECONDS)
+                    .untilAsserted(
+                            () -> assertThat(consumed.get())
+                                    .isTrue()
+                    );
+
+            assertTrue(result);
+            assertEquals(0, list.size());
+        }
+    }
+
+    @Test
+    public void testRemoveAllAndApplyOnEmptyCollection() {
+        try (final AppliedList<String> list = new AppliedList<>()) {
+            final List<String> values = List.of("value 1", "value 2", "value 3");
+
+            values.forEach(list::add);
+
+            final boolean result = list.removeAllAndApply(new ArrayList<>(), e -> {
+                System.out.println(STR."testRemoveAllAndApply: \{e}");
+            }, () -> {});
+
+            assertFalse(result);
+            assertEquals(3, list.size());
+        }
+    }
+
+    @Test
+    public void testRemoveAllAndApplyOnNonMatchingCollection() {
+        try (final AppliedList<String> list = new AppliedList<>()) {
+            final List<String> values = List.of("value 1", "value 2", "value 3");
+            final List<String> removals = List.of("value 4", "value 5");
+
+            values.forEach(list::add);
+
+            final boolean result = list.removeAllAndApply(
+                    removals,
+                    e -> System.out.println(STR."testRemoveAllAndApply: \{e}"),
+                    () -> {}
+            );
+
+            assertFalse(result);
+            assertEquals(3, list.size());
+        }
+    }
+
+    @Test
     public void testRemoveIfAndApplyByObjectFound() {
         try (final AppliedList<String> list = new AppliedList<>()) {
             final WrappedObject<Boolean> consumed = WrappedObject.of(false);

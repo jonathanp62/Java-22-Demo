@@ -350,6 +350,37 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
     }
 
     /**
+     * Removes all of this collection's elements that are also contained in the specified
+     * collection (optional operation). After this call returns, this collection will contain
+     * no elements in common with the specified collection.
+     * Apply the onElement consumer to each removed element.
+     *
+     * @param   c           java.util.Collection&lt;? extends T&gt;
+     * @param   onElement   java.util.function.Consumer&lt;T&gt;
+     * @return              boolean
+     */
+    public boolean removeAllAndApply(@Nonnull final Collection<? extends T> c, final Consumer<T> onElement, final Runnable onEnd) {
+        this.logger.entry(c, onElement, onEnd);
+
+        final WrappedObject<Boolean> result = WrappedObject.of(false);
+
+        if (!c.isEmpty()) {
+            c.forEach(e -> {
+                if (this.list.contains(e) && this.list.remove(e)) {
+                    super.runTask(() -> onElement.accept(e));
+                    result.set(true);
+                }
+            });
+        }
+
+        onEnd.run();
+
+        this.logger.exit(result.get());
+
+        return result.get();
+    }
+
+    /**
      * Removes the first occurrence of this element from the list if one exists
      * and the applied predicate function evaluates to true.
      * Apply the consumer to the removed element if it is not null.
@@ -417,7 +448,6 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
 
     /*
      * Implement methods:
-     *   removeAllAndApply
      *   retainAllAndApply
      */
 
