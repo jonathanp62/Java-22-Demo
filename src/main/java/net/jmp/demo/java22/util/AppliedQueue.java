@@ -420,6 +420,35 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
         return result.get();
     }
 
+    /**
+     * Retains only the elements in this queue that are contained
+     * in the specified collection (optional operation). In other
+     * words, removes from this queue all of its elements that are
+     * not contained in the specified collection. After this call
+     * returns, this collection will contain only elements in common
+     * with the specified collection.
+     * Apply the onElement consumer to each retained element.
+     *
+     * @param   c           java.util.Collection&lt;? extends T&gt;
+     * @param   onElement   java.util.function.Consumer&lt;T&gt;
+     * @return              boolean
+     */
+    public boolean retainAllAndApply(@Nonnull final Collection<? extends T> c, final Consumer<T> onElement, final Runnable onEnd) {
+        this.logger.entry(c, onElement, onEnd);
+
+        final WrappedObject<Boolean> result = WrappedObject.of(false);
+
+        if (!c.isEmpty()) {
+
+        }
+
+        onEnd.run();
+
+        this.logger.exit(result.get());
+
+        return result.get();
+    }
+
     /*
      * Methods to implement:
      *   retainAllAndApply
