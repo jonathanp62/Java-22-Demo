@@ -43,6 +43,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import javax.annotation.Nonnull;
 
@@ -105,7 +106,7 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
     private boolean addOrOfferIf(final T t,
                                  @Nonnull final Predicate<? super T> matcher,
                                  final Function<? super T, Boolean> function) {
-        this.logger.entry(t, matcher);
+        this.logger.entry(t, matcher, function);
 
         boolean result = true;  // Return true if the element did not match
 
@@ -146,6 +147,30 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
         this.logger.exit(result);
 
         return result;
+    }
+
+    /**
+     * Peeks, polls, or removes the head of this queue, or returns null if
+     * this queue is empty.
+     * Apply the consumer to the retrieved element if it is not null.
+     *
+     * @param   consumer    java.util.function.Consumer&lt;T&gt;
+     * @param   supplier    java.util.function.Supplier&lt;T&gt;
+     * @return              T
+     */
+    private T peekOrPollOrRemoveAndApply(final Consumer<T> consumer,
+                                         final Supplier<T> supplier) {
+        this.logger.entry(consumer, supplier);
+
+        final T element = supplier.get();
+
+        if (element != null) {
+            super.runTask(() -> consumer.accept(element));
+        }
+
+        this.logger.exit(element);
+
+        return element;
     }
 
     /**
@@ -329,8 +354,6 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
         return element;
     }
 
-    // @todo peel/poll/removeAndApply can be abstracted with a function
-
     /**
      * Retrieves, but does not remove, the head of this queue, or returns null if
      * this queue is empty.
@@ -342,11 +365,7 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
     public T peekAndApply(final Consumer<T> consumer) {
         this.logger.entry(consumer);
 
-        final T element = this.queue.peek();
-
-        if (element != null) {
-            super.runTask(() -> consumer.accept(element));
-        }
+        final T element = this.peekOrPollOrRemoveAndApply(consumer, this.queue::peek);
 
         this.logger.exit(element);
 
@@ -362,11 +381,7 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
     public T pollAndApply(final Consumer<T> consumer) {
         this.logger.entry(consumer);
 
-        final T element = this.queue.poll();
-
-        if (element != null) {
-            super.runTask(() -> consumer.accept(element));
-        }
+        final T element = this.peekOrPollOrRemoveAndApply(consumer, this.queue::poll);
 
         this.logger.exit(element);
 
@@ -388,11 +403,7 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
             throw new NoSuchElementException();
         }
 
-        final T element = this.queue.remove();
-
-        if (element != null) {
-            super.runTask(() -> consumer.accept(element));
-        }
+        final T element = this.peekOrPollOrRemoveAndApply(consumer, this.queue::remove);
 
         this.logger.exit(element);
 
