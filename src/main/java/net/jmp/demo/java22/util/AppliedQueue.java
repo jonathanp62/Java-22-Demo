@@ -174,6 +174,27 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
     }
 
     /**
+     * Inserts the element into the queue after applying the mapper function.
+     *
+     * @param   t           T
+     * @param   mapper      java.util.function.Function&lt;? super T, ? extends T&gt;
+     * @param   function    java.util.function.Function&lt;? super T, java.lang.Boolean&gt;
+     * @return              boolean
+     */
+    private boolean applyAndAddOrOffer(final T t,
+                                       final Function<? super T, ? extends T> mapper,
+                                       final Function<? super T, Boolean> function) {
+        this.logger.entry(t, mapper, function);
+
+        final T mappedValue = mapper.apply(t);
+        final boolean result = function.apply(mappedValue);
+
+        this.logger.exit(result);
+
+        return result;
+    }
+
+    /**
      * Inserts the element into the queue if the
      * applied predicate function evaluates to true.
      *
@@ -263,14 +284,13 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
     public boolean applyAndOffer(final T t, final Function<? super T, ? extends T> mapper) {
         this.logger.entry(t, mapper);
 
-        final T mappedValue = mapper.apply(t);
-        final boolean result = this.queue.offer(mappedValue);
+        final boolean result = this.applyAndAddOrOffer(t, mapper, this.queue::offer);
 
         this.logger.exit(result);
 
         return result;
     }
-
+    
     /**
      * Inserts the element into the queue after applying the mapper function.
      *
@@ -281,8 +301,7 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
     public boolean applyAndAdd(final T t, final Function<? super T, ? extends T> mapper) {
         this.logger.entry(t, mapper);
 
-        final T mappedValue = mapper.apply(t);
-        final boolean result = this.queue.add(mappedValue);
+        final boolean result = this.applyAndAddOrOffer(t, mapper, this.queue::add);
 
         this.logger.exit(result);
 
@@ -345,9 +364,7 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
             throw new NoSuchElementException();
         }
 
-        final T element = this.queue.element();
-
-        super.runTask(() -> consumer.accept(element));
+        final T element = this.peekOrPollOrRemoveAndApply(consumer, this.queue::element);
 
         this.logger.exit(element);
 
