@@ -102,13 +102,45 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
      * @param   function    java.util.function.Function&lt;? super T, java.lang.Boolean&gt;
      * @return              boolean
      */
-    private boolean addOrOfferIf(final T t, @Nonnull final Predicate<? super T> matcher, final Function<? super T, Boolean> function) {
+    private boolean addOrOfferIf(final T t,
+                                 @Nonnull final Predicate<? super T> matcher,
+                                 final Function<? super T, Boolean> function) {
         this.logger.entry(t, matcher);
 
         boolean result = true;  // Return true if the element did not match
 
         if (matcher.test(t)) {
             result = function.apply(t);
+        }
+
+        this.logger.exit(result);
+
+        return result;
+    }
+
+    /**
+     * Inserts the element into the queue after applying
+     * the mapper function if the applied predicate
+     * function evaluates to true.
+     *
+     * @param   t           T
+     * @param   mapper      java.util.function.Function&lt;? super T,? extends T&gt;
+     * @param   matcher     java.util.function.Predicate&lt;? super T&gt;
+     * @param   function    java.util.function.Function&lt;? super T, java.lang.Boolean&gt;
+     * @return              boolean
+     */
+    private boolean applyAndAddOrOfferIf(final T t,
+                                         final Function<? super T, ? extends T> mapper,
+                                         @Nonnull final Predicate<? super T> matcher,
+                                         final Function<? super T, Boolean> function) {
+        this.logger.entry(t, mapper, matcher, function);
+
+        boolean result = true;  // Return true if the element did not match
+
+        if (matcher.test(t)) {
+            final T mappedValue = mapper.apply(t);
+
+            result = function.apply(mappedValue);
         }
 
         this.logger.exit(result);
@@ -144,16 +176,12 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
      * @param   matcher java.util.function.Predicate&lt;? super T&gt;
      * @return          boolean
      */
-    public boolean applyAndAddIf(final T t, final Function<? super T, ? extends T> mapper, @Nonnull final Predicate<? super T> matcher) {
+    public boolean applyAndAddIf(final T t,
+                                 final Function<? super T, ? extends T> mapper,
+                                 @Nonnull final Predicate<? super T> matcher) {
         this.logger.entry(t, mapper, matcher);
 
-        boolean result = true;  // Return true if the element did not match
-
-        if (matcher.test(t)) {
-            final T mappedValue = mapper.apply(t);
-
-            result = this.queue.add(mappedValue);
-        }
+        final boolean result = this.applyAndAddOrOfferIf(t, mapper, matcher, this.queue::add);
 
         this.logger.exit(result);
 
@@ -188,16 +216,12 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
      * @param   matcher java.util.function.Predicate&lt;? super T&gt;
      * @return          boolean
      */
-    public boolean applyAndOfferIf(final T t, final Function<? super T, ? extends T> mapper, @Nonnull final Predicate<? super T> matcher) {
+    public boolean applyAndOfferIf(final T t,
+                                   final Function<? super T, ? extends T> mapper,
+                                   @Nonnull final Predicate<? super T> matcher) {
         this.logger.entry(t, mapper, matcher);
 
-        boolean result = true;  // Return true if the element did not match
-
-        if (matcher.test(t)) {
-            final T mappedValue = mapper.apply(t);
-
-            result = this.queue.offer(mappedValue);
-        }
+        final boolean result = this.applyAndAddOrOfferIf(t, mapper, matcher, this.queue::offer);
 
         this.logger.exit(result);
 
@@ -248,7 +272,8 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
      * @param   mapper  java.util.function.Function&lt;? super T, ? extends T&gt;
      * @return          boolean
      */
-    public boolean applyAndAddAll(@Nonnull final Collection<? extends T> c, final Function<? super T, ? extends T> mapper) {
+    public boolean applyAndAddAll(@Nonnull final Collection<? extends T> c,
+                                  final Function<? super T, ? extends T> mapper) {
         this.logger.entry(c, mapper);
 
         final WrappedObject<Boolean> result = WrappedObject.of(false);
@@ -304,6 +329,8 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
         return element;
     }
 
+    // @todo peel/poll/removeAndApply can be abstracted with a function
+
     /**
      * Retrieves, but does not remove, the head of this queue, or returns null if
      * this queue is empty.
@@ -346,6 +373,8 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
         return element;
     }
 
+    // @todo removeAllAndApply is the same in AppliedList
+
     /**
      * Retrieves and removes the head of this queue, or throw an exception if this queue is empty.
      * Apply the consumer to the retrieved element if it is not null.
@@ -378,9 +407,12 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
      *
      * @param   c           java.util.Collection&lt;? extends T&gt;
      * @param   onElement   java.util.function.Consumer&lt;T&gt;
+     * @param   onEnd       java.lang.Runnable
      * @return              boolean
      */
-    public boolean removeAllAndApply(@Nonnull final Collection<? extends T> c, final Consumer<T> onElement, final Runnable onEnd) {
+    public boolean removeAllAndApply(@Nonnull final Collection<? extends T> c,
+                                     final Consumer<T> onElement,
+                                     final Runnable onEnd) {
         this.logger.entry(c, onElement, onEnd);
 
         final WrappedObject<Boolean> result = WrappedObject.of(false);
@@ -408,7 +440,8 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
      * @param   consumer    java.util.function.Consumer&lt;&gt;
      * @return              boolean
      */
-    public boolean removeIfAndApply(@Nonnull final Predicate<? super T> matcher, @Nonnull final Consumer<T> consumer) {
+    public boolean removeIfAndApply(@Nonnull final Predicate<? super T> matcher,
+                                    @Nonnull final Consumer<T> consumer) {
         this.logger.entry(matcher, consumer);
 
         final WrappedObject<Boolean> result = WrappedObject.of(false);
@@ -438,9 +471,12 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
      *
      * @param   c           java.util.Collection&lt;? extends T&gt;
      * @param   onElement   java.util.function.Consumer&lt;T&gt;
+     * @param   onEnd       java.lang.Runnable
      * @return              boolean
      */
-    public boolean retainAllAndApply(@Nonnull final Collection<? extends T> c, final Consumer<T> onElement, final Runnable onEnd) {
+    public boolean retainAllAndApply(@Nonnull final Collection<? extends T> c,
+                                     final Consumer<T> onElement,
+                                     final Runnable onEnd) {
         this.logger.entry(c, onElement, onEnd);
 
         final WrappedObject<Boolean> result = WrappedObject.of(false);
