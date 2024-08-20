@@ -1,12 +1,13 @@
 package net.jmp.demo.java22.util;
 
 /*
+ * (#)AppliedBaseCollection.java    0.7.0   08/20/2024
  * (#)AppliedBaseCollection.java    0.6.0   08/16/2024
  * (#)AppliedBaseCollection.java    0.5.0   08/10/2024
  * (#)AppliedBaseCollection.java    0.4.0   08/09/2024
  *
  * @author   Jonathan Parker
- * @version  0.6.0
+ * @version  0.7.0
  * @since    0.4.0
  *
  * MIT License
@@ -33,12 +34,15 @@ package net.jmp.demo.java22.util;
  */
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+
+import java.util.function.Consumer;
 
 import org.slf4j.LoggerFactory;
 
@@ -94,6 +98,30 @@ public class AppliedBaseCollection<T> {
 
         this.waitForFutures();
         this.executor.shutdown();
+
+        this.logger.exit();
+    }
+
+    /**
+     * Apply the onElement to each element
+     * and then clear the collection.
+     *
+     * @param   collection  java.util.Collection&lt;T&gt;
+     * @param   onElement   java.util.function.Consumer&lt;T&gt;
+     * @param   onEnd       java.lang.Runnable
+     */
+    protected void clearAndApply(final Collection<T> collection, final Consumer<T> onElement, final Runnable onEnd) {
+        this.logger.entry(collection, onElement, onEnd);
+
+        collection.forEach(e -> {
+            if (e != null) {
+                this.runTask(() -> onElement.accept(e));
+            }
+        });
+
+        collection.clear();
+
+        onEnd.run();
 
         this.logger.exit();
     }

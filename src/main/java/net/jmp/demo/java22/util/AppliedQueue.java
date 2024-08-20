@@ -97,6 +97,29 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
      * Inserts the element into the queue if the
      * applied predicate function evaluates to true.
      *
+     * @param   t           T
+     * @param   matcher     java.util.function.Predicate&lt;? super T&gt;
+     * @param   function    java.util.function.Function&lt;? super T, java.lang.Boolean&gt;
+     * @return              boolean
+     */
+    private boolean addOrOfferIf(final T t, @Nonnull final Predicate<? super T> matcher, final Function<? super T, Boolean> function) {
+        this.logger.entry(t, matcher);
+
+        boolean result = true;  // Return true if the element did not match
+
+        if (matcher.test(t)) {
+            result = function.apply(t);
+        }
+
+        this.logger.exit(result);
+
+        return result;
+    }
+
+    /**
+     * Inserts the element into the queue if the
+     * applied predicate function evaluates to true.
+     *
      * @param   t       T
      * @param   matcher java.util.function.Predicate&lt;? super T&gt;
      * @return          boolean
@@ -104,11 +127,7 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
     public boolean addIf(final T t, @Nonnull final Predicate<? super T> matcher) {
         this.logger.entry(t, matcher);
 
-        boolean result = true;  // Return true if the element did not match
-
-        if (matcher.test(t)) {
-            result = this.queue.add(t);
-        }
+        final boolean result = this.addOrOfferIf(t, matcher, this.queue::add);
 
         this.logger.exit(result);
 
@@ -152,11 +171,7 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
     public boolean offerIf(final T t, @Nonnull final Predicate<? super T> matcher) {
         this.logger.entry(t, matcher);
 
-        boolean result = true;  // Return true if the element did not match
-
-        if (matcher.test(t)) {
-            result = this.queue.offer(t);
-        }
+        final boolean result = this.addOrOfferIf(t, matcher, this.queue::offer);
 
         this.logger.exit(result);
 
@@ -260,15 +275,7 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
     public void clearAndApply(final Consumer<T> onElement, final Runnable onEnd) {
         this.logger.entry(onElement);
 
-        this.queue.forEach(e -> {
-            if (e != null) {
-                super.runTask(() -> onElement.accept(e));
-            }
-        });
-
-        this.queue.clear();
-
-        onEnd.run();
+        super.clearAndApply(this.queue, onElement, onEnd);
 
         this.logger.exit();
     }

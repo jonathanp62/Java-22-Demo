@@ -264,15 +264,7 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
     public void clearAndApply(final Consumer<T> onElement, final Runnable onEnd) {
         this.logger.entry(onElement, onEnd);
 
-        this.list.forEach(e -> {
-            if (e != null) {
-                super.runTask(() -> onElement.accept(e));
-            }
-        });
-
-        this.list.clear();
-
-        onEnd.run();
+        super.clearAndApply(this.list, onElement, onEnd);
 
         this.logger.exit();
     }
