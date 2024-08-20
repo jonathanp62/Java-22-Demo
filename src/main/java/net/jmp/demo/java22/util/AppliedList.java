@@ -240,18 +240,11 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
     public boolean applyAndAddAll(@Nonnull final Collection<? extends T> c, final Function<? super T, ? extends T> mapper) {
         this.logger.entry(c, mapper);
 
-        final WrappedObject<Boolean> result = WrappedObject.of(false);
+        final boolean result = super.applyAndAddAll(this.list, c, mapper);
 
-        if (!c.isEmpty()) {
-            c.forEach(e -> {
-                this.list.add(mapper.apply(e));
-                result.set(true);
-            });
-        }
+        this.logger.exit(result);
 
-        this.logger.exit(result.get());
-
-        return result.get();
+        return result;
     }
 
     /**
@@ -351,25 +344,16 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
      * @param   onElement   java.util.function.Consumer&lt;T&gt;
      * @return              boolean
      */
-    public boolean removeAllAndApply(@Nonnull final Collection<? extends T> c, final Consumer<T> onElement, final Runnable onEnd) {
+    public boolean removeAllAndApply(@Nonnull final Collection<? extends T> c,
+                                     final Consumer<T> onElement,
+                                     final Runnable onEnd) {
         this.logger.entry(c, onElement, onEnd);
 
-        final WrappedObject<Boolean> result = WrappedObject.of(false);
+        final boolean result = super.removeAllAndApply(this.list, c, onElement, onEnd);
 
-        if (!c.isEmpty()) {
-            c.forEach(e -> {
-                if (this.list.contains(e) && this.list.remove(e)) {
-                    super.runTask(() -> onElement.accept(e));
-                    result.set(true);
-                }
-            });
-        }
+        this.logger.exit(result);
 
-        onEnd.run();
-
-        this.logger.exit(result.get());
-
-        return result.get();
+        return result;
     }
 
     /**

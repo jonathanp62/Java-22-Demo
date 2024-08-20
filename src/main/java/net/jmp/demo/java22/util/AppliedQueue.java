@@ -290,7 +290,7 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
 
         return result;
     }
-    
+
     /**
      * Inserts the element into the queue after applying the mapper function.
      *
@@ -320,18 +320,11 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
                                   final Function<? super T, ? extends T> mapper) {
         this.logger.entry(c, mapper);
 
-        final WrappedObject<Boolean> result = WrappedObject.of(false);
+        final boolean result = super.applyAndAddAll(this.queue, c, mapper);
 
-        if (!c.isEmpty()) {
-            c.forEach(e -> {
-                this.queue.add(mapper.apply(e));
-                result.set(true);
-            });
-        }
+        this.logger.exit(result);
 
-        this.logger.exit(result.get());
-
-        return result.get();
+        return result;
     }
 
     /**
@@ -443,22 +436,11 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
                                      final Runnable onEnd) {
         this.logger.entry(c, onElement, onEnd);
 
-        final WrappedObject<Boolean> result = WrappedObject.of(false);
+        final boolean result = super.removeAllAndApply(this.queue, c, onElement, onEnd);
 
-        if (!c.isEmpty()) {
-            c.forEach(e -> {
-                if (this.queue.contains(e) && this.queue.remove(e)) {
-                    super.runTask(() -> onElement.accept(e));
-                    result.set(true);
-                }
-            });
-        }
+        this.logger.exit(result);
 
-        onEnd.run();
-
-        this.logger.exit(result.get());
-
-        return result.get();
+        return result;
     }
 
     /**

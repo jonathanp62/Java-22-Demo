@@ -43,6 +43,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import java.util.function.Consumer;
+import java.util.function.Function;
+
+import javax.annotation.Nonnull;
 
 import org.slf4j.LoggerFactory;
 
@@ -103,6 +106,34 @@ public class AppliedBaseCollection<T> {
     }
 
     /**
+     * Adds all the elements in the specified collection to this list.
+     * Apply the mapper function to each element before adding it.
+     *
+     * @param   target  java.util.Collection&lt;T&gt;
+     * @param   source  java.util.Collection&lt;? extends T&gt;
+     * @param   mapper  java.util.function.Function&lt;? super T, ? extends T&gt;
+     * @return          boolean
+     */
+    protected boolean applyAndAddAll(@Nonnull final Collection<T> target,
+                                     @Nonnull final Collection<? extends T> source,
+                                     final Function<? super T, ? extends T> mapper) {
+        this.logger.entry(target, source, mapper);
+
+        final WrappedObject<Boolean> result = WrappedObject.of(false);
+
+        if (!source.isEmpty()) {
+            source.forEach(e -> {
+                target.add(mapper.apply(e));
+                result.set(true);
+            });
+        }
+
+        this.logger.exit(result.get());
+
+        return result.get();
+    }
+
+    /**
      * Apply the onElement to each element
      * and then clear the collection.
      *
@@ -124,6 +155,42 @@ public class AppliedBaseCollection<T> {
         onEnd.run();
 
         this.logger.exit();
+    }
+
+    /**
+     * Removes all of this collection's elements that are also contained in the specified
+     * collection (optional operation). After this call returns, this collection will contain
+     * no elements in common with the specified collection.
+     * Apply the onElement consumer to each removed element.
+     *
+     * @param   target      java.util.Collection&lt;T&gt;
+     * @param   source      java.util.Collection&lt;? extends T&gt;
+     * @param   onElement   java.util.function.Consumer&lt;T&gt;
+     * @param   onEnd       java.lang.Runnable
+     * @return              boolean
+     */
+    protected boolean removeAllAndApply(@Nonnull final Collection<T> target,
+                                        @Nonnull final Collection<? extends T> source,
+                                        final Consumer<T> onElement,
+                                        final Runnable onEnd) {
+        this.logger.entry(target, source, onElement, onEnd);
+
+        final WrappedObject<Boolean> result = WrappedObject.of(false);
+
+        if (!source.isEmpty()) {
+            source.forEach(e -> {
+                if (target.contains(e) && target.remove(e)) {
+                    this.runTask(() -> onElement.accept(e));
+                    result.set(true);
+                }
+            });
+        }
+
+        onEnd.run();
+
+        this.logger.exit(result.get());
+
+        return result.get();
     }
 
     /**
