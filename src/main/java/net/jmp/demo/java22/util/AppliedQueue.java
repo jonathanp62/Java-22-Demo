@@ -397,9 +397,7 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
 
         return element;
     }
-
-    // @todo removeAllAndApply is the same in AppliedList
-
+    
     /**
      * Retrieves and removes the head of this queue, or throw an exception if this queue is empty.
      * Apply the consumer to the retrieved element if it is not null.

@@ -366,7 +366,9 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
      * @param   consumer    java.util.function.Consumer&lt;T&gt;
      * @return              boolean
      */
-    public boolean removeIfAndApply(final T object, final Predicate<? super T> matcher, final Consumer<T> consumer) {
+    public boolean removeIfAndApply(final T object,
+                                    final Predicate<? super T> matcher,
+                                    final Consumer<T> consumer) {
         this.logger.entry(object, matcher, consumer);
 
         final int index = this.list.indexOf(object);
@@ -400,7 +402,9 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
      * @param   consumer    java.util.function.Consumer&lt;T&gt;
      * @return              T
      */
-    public T removeIfAndApply(final int index, final Predicate<? super T> matcher, final Consumer<T> consumer) {
+    public T removeIfAndApply(final int index,
+                              final Predicate<? super T> matcher,
+                              final Consumer<T> consumer) {
         this.logger.entry(index, matcher, consumer);
 
         T result = null;
@@ -435,13 +439,25 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
      * @param   onElement   java.util.function.Consumer&lt;T&gt;
      * @return              boolean
      */
-    public boolean retainAllAndApply(@Nonnull final Collection<? extends T> c, final Consumer<T> onElement, final Runnable onEnd) {
+    public boolean retainAllAndApply(@Nonnull final Collection<? extends T> c,
+                                     final Consumer<T> onElement,
+                                     final Runnable onEnd) {
         this.logger.entry(c, onElement, onEnd);
 
         final WrappedObject<Boolean> result = WrappedObject.of(false);
+        final List<T> removals = new ArrayList<>();
 
-        if (!c.isEmpty()) {
+        for (final T element : this.list) {
+            if (c.contains(element)) {
+                super.runTask(() -> onElement.accept(element));
+            } else {
+                removals.add(element);
+            }
+        }
 
+        if (!removals.isEmpty()) {
+            this.list.removeAll(removals);
+            result.set(true);
         }
 
         onEnd.run();

@@ -621,4 +621,92 @@ public final class TestAppliedList {
             final String _ = list.removeIfAndApply(3, String::isEmpty, System.out::println);
         }
     }
+
+    @Test
+    public void testRetainAllAndApplyOnFullMatchingCollection() {
+        try (final AppliedList<String> list = new AppliedList<>()) {
+            final WrappedObject<Boolean> consumed = WrappedObject.of(false);
+            final List<String> values = List.of("value 1", "value 2", "value 3");
+            final List<String> results = new ArrayList<>();
+
+            list.addAll(values);
+
+            final boolean result = list.retainAllAndApply(values, results::add, () -> consumed.set(true));
+
+            await().atMost(AWAIT_TIME, TimeUnit.MILLISECONDS)
+                    .untilAsserted(
+                            () -> assertThat(consumed.get())
+                                    .isTrue()
+                    );
+
+            assertFalse(result);
+            assertEquals(3, results.size());
+            assertTrue(results.contains("value 1"));
+            assertTrue(results.contains("value 2"));
+            assertTrue(results.contains("value 3"));
+        }
+    }
+
+    @Test
+    public void testRetainAllAndApplyOnPartialMatchingCollection() {
+        try (final AppliedList<String> list = new AppliedList<>()) {
+            final WrappedObject<Boolean> consumed = WrappedObject.of(false);
+            final List<String> values = List.of("value 1", "value 2", "value 3");
+            final List<String> retains = List.of("value 1", "value 3");
+            final List<String> results = new ArrayList<>();
+
+            list.addAll(values);
+
+            final boolean result = list.retainAllAndApply(retains, results::add, () -> consumed.set(true));
+
+            await().atMost(AWAIT_TIME, TimeUnit.MILLISECONDS)
+                    .untilAsserted(
+                            () -> assertThat(consumed.get())
+                                    .isTrue()
+                    );
+
+            assertTrue(result);
+            assertEquals(2, results.size());
+            assertTrue(results.contains("value 1"));
+            assertTrue(results.contains("value 3"));
+        }
+    }
+
+    @Test
+    public void testRetainAllAndApplyOnEmptyCollection() {
+        try (final AppliedList<String> list = new AppliedList<>()) {
+            final List<String> values = List.of("value 1", "value 2", "value 3");
+            final List<String> results = new ArrayList<>();
+
+            list.addAll(values);
+
+            final boolean result = list.retainAllAndApply(new ArrayList<>(), results::add, () -> {});
+
+            assertTrue(result);
+            assertEquals(0, list.size());
+        }
+    }
+
+    @Test
+    public void testRetainAllAndApplyOnNonMatchingCollection() {
+        try (final AppliedList<String> list = new AppliedList<>()) {
+            final WrappedObject<Boolean> consumed = WrappedObject.of(false);
+            final List<String> values = List.of("value 1", "value 2", "value 3");
+            final List<String> retains = List.of("value 4", "value 5");
+            final List<String> results = new ArrayList<>();
+
+            list.addAll(values);
+
+            final boolean result = list.retainAllAndApply(retains, results::add, () -> consumed.set(true));
+
+            await().atMost(AWAIT_TIME, TimeUnit.MILLISECONDS)
+                    .untilAsserted(
+                            () -> assertThat(consumed.get())
+                                    .isTrue()
+                    );
+
+            assertTrue(result);
+            assertEquals(0, results.size());
+        }
+    }
 }
