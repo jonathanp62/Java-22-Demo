@@ -487,17 +487,11 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
                                      final Runnable onEnd) {
         this.logger.entry(c, onElement, onEnd);
 
-        final WrappedObject<Boolean> result = WrappedObject.of(false);
+        final boolean result = super.retainAllAndApply(this.queue, c, onElement, onEnd);
 
-        if (!c.isEmpty()) {
+        this.logger.exit(result);
 
-        }
-
-        onEnd.run();
-
-        this.logger.exit(result.get());
-
-        return result.get();
+        return result;
     }
 
     /*

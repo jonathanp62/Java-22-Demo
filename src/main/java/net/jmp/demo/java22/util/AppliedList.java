@@ -444,27 +444,11 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
                                      final Runnable onEnd) {
         this.logger.entry(c, onElement, onEnd);
 
-        final WrappedObject<Boolean> result = WrappedObject.of(false);
-        final List<T> removals = new ArrayList<>();
+        final boolean result = super.retainAllAndApply(this.list, c, onElement, onEnd);
 
-        for (final T element : this.list) {
-            if (c.contains(element)) {
-                super.runTask(() -> onElement.accept(element));
-            } else {
-                removals.add(element);
-            }
-        }
+        this.logger.exit(result);
 
-        if (!removals.isEmpty()) {
-            this.list.removeAll(removals);
-            result.set(true);
-        }
-
-        onEnd.run();
-
-        this.logger.exit(result.get());
-
-        return result.get();
+        return result;
     }
 
     /* List and Collection method overrides */

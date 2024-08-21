@@ -192,6 +192,48 @@ public class AppliedBaseCollection<T> {
 
         return result.get();
     }
+    /**
+     * Retains only the elements in this list that are contained
+     * in the specified collection (optional operation). In other
+     * words, removes from this list all of its elements that are
+     * not contained in the specified collection. After this call
+     * returns, this collection will contain only elements in common
+     * with the specified collection.
+     * Apply the onElement consumer to each retained element.
+     *
+     * @param   target      java.util.Collection&lt;T&gt;
+     * @param   source      java.util.Collection&lt;? extends T&gt;
+     * @param   onElement   java.util.function.Consumer&lt;T&gt;
+     * @return              boolean
+     */
+    protected boolean retainAllAndApply(@Nonnull Collection<T> target,
+                                        @Nonnull final Collection<? extends T> source,
+                                        final Consumer<T> onElement,
+                                        final Runnable onEnd) {
+        this.logger.entry(target, source, onElement, onEnd);
+
+        final WrappedObject<Boolean> result = WrappedObject.of(false);
+        final List<T> removals = new ArrayList<>();
+
+        for (final T element : target) {
+            if (source.contains(element)) {
+                this.runTask(() -> onElement.accept(element));
+            } else {
+                removals.add(element);
+            }
+        }
+
+        if (!removals.isEmpty()) {
+            target.removeAll(removals);
+            result.set(true);
+        }
+
+        onEnd.run();
+
+        this.logger.exit(result.get());
+
+        return result.get();
+    }
 
     /**
      * Run the task by submitting the
