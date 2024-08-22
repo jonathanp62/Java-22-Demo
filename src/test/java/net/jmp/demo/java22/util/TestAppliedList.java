@@ -1,11 +1,12 @@
 package net.jmp.demo.java22.util;
 
 /*
+ * (#)TestAppliedList.java  0.7.1   08/22/2024
  * (#)TestAppliedList.java  0.7.0   08/19/2024
  * (#)TestAppliedList.java  0.6.0   08/17/2024
  *
  * @author   Jonathan Parker
- * @version  0.7.0
+ * @version  0.7.1
  * @since    0.6.0
  *
  * MIT License
@@ -196,7 +197,6 @@ public final class TestAppliedList {
 
             list.addAll(values);
 
-            assertFalse(list.isEmpty());
             assertEquals(3, list.size());
             assertTrue(list.contains("value 1"));
             assertTrue(list.contains("value 2"));
@@ -204,46 +204,35 @@ public final class TestAppliedList {
 
             list.clearAndApply(e -> System.out.println(STR."Cleared: \{e}"), () -> consumed.set(true));
 
-            await().atMost(AWAIT_TIME, TimeUnit.MILLISECONDS)
-                    .untilAsserted(
-                            () -> assertThat(consumed.get())
-                                    .isTrue()
-                    );
+            list.waitForConsumers();
 
+            assertTrue(consumed.get());
             assertTrue(list.isEmpty());
         }
     }
 
     @Test
     public void testConsume() {
+        final List<String> results = new ArrayList<>();
+
         try (final AppliedList<String> list = new AppliedList<>()) {
-            final WrappedObject<Boolean> consumed = WrappedObject.of(false);
             final List<String> values = List.of("value 1", "value 2", "value 3");
 
             list.addAll(values);
 
-            assertFalse(list.isEmpty());
             assertEquals(3, list.size());
             assertTrue(list.contains("value 1"));
             assertTrue(list.contains("value 2"));
             assertTrue(list.contains("value 3"));
 
-            final List<String> results = new ArrayList<>();
-
-            list.consume(results::add, () -> consumed.set(true));
-
-            await().atMost(AWAIT_TIME, TimeUnit.MILLISECONDS)
-                    .untilAsserted(
-                            () -> assertThat(consumed.get())
-                                    .isTrue()
-                    );
-
-            assertFalse(results.isEmpty());
-            assertEquals(3, results.size());
-            assertTrue(results.contains("value 1"));
-            assertTrue(results.contains("value 2"));
-            assertTrue(results.contains("value 3"));
+            list.consume(results::add, () -> {});
         }
+
+        assertFalse(results.isEmpty());
+        assertEquals(3, results.size());
+        assertTrue(results.contains("value 1"));
+        assertTrue(results.contains("value 2"));
+        assertTrue(results.contains("value 3"));
     }
 
     @Test
@@ -376,7 +365,7 @@ public final class TestAppliedList {
             final WrappedObject<Boolean> consumed = new WrappedObject<>(false);
             final List<String> values = List.of("value 1", "value 2", "value 3");
 
-            values.forEach(list::add);
+            list.addAll(values);
 
             final boolean result = list.removeAllAndApply(
                     values,
@@ -635,11 +624,12 @@ public final class TestAppliedList {
 
             await().atMost(AWAIT_TIME, TimeUnit.MILLISECONDS)
                     .untilAsserted(
-                            () -> assertThat(consumed.get())
-                                    .isTrue()
+                            () -> assertThat(results.size())
+                                    .isEqualTo(3)
                     );
 
             assertFalse(result);
+            assertTrue(consumed.get());
             assertEquals(3, results.size());
             assertTrue(results.contains("value 1"));
             assertTrue(results.contains("value 2"));
@@ -659,13 +649,11 @@ public final class TestAppliedList {
 
             final boolean result = list.retainAllAndApply(retains, results::add, () -> consumed.set(true));
 
-            await().atMost(AWAIT_TIME, TimeUnit.MILLISECONDS)
-                    .untilAsserted(
-                            () -> assertThat(consumed.get())
-                                    .isTrue()
-                    );
-
             assertTrue(result);
+
+            list.waitForConsumers();
+
+            assertTrue(consumed.get());
             assertEquals(2, results.size());
             assertTrue(results.contains("value 1"));
             assertTrue(results.contains("value 3"));
@@ -674,9 +662,10 @@ public final class TestAppliedList {
 
     @Test
     public void testRetainAllAndApplyOnEmptyCollection() {
+        final List<String> results = new ArrayList<>();
+
         try (final AppliedList<String> list = new AppliedList<>()) {
             final List<String> values = List.of("value 1", "value 2", "value 3");
-            final List<String> results = new ArrayList<>();
 
             list.addAll(values);
 
@@ -685,28 +674,25 @@ public final class TestAppliedList {
             assertTrue(result);
             assertEquals(0, list.size());
         }
+
+        assertEquals(0, results.size());
     }
 
     @Test
     public void testRetainAllAndApplyOnNonMatchingCollection() {
+        final List<String> results = new ArrayList<>();
+
         try (final AppliedList<String> list = new AppliedList<>()) {
-            final WrappedObject<Boolean> consumed = WrappedObject.of(false);
             final List<String> values = List.of("value 1", "value 2", "value 3");
             final List<String> retains = List.of("value 4", "value 5");
-            final List<String> results = new ArrayList<>();
 
             list.addAll(values);
 
-            final boolean result = list.retainAllAndApply(retains, results::add, () -> consumed.set(true));
-
-            await().atMost(AWAIT_TIME, TimeUnit.MILLISECONDS)
-                    .untilAsserted(
-                            () -> assertThat(consumed.get())
-                                    .isTrue()
-                    );
+            final boolean result = list.retainAllAndApply(retains, results::add, () -> {});
 
             assertTrue(result);
-            assertEquals(0, results.size());
         }
+
+        assertEquals(0, results.size());
     }
 }

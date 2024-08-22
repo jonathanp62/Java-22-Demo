@@ -1,13 +1,14 @@
 package net.jmp.demo.java22.util;
 
 /*
+ * (#)AppliedBaseCollection.java    0.7.1   08/22/2024
  * (#)AppliedBaseCollection.java    0.7.0   08/20/2024
  * (#)AppliedBaseCollection.java    0.6.0   08/16/2024
  * (#)AppliedBaseCollection.java    0.5.0   08/10/2024
  * (#)AppliedBaseCollection.java    0.4.0   08/09/2024
  *
  * @author   Jonathan Parker
- * @version  0.7.0
+ * @version  0.7.1
  * @since    0.4.0
  *
  * MIT License
@@ -245,6 +246,17 @@ public class AppliedBaseCollection<T> {
         this.logger.entry(task);
 
         this.futures.add(this.executor.submit(task));
+
+        this.logger.exit();
+    }
+
+    /**
+     * Wait for the consumers to finish.
+     */
+    protected void waitForConsumers() {
+        this.logger.entry();
+
+        this.waitForFutures();
 
         this.logger.exit();
     }

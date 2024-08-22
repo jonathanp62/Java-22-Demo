@@ -1,11 +1,12 @@
 package net.jmp.demo.java22.demos;
 
 /*
+ * (#)AppliedCollectionDemo.java    0.7.1   08/22/2024
  * (#)AppliedCollectionDemo.java    0.7.0   08/19/2024
  * (#)AppliedCollectionDemo.java    0.5.0   08/10/2024
  *
  * @author   Jonathan Parker
- * @version  0.7.0
+ * @version  0.7.1
  * @since    0.5.0
  *
  * MIT License
@@ -33,10 +34,12 @@ package net.jmp.demo.java22.demos;
 
 import java.util.List;
 
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import java.util.stream.IntStream;
 
+import net.jmp.demo.java22.util.AppliedList;
 import net.jmp.demo.java22.util.AppliedQueue;
 
 import org.slf4j.LoggerFactory;
@@ -47,10 +50,15 @@ import org.slf4j.ext.XLogger;
  * A demonstration class for applied collections.
  */
 public final class AppliedCollectionDemo implements Demo {
-    /**
-     * The logger.
-     */
+    /** The logger. */
     private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
+
+    /** A string capitalizer function. */
+    private final Function<String, String> capitalizer = string -> {
+        final String firstLetter = string.substring(0, 1).toUpperCase();
+
+        return firstLetter + string.substring(1);
+    };
 
     /**
      * The default constructor.
@@ -67,6 +75,7 @@ public final class AppliedCollectionDemo implements Demo {
         this.logger.entry();
 
         this.appliedQueues();
+        this.appliedLists();
 
         this.logger.exit();
     }
@@ -77,9 +86,9 @@ public final class AppliedCollectionDemo implements Demo {
     private void appliedQueues() {
         this.logger.entry();
 
-        this.offerAndPoll();
-        this.peekAndRemove();
-        this.addAndRemoveAll();
+        this.offerToAndPollFromQueue();
+        this.peekAtAndRemoveFromQueue();
+        this.addToAndRemoveAllFromQueue();
 
         this.logger.exit();
     }
@@ -87,20 +96,16 @@ public final class AppliedCollectionDemo implements Demo {
     /**
      * Use offer and poll on an applied string queue.
      */
-    private void offerAndPoll() {
+    private void offerToAndPollFromQueue() {
         this.logger.entry();
 
         try (final AppliedQueue<String> stringQueue = new AppliedQueue<>()) {
-            final Function<String, String> capitalizer = string -> {
-                final String firstLetter = string.substring(0, 1).toUpperCase();
-
-                return firstLetter + string.substring(1);
-            };
-
-            final List<String> words = List.of("one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten");
+            final List<String> words = List.of(
+                    "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"
+            );
 
             words.forEach(word -> {
-                if (!stringQueue.applyAndOffer(word, capitalizer)) {
+                if (!stringQueue.applyAndOffer(word, this.capitalizer)) {
                     this.logger.warn("Failed to offer word: {}", word);
                 }
             });
@@ -122,7 +127,7 @@ public final class AppliedCollectionDemo implements Demo {
     /**
      * Use peek and remove on an applied integer queue.
      */
-    private void peekAndRemove() {
+    private void peekAtAndRemoveFromQueue() {
         this.logger.entry();
 
         try (final AppliedQueue<Integer> integerQueue = new AppliedQueue<>()) {
@@ -145,7 +150,7 @@ public final class AppliedCollectionDemo implements Demo {
     /**
      * Use add and remove all on an applied integer queue.
      */
-    private void addAndRemoveAll() {
+    private void addToAndRemoveAllFromQueue() {
         this.logger.entry();
 
         try (final AppliedQueue<Integer> integerQueue = new AppliedQueue<>()) {
@@ -160,6 +165,53 @@ public final class AppliedCollectionDemo implements Demo {
             if (!integerQueue.removeAllAndApply(odds, e -> this.logger.info("Removed: {}", e), () -> {})) {
                 this.logger.info("Odd numbers were not removed");
             }
+        }
+
+        this.logger.exit();
+    }
+
+    /**
+     * Applied lists.
+     */
+    private void appliedLists() {
+        this.logger.entry();
+
+        this.addToAndRemoveFromList();
+
+        this.logger.exit();
+    }
+
+    /**
+     * Add to and remove from a list.
+     */
+    private void addToAndRemoveFromList() {
+        this.logger.entry();
+
+        try (final AppliedList<String> stringList = new AppliedList<>()) {
+            final List<String> words = List.of(
+                    "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"
+            );
+
+            words.forEach(word -> {
+                if (!stringList.applyAndAdd(word, this.capitalizer)) {
+                    this.logger.warn("Failed to add word: {}", word);
+                }
+            });
+
+            final Consumer<String> consumer = string -> this.logger.info(STR."LE: \{string.toUpperCase()})");
+
+            stringList.removeAndApply("One", consumer);
+            stringList.removeIfAndApply("Two", s -> s.length() == 3, consumer);
+            stringList.removeIfAndApply("Three", s -> s.length() == 5, consumer);
+            stringList.removeIfAndApply("Ten", s -> s.length() == 3, consumer);
+            stringList.removeIfAndApply("Four", s -> s.length() == 4, consumer);
+            stringList.removeIfAndApply("Five", s -> s.length() == 4, consumer);
+            stringList.removeIfAndApply("Six", s -> s.length() == 3, consumer);
+            stringList.removeIfAndApply("Seven", s -> s.length() == 5, consumer);
+            stringList.removeAndApply("Eight", consumer);
+            stringList.removeAndApply("Nine", consumer);
+
+            assert stringList.isEmpty();
         }
 
         this.logger.exit();

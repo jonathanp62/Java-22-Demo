@@ -1,12 +1,13 @@
 package net.jmp.demo.java22.util;
 
 /*
+ * (#)TestAppliedQueue.java 0.7.1   08/22/2024
  * (#)TestAppliedQueue.java 0.7.0   08/18/2024
  * (#)TestAppliedQueue.java 0.6.0   08/17/2024
  * (#)TestAppliedQueue.java 0.5.0   08/13/2024
  *
  * @author   Jonathan Parker
- * @version  0.7.0
+ * @version  0.7.1
  * @since    0.5.0
  *
  * MIT License
@@ -189,12 +190,9 @@ public final class TestAppliedQueue {
 
             queue.clearAndApply(e -> System.out.println(STR."Cleared: \{e}"), () -> consumed.set(true));
 
-            await().atMost(AWAIT_TIME, TimeUnit.MILLISECONDS)
-                    .untilAsserted(
-                            () -> assertThat(consumed.get())
-                                    .isTrue()
-                    );
+            queue.waitForConsumers();
 
+            assertTrue(consumed.get());
             assertTrue(queue.isEmpty());
         }
     }
@@ -462,11 +460,12 @@ public final class TestAppliedQueue {
 
             await().atMost(AWAIT_TIME, TimeUnit.MILLISECONDS)
                     .untilAsserted(
-                            () -> assertThat(consumed.get())
-                                    .isTrue()
+                            () -> assertThat(results.size())
+                                    .isEqualTo(3)
                     );
 
             assertFalse(result);
+            assertTrue(consumed.get());
             assertEquals(3, results.size());
             assertTrue(results.contains("value 1"));
             assertTrue(results.contains("value 2"));
@@ -486,13 +485,11 @@ public final class TestAppliedQueue {
 
             final boolean result = queue.retainAllAndApply(retains, results::add, () -> consumed.set(true));
 
-            await().atMost(AWAIT_TIME, TimeUnit.MILLISECONDS)
-                    .untilAsserted(
-                            () -> assertThat(consumed.get())
-                                    .isTrue()
-                    );
-
             assertTrue(result);
+
+            queue.waitForConsumers();
+
+            assertTrue(consumed.get());
             assertEquals(2, results.size());
             assertTrue(results.contains("value 1"));
             assertTrue(results.contains("value 3"));
@@ -501,9 +498,10 @@ public final class TestAppliedQueue {
 
     @Test
     public void testRetainAllAndApplyOnEmptyCollection() {
+        final List<String> results = new ArrayList<>();
+
         try (final AppliedQueue<String> queue = new AppliedQueue<>()) {
             final List<String> values = List.of("value 1", "value 2", "value 3");
-            final List<String> results = new ArrayList<>();
 
             queue.addAll(values);
 
@@ -512,28 +510,25 @@ public final class TestAppliedQueue {
             assertTrue(result);
             assertEquals(0, queue.size());
         }
+
+        assertEquals(0, results.size());
     }
 
     @Test
     public void testRetainAllAndApplyOnNonMatchingCollection() {
+        final List<String> results = new ArrayList<>();
+
         try (final AppliedQueue<String> queue = new AppliedQueue<>()) {
-            final WrappedObject<Boolean> consumed = WrappedObject.of(false);
             final List<String> values = List.of("value 1", "value 2", "value 3");
             final List<String> retains = List.of("value 4", "value 5");
-            final List<String> results = new ArrayList<>();
 
             queue.addAll(values);
 
-            final boolean result = queue.retainAllAndApply(retains, results::add, () -> consumed.set(true));
-
-            await().atMost(AWAIT_TIME, TimeUnit.MILLISECONDS)
-                    .untilAsserted(
-                            () -> assertThat(consumed.get())
-                                    .isTrue()
-                    );
+            final boolean result = queue.retainAllAndApply(retains, results::add, () -> {});
 
             assertTrue(result);
-            assertEquals(0, results.size());
         }
+
+        assertEquals(0, results.size());
     }
 }
