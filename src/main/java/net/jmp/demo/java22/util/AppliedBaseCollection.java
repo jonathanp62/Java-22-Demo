@@ -1,6 +1,7 @@
 package net.jmp.demo.java22.util;
 
 /*
+ * (#)AppliedBaseCollection.java    0.8.0   08/22/2024
  * (#)AppliedBaseCollection.java    0.7.1   08/22/2024
  * (#)AppliedBaseCollection.java    0.7.0   08/20/2024
  * (#)AppliedBaseCollection.java    0.6.0   08/16/2024
@@ -8,7 +9,7 @@ package net.jmp.demo.java22.util;
  * (#)AppliedBaseCollection.java    0.4.0   08/09/2024
  *
  * @author   Jonathan Parker
- * @version  0.7.1
+ * @version  0.8.0
  * @since    0.4.0
  *
  * MIT License
@@ -48,9 +49,10 @@ import java.util.function.Function;
 
 import javax.annotation.Nonnull;
 
-import org.slf4j.LoggerFactory;
+import static net.jmp.demo.java22.util.LoggerUtils.*;
 
-import org.slf4j.ext.XLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A base class for applied collections.
@@ -61,7 +63,7 @@ public class AppliedBaseCollection<T> {
     private static final int DEFAULT_NUMBER_OF_THREADS = Runtime.getRuntime().availableProcessors();
 
     /** The logger. */
-    private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
+    private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
     /** The executor service. */
     protected final ExecutorService executor;
@@ -98,12 +100,16 @@ public class AppliedBaseCollection<T> {
      * the executor service.
      */
     protected void close() {
-        this.logger.entry();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
 
         this.waitForFutures();
         this.executor.shutdown();
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**
@@ -118,7 +124,9 @@ public class AppliedBaseCollection<T> {
     protected boolean applyAndAddAll(@Nonnull final Collection<T> target,
                                      @Nonnull final Collection<? extends T> source,
                                      final Function<? super T, ? extends T> mapper) {
-        this.logger.entry(target, source, mapper);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(target, source, mapper));
+        }
 
         final WrappedObject<Boolean> result = WrappedObject.of(false);
 
@@ -129,7 +137,9 @@ public class AppliedBaseCollection<T> {
             });
         }
 
-        this.logger.exit(result.get());
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exitWith(result.get()));
+        }
 
         return result.get();
     }
@@ -143,7 +153,9 @@ public class AppliedBaseCollection<T> {
      * @param   onEnd       java.lang.Runnable
      */
     protected void clearAndApply(final Collection<T> collection, final Consumer<T> onElement, final Runnable onEnd) {
-        this.logger.entry(collection, onElement, onEnd);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(collection, onElement, onEnd));
+        }
 
         collection.forEach(e -> {
             if (e != null) {
@@ -155,7 +167,9 @@ public class AppliedBaseCollection<T> {
 
         onEnd.run();
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**
@@ -174,7 +188,9 @@ public class AppliedBaseCollection<T> {
                                         @Nonnull final Collection<? extends T> source,
                                         final Consumer<T> onElement,
                                         final Runnable onEnd) {
-        this.logger.entry(target, source, onElement, onEnd);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(target, source, onElement, onEnd));
+        }
 
         final WrappedObject<Boolean> result = WrappedObject.of(false);
 
@@ -189,7 +205,9 @@ public class AppliedBaseCollection<T> {
 
         onEnd.run();
 
-        this.logger.exit(result.get());
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exitWith(result.get()));
+        }
 
         return result.get();
     }
@@ -211,7 +229,9 @@ public class AppliedBaseCollection<T> {
                                         @Nonnull final Collection<? extends T> source,
                                         final Consumer<T> onElement,
                                         final Runnable onEnd) {
-        this.logger.entry(target, source, onElement, onEnd);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(target, source, onElement, onEnd));
+        }
 
         final WrappedObject<Boolean> result = WrappedObject.of(false);
         final List<T> removals = new ArrayList<>();
@@ -231,7 +251,9 @@ public class AppliedBaseCollection<T> {
 
         onEnd.run();
 
-        this.logger.exit(result.get());
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exitWith(result.get()));
+        }
 
         return result.get();
     }
@@ -243,36 +265,46 @@ public class AppliedBaseCollection<T> {
      * @param   task    java.lang.Runnable
      */
     protected void runTask(final Runnable task) {
-        this.logger.entry(task);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(task));
+        }
 
         this.futures.add(this.executor.submit(task));
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**
      * Wait for the consumers to finish.
      */
     protected void waitForConsumers() {
-        this.logger.entry();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
 
         this.waitForFutures();
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**
      * Wait for any futures to complete.
      */
     private void waitForFutures() {
-        this.logger.entry();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
 
         this.futures.forEach(future -> {
             if (!future.isDone()) {
                 try {
                     future.get();
                 } catch (InterruptedException | ExecutionException e) {
-                    this.logger.catching(e);
+                    this.logger.error("A thread incurred an exception or was interrupted", e);
 
                     if (e instanceof InterruptedException) {
                         Thread.currentThread().interrupt();
@@ -283,6 +315,8 @@ public class AppliedBaseCollection<T> {
 
         this.futures.clear();
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 }

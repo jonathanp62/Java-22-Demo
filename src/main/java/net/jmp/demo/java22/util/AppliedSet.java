@@ -1,10 +1,11 @@
 package net.jmp.demo.java22.util;
 
 /*
+ * (#)AppliedSet.java   0.8.0   08/22/2024
  * (#)AppliedSet.java   0.6.0   08/17/2024
  *
  * @author   Jonathan Parker
- * @version  0.6.0
+ * @version  0.8.0
  * @since    0.6.0
  *
  * MIT License
@@ -32,16 +33,17 @@ package net.jmp.demo.java22.util;
 
 import java.util.*;
 
-import org.slf4j.LoggerFactory;
+import static net.jmp.demo.java22.util.LoggerUtils.*;
 
-import org.slf4j.ext.XLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class AppliedSet<T> extends AppliedBaseCollection<T> implements Set<T>, AutoCloseable {
     /** The logger. */
-    private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
+    private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
     /** The set. */
-    private Set<T> set;
+    private final Set<T> set;
 
     /**
      * The default constructor.
@@ -67,11 +69,15 @@ public final class AppliedSet<T> extends AppliedBaseCollection<T> implements Set
      */
     @Override
     public void close() {
-        this.logger.entry();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
 
         super.close();
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /*
