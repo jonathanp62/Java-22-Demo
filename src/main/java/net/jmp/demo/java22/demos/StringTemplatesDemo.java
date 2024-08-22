@@ -1,10 +1,11 @@
 package net.jmp.demo.java22.demos;
 
 /*
+ * (#)StringTemplatesDemo.java  0.7.1   08/22/2024
  * (#)StringTemplatesDemo.java  0.2.0   08/06/2024
  *
  * @author   Jonathan Parker
- * @version  0.2.0
+ * @version  0.7.1
  * @since    0.2.0
  *
  * MIT License
@@ -42,16 +43,17 @@ import static java.util.FormatProcessor.FMT;
 
 import java.util.List;
 
-import org.slf4j.LoggerFactory;
+import static net.jmp.demo.java22.util.LoggerUtils.*;
 
-import org.slf4j.ext.XLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The class that demonstrates string templates.
  */
 public final class StringTemplatesDemo implements Demo {
     /** The logger. */
-    private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
+    private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
     /**
      * The default constructor.
@@ -65,7 +67,9 @@ public final class StringTemplatesDemo implements Demo {
      */
     @Override
     public void demo() {
-        this.logger.entry();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
 
         final List<Demo> demos = List.of(
                 new STRTemplateProcessor(),
@@ -77,7 +81,9 @@ public final class StringTemplatesDemo implements Demo {
         this.raw();
         this.interpolation();
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**
@@ -85,7 +91,9 @@ public final class StringTemplatesDemo implements Demo {
      * produces an unprocessed StringTemplate object.
      */
     private void raw() {
-        this.logger.entry();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
 
         final String name = "Jonathan";
         final StringTemplate st = RAW."My name is \{name}";
@@ -95,7 +103,9 @@ public final class StringTemplatesDemo implements Demo {
 
         this.logger.info(info);
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**
@@ -103,7 +113,9 @@ public final class StringTemplatesDemo implements Demo {
      * interpolating them.
      */
     private void interpolation() {
-        this.logger.entry();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
 
         final int x = 10;
         final int y = 20;
@@ -124,7 +136,9 @@ public final class StringTemplatesDemo implements Demo {
 
         this.logger.info(string);
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**
@@ -133,7 +147,9 @@ public final class StringTemplatesDemo implements Demo {
     class STRTemplateProcessor implements Demo {
         @Override
         public void demo() {
-            logger.entry();
+            if (logger.isTraceEnabled()) {
+                logger.trace(entry());
+            }
 
             this.strings();
             this.arithmetic();
@@ -143,14 +159,18 @@ public final class StringTemplatesDemo implements Demo {
             this.leftToRightEvaluation();
             this.nestedExpressions();
 
-            logger.exit();
+            if (logger.isTraceEnabled()) {
+                logger.trace(exit());
+            }
         }
 
         /**
          * Embedded expressions can be strings
          */
         private void strings() {
-            logger.entry();
+            if (logger.isTraceEnabled()) {
+                logger.trace(entry());
+            }
 
             final String firstName = "Bill";
             final String lastName  = "Duck";
@@ -166,14 +186,18 @@ public final class StringTemplatesDemo implements Demo {
 
             logger.info(sortedName);
 
-            logger.exit();
+            if (logger.isTraceEnabled()) {
+                logger.trace(exit());
+            }
         }
 
         /**
          * Embedded expressions can perform arithmetic
          */
         private void arithmetic() {
-            logger.entry();
+            if (logger.isTraceEnabled()) {
+                logger.trace(entry());
+            }
 
             final int x = 10, y = 20;
             final String s = STR."\{x} + \{y} = \{x + y}";
@@ -182,14 +206,18 @@ public final class StringTemplatesDemo implements Demo {
 
             logger.info(s);
 
-            logger.exit();
+            if (logger.isTraceEnabled()) {
+                logger.trace(exit());
+            }
         }
 
         /**
          * Embedded expressions can invoke methods and access fields.
          */
         private void invokeMethodsAndAccessFields() {
-            logger.entry();
+            if (logger.isTraceEnabled()) {
+                logger.trace(entry());
+            }
 
             final String s = STR."You have a \{getOfferType()} waiting for you!";
 
@@ -204,7 +232,9 @@ public final class StringTemplatesDemo implements Demo {
 
             logger.info(t);
 
-            logger.exit();
+            if (logger.isTraceEnabled()) {
+                logger.trace(exit());
+            }
         }
 
         /**
@@ -212,7 +242,9 @@ public final class StringTemplatesDemo implements Demo {
          * how an expression can be evaluated.
          */
         private void unescapedDoubleQuotes() {
-            logger.entry();
+            if (logger.isTraceEnabled()) {
+                logger.trace(entry());
+            }
 
             final String filePath = "tmp.dat";
             final File file = new File(filePath);
@@ -222,14 +254,18 @@ public final class StringTemplatesDemo implements Demo {
 
             logger.info(message);
 
-            logger.exit();
+            if (logger.isTraceEnabled()) {
+                logger.trace(exit());
+            }
         }
 
         /**
          * Spread an expression over multiple lines.
          */
         private void multilineExpressions() {
-            logger.entry();
+            if (logger.isTraceEnabled()) {
+                logger.trace(entry());
+            }
 
             final String time = STR."The time is \{
                     // The java.time.format package is very useful
@@ -254,14 +290,18 @@ public final class StringTemplatesDemo implements Demo {
 
             logger.info(json);
 
-            logger.exit();
+            if (logger.isTraceEnabled()) {
+                logger.trace(exit());
+            }
         }
 
         /**
          * Left to right evaluation.
          */
         private void leftToRightEvaluation() {
-            logger.entry();
+            if (logger.isTraceEnabled()) {
+                logger.trace(entry());
+            }
 
             int index = 0;
 
@@ -271,14 +311,18 @@ public final class StringTemplatesDemo implements Demo {
 
             logger.info(data);
 
-            logger.exit();
+            if (logger.isTraceEnabled()) {
+                logger.trace(exit());
+            }
         }
 
         /**
          * Nesting template expressions.
          */
         private void nestedExpressions() {
-            logger.entry();
+            if (logger.isTraceEnabled()) {
+                logger.trace(entry());
+            }
 
             final String[] fruit = { "apples", "oranges", "peaches" };
 
@@ -293,7 +337,9 @@ public final class StringTemplatesDemo implements Demo {
 
             logger.info(s2);
 
-            logger.exit();
+            if (logger.isTraceEnabled()) {
+                logger.trace(exit());
+            }
         }
 
         /**
@@ -325,7 +371,9 @@ public final class StringTemplatesDemo implements Demo {
     class FMTTemplateProcessor implements Demo {
         @Override
         public void demo() {
-            logger.entry();
+            if (logger.isTraceEnabled()) {
+                logger.trace(entry());
+            }
 
             Rectangle[] zone = new Rectangle[] {
                     new Rectangle("Addison", 17.8, 31.4),
@@ -344,7 +392,9 @@ public final class StringTemplatesDemo implements Demo {
 
             logger.info(table);
 
-            logger.exit();
+            if (logger.isTraceEnabled()) {
+                logger.trace(exit());
+            }
         }
     }
 

@@ -1,11 +1,12 @@
 package net.jmp.demo.java22.demos;
 
 /*
+ * (#)UnnamedVariablesDemo.java 0.7.1   08/22/2024
  * (#)UnnamedVariablesDemo.java 0.6.0   08/15/2024
  * (#)UnnamedVariablesDemo.java 0.3.0   08/07/2024
  *
  * @author   Jonathan Parker
- * @version  0.6.0
+ * @version  0.7.1
  * @since    0.3.0
  *
  * MIT License
@@ -35,16 +36,17 @@ import java.util.*;
 
 import net.jmp.demo.java22.util.AppliedQueue;
 
-import org.slf4j.LoggerFactory;
+import static net.jmp.demo.java22.util.LoggerUtils.*;
 
-import org.slf4j.ext.XLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A class the demonstrates using unnamed variables.
  */
 public final class UnnamedVariablesDemo implements Demo {
     /** The logger. */
-    private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
+    private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
     /**
      * The default constructor.
@@ -58,19 +60,25 @@ public final class UnnamedVariablesDemo implements Demo {
      */
     @Override
     public void demo() {
-        this.logger.entry();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
 
         this.unnamedVariables();
         this.unnamedPatterns();
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**
      * Unnamed variables.
      */
     private void unnamedVariables() {
-        this.logger.entry();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
 
         // As an exception
 
@@ -108,14 +116,18 @@ public final class UnnamedVariablesDemo implements Demo {
             this.logger.info("Opened an applied queue");
         }
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**
      * Unnamed patterns.
      */
     private void unnamedPatterns() {
-        this.logger.entry();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
 
         // Patterns in case statements
 
@@ -129,6 +141,8 @@ public final class UnnamedVariablesDemo implements Demo {
             default -> this.logger.error("Unsupported collection");
         }
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 }

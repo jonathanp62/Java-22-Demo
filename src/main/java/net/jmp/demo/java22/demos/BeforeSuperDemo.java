@@ -1,10 +1,11 @@
 package net.jmp.demo.java22.demos;
 
 /*
+ * (#)BeforeSuperDemo.java  0.7.1   08/22/2024
  * (#)BeforeSuperDemo.java  0.3.0   08/07/2024
  *
  * @author   Jonathan Parker
- * @version  0.3.0
+ * @version  0.7.1
  * @since    0.3.0
  *
  * MIT License
@@ -32,9 +33,10 @@ package net.jmp.demo.java22.demos;
 
 import java.util.Objects;
 
-import org.slf4j.LoggerFactory;
+import static net.jmp.demo.java22.util.LoggerUtils.*;
 
-import org.slf4j.ext.XLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A class the demonstrates statements before 'super()' in a constructor.
@@ -47,7 +49,7 @@ import org.slf4j.ext.XLogger;
  */
 public final class BeforeSuperDemo implements Demo {
     /** The logger. */
-    private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
+    private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
     /**
      * The default constructor.
@@ -61,7 +63,9 @@ public final class BeforeSuperDemo implements Demo {
      */
     @Override
     public void demo() {
-        this.logger.entry();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
 
         final var square = new Square(4, 3, "Yellow");
 
@@ -73,7 +77,9 @@ public final class BeforeSuperDemo implements Demo {
             this.logger.error(iae.getMessage());
         }
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**

@@ -1,11 +1,12 @@
 package net.jmp.demo.java22.demos;
 
 /*
+ * (#)KeyedFunctionExecutorDemo.java    0.7.1   08/22/2024
  * (#)KeyedFunctionExecutorDemo.java    0.5.0   08/14/2024
  * (#)KeyedFunctionExecutorDemo.java    0.2.0   08/07/2024
  *
  * @author   Jonathan Parker
- * @version  0.5.0
+ * @version  0.7.1
  * @since    0.2.0
  *
  * MIT License
@@ -39,16 +40,17 @@ import java.util.stream.IntStream;
 
 import net.jmp.demo.java22.util.KeyedFunctionExecutor;
 
-import org.slf4j.LoggerFactory;
+import static net.jmp.demo.java22.util.LoggerUtils.*;
 
-import org.slf4j.ext.XLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class that demonstrates the keyed function executor.
  */
 public final class KeyedFunctionExecutorDemo implements Demo {
     /** The logger. */
-    private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
+    private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
     /**
      * The default constructor.
@@ -62,7 +64,9 @@ public final class KeyedFunctionExecutorDemo implements Demo {
      */
     @Override
     public void demo() {
-        this.logger.entry();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
 
         try (final KeyedFunctionExecutor<String> keyedFunctionExecutor = new KeyedFunctionExecutor<>()) {
             final Function<String, Void> function = s -> {
@@ -81,6 +85,8 @@ public final class KeyedFunctionExecutorDemo implements Demo {
             });
         }
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 }

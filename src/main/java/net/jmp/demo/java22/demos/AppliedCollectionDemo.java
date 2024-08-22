@@ -32,6 +32,7 @@ package net.jmp.demo.java22.demos;
  * SOFTWARE.
  */
 
+import java.util.ArrayList;
 import java.util.List;
 
 import java.util.function.Consumer;
@@ -42,16 +43,17 @@ import java.util.stream.IntStream;
 import net.jmp.demo.java22.util.AppliedList;
 import net.jmp.demo.java22.util.AppliedQueue;
 
-import org.slf4j.LoggerFactory;
+import static net.jmp.demo.java22.util.LoggerUtils.*;
 
-import org.slf4j.ext.XLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A demonstration class for applied collections.
  */
 public final class AppliedCollectionDemo implements Demo {
     /** The logger. */
-    private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
+    private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
     /** A string capitalizer function. */
     private final Function<String, String> capitalizer = string -> {
@@ -72,32 +74,42 @@ public final class AppliedCollectionDemo implements Demo {
      */
     @Override
     public void demo() {
-        this.logger.entry();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
 
         this.appliedQueues();
         this.appliedLists();
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**
      * Applied queues.
      */
     private void appliedQueues() {
-        this.logger.entry();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
 
         this.offerToAndPollFromQueue();
         this.peekAtAndRemoveFromQueue();
         this.addToAndRemoveAllFromQueue();
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**
      * Use offer and poll on an applied string queue.
      */
     private void offerToAndPollFromQueue() {
-        this.logger.entry();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
 
         try (final AppliedQueue<String> stringQueue = new AppliedQueue<>()) {
             final List<String> words = List.of(
@@ -121,14 +133,18 @@ public final class AppliedCollectionDemo implements Demo {
             assert stringQueue.isEmpty();
         }
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**
      * Use peek and remove on an applied integer queue.
      */
     private void peekAtAndRemoveFromQueue() {
-        this.logger.entry();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
 
         try (final AppliedQueue<Integer> integerQueue = new AppliedQueue<>()) {
             var _ = integerQueue.applyAndAdd(1, i -> i * 10);
@@ -144,14 +160,18 @@ public final class AppliedCollectionDemo implements Demo {
             assert integerQueue.isEmpty();
         }
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**
      * Use add and remove all on an applied integer queue.
      */
     private void addToAndRemoveAllFromQueue() {
-        this.logger.entry();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
 
         try (final AppliedQueue<Integer> integerQueue = new AppliedQueue<>()) {
             IntStream.rangeClosed(1, 10).forEach(i -> integerQueue.applyAndAdd(i, j -> j * 10));
@@ -167,25 +187,36 @@ public final class AppliedCollectionDemo implements Demo {
             }
         }
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**
      * Applied lists.
      */
     private void appliedLists() {
-        this.logger.entry();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
 
         this.addToAndRemoveFromList();
+        this.applyAndAddAllToList();
+        this.removeAllAndApplyFromList();
+        this.retainAllAndApplyFromList();
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**
      * Add to and remove from a list.
      */
     private void addToAndRemoveFromList() {
-        this.logger.entry();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
 
         try (final AppliedList<String> stringList = new AppliedList<>()) {
             final List<String> words = List.of(
@@ -214,6 +245,96 @@ public final class AppliedCollectionDemo implements Demo {
             assert stringList.isEmpty();
         }
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
+    }
+
+    /**
+     * Apply and add all to a list.
+     */
+    private void applyAndAddAllToList() {
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
+
+        final List<Integer> source = new ArrayList<>();
+
+        IntStream.rangeClosed(1, 10).forEach(source::add);
+
+        try (final AppliedList<Integer> integerList = new AppliedList<>()) {
+            final boolean result = integerList.applyAndAddAll(source, e -> e * 10);
+
+            assert result;
+
+            integerList.forEach(e -> this.logger.info("Added: {}", e));
+
+            integerList.clearAndApply(e -> this.logger.info("Cleared: {}", e), () -> {});
+        }
+
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
+    }
+
+    /**
+     * Remove all and apply from a list;
+     */
+    private void removeAllAndApplyFromList() {
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
+
+        try (final AppliedList<Integer> integerList = new AppliedList<>()) {
+            integerList.add(2);
+            integerList.add(4);
+            integerList.add(6);
+
+            final List<Integer> removals = List.of(2, 6);
+            final boolean result = integerList.removeAllAndApply(
+                    removals,
+                    e -> this.logger.info("Removed: {}", e),
+                    () -> {}
+            );
+
+            assert result;
+            assert integerList.size() == 1;
+            assert integerList.contains(4);
+        }
+
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
+    }
+
+    /**
+     * Retain all and apply from a list;
+     */
+    private void retainAllAndApplyFromList() {
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
+
+        try (final AppliedList<Integer> integerList = new AppliedList<>()) {
+            integerList.add(2);
+            integerList.add(4);
+            integerList.add(6);
+
+            final List<Integer> retains = List.of(2, 6);
+            final boolean result = integerList.retainAllAndApply(
+                    retains,
+                    e -> this.logger.info("Retained: {}", e),
+                    () -> {}
+            );
+
+            assert result;
+            assert integerList.size() == 2;
+            assert integerList.contains(2);
+            assert integerList.contains(6);
+        }
+
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 }

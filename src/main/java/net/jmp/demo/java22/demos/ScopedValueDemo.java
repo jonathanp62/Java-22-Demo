@@ -1,10 +1,11 @@
 package net.jmp.demo.java22.demos;
 
 /*
+ * (#)ScopedValueDemo.java  0.7.1   08/22/2024
  * (#)ScopedValueDemo.java  0.2.0   08/04/2024
  *
  * @author   Jonathan Parker
- * @version  0.2.0
+ * @version  0.7.1
  * @since    0.2.0
  *
  * MIT License
@@ -35,9 +36,10 @@ import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.StructuredTaskScope;
 
-import org.slf4j.LoggerFactory;
+import static net.jmp.demo.java22.util.LoggerUtils.*;
 
-import org.slf4j.ext.XLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The class that demonstrates the scoped value.
@@ -54,7 +56,7 @@ import org.slf4j.ext.XLogger;
  */
 public final class ScopedValueDemo implements Demo {
     /** The logger. */
-    private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
+    private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
     /** A scoped value UUID. */
     private static final ScopedValue<String> UID = ScopedValue.newInstance();
@@ -74,14 +76,18 @@ public final class ScopedValueDemo implements Demo {
      */
     @Override
     public void demo() {
-        this.logger.entry();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
 
         this.basic();
         this.multiples();
         this.rebinding();
         this.inheritance();
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**
@@ -89,7 +95,9 @@ public final class ScopedValueDemo implements Demo {
      * and pass it to the runnable.
      */
     private void basic() {
-        this.logger.entry();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
 
         final String uuid = UUID.randomUUID().toString();
 
@@ -107,14 +115,18 @@ public final class ScopedValueDemo implements Demo {
                     }
                 });
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**
      * Multiple bindings.
      */
     private void multiples() {
-        this.logger.entry();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
 
         final String uuid = UUID.randomUUID().toString();
         final String name = "Parker";
@@ -129,25 +141,33 @@ public final class ScopedValueDemo implements Demo {
                     }
                 });
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**
      * Rebinding a scoped value.
      */
     private void rebinding() {
-        this.logger.entry();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
 
         ScopedValue.where(NAME, "Jonathan").run(this::bar);
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**
      * Method bar.
      */
     private void bar() {
-        this.logger.entry();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
 
         if (this.logger.isInfoEnabled()) {
             this.logger.info("NAME: {}", NAME.get());   // Jonathan
@@ -159,27 +179,35 @@ public final class ScopedValueDemo implements Demo {
             this.logger.info("NAME: {}", NAME.get());   // Jonathan
         }
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**
      * Method baz.
      */
     private void baz() {
-        this.logger.entry();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
 
         if (this.logger.isInfoEnabled()) {
             this.logger.info("NAME: {}", NAME.get());   // Martin
         }
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**
      * Inheritance or sharing across threads.
      */
     private void inheritance() {
-        this.logger.entry();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
 
         final Callable<String> childTask1 = () -> {
             if (this.logger.isInfoEnabled()) {
@@ -226,7 +254,9 @@ public final class ScopedValueDemo implements Demo {
             }
         });
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**
@@ -236,7 +266,9 @@ public final class ScopedValueDemo implements Demo {
      * @param   item    int
      */
     private void logSubtaskStatus(final StructuredTaskScope.Subtask<String> subtask, final int item) {
-        this.logger.entry(subtask, item);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(subtask, item));
+        }
 
         assert subtask != null;
 
@@ -248,6 +280,8 @@ public final class ScopedValueDemo implements Demo {
             this.logger.error("Child task {} result or exception is not available", item);
         }
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 }

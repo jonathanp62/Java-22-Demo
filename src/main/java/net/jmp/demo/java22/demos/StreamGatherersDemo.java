@@ -1,11 +1,12 @@
 package net.jmp.demo.java22.demos;
 
 /*
+ * (#)StreamGatherersDemo.java  0.7.1   08/22/2024
  * (#)StreamGatherersDemo.java  0.4.0   08/09/2024
  * (#)StreamGatherersDemo.java  0.2.0   08/04/2024
  *
  * @author   Jonathan Parker
- * @version  0.4.0
+ * @version  0.7.1
  * @since    0.2.0
  *
  * MIT License
@@ -47,9 +48,10 @@ import net.jmp.demo.java22.gatherers.*;
 
 import net.jmp.demo.java22.records.Money;
 
-import org.slf4j.LoggerFactory;
+import static net.jmp.demo.java22.util.LoggerUtils.*;
 
-import org.slf4j.ext.XLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The class that demonstrates built-in stream gatherers
@@ -61,7 +63,7 @@ import org.slf4j.ext.XLogger;
  */
 public final class StreamGatherersDemo implements Demo {
     /** The logger. */
-    private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
+    private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
     /**
      * The default constructor.
@@ -75,7 +77,9 @@ public final class StreamGatherersDemo implements Demo {
      */
     @Override
     public void demo() {
-        this.logger.entry();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
 
         this.slidingWindows();
         this.fixedWindows();
@@ -84,14 +88,18 @@ public final class StreamGatherersDemo implements Demo {
         this.mapConcurrent();
         this.custom();
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**
      * Sliding windows.
      */
     private void slidingWindows() {
-        this.logger.entry();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
 
         final List<String> countries = List.of("India", "Poland", "UK", "Australia", "USA", "Netherlands");
 
@@ -104,14 +112,18 @@ public final class StreamGatherersDemo implements Demo {
             this.logger.info("Sliding windows: {}", windows);
         }
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**
      * Fixed windows.
      */
     private void fixedWindows() {
-        this.logger.entry();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
 
         final List<String> composers = List.of("Mozart", "Bach", "Beethoven", "Mahler", "Bruckner", "Liszt", "Chopin", "Telemann", "Vivaldi");
 
@@ -124,14 +136,18 @@ public final class StreamGatherersDemo implements Demo {
             this.logger.info("Fixed windows: {}", windows);
         }
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**
      * Scan.
      */
     private void scan() {
-        this.logger.entry();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
 
         final List<String> numbers = Stream.of(
                 1, 2, 3, 4, 5, 6, 7, 8, 9
@@ -143,14 +159,18 @@ public final class StreamGatherersDemo implements Demo {
             this.logger.info("Scan: {}", numbers);
         }
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**
      * Fold.
      */
     private void fold() {
-        this.logger.entry();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
 
         final String numbers = Stream.of(
                 1, 2, 3, 4, 5, 6, 7, 8, 9
@@ -162,14 +182,18 @@ public final class StreamGatherersDemo implements Demo {
             this.logger.info("Fold: {}", numbers);
         }
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**
      * Map concurrent.
      */
     private void mapConcurrent() {
-        this.logger.entry();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
 
         final List<Integer> numbers = List.of(1, 2, 3, 4, 5, 6, 7, 8, 9);
 
@@ -184,7 +208,9 @@ public final class StreamGatherersDemo implements Demo {
             this.logger.info("MapConcurrent: {}", strings);
         }
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**
@@ -193,7 +219,9 @@ public final class StreamGatherersDemo implements Demo {
      * @since    0.4.0
      */
     private void custom() {
-        this.logger.entry();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
 
         final List<Money> money = List.of(
                 new Money(BigDecimal.valueOf(12), Currency.getInstance("PLN")),
@@ -210,7 +238,9 @@ public final class StreamGatherersDemo implements Demo {
         this.customFindLastGatherer(money);
         this.customGatherAndThen();
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**
@@ -220,7 +250,9 @@ public final class StreamGatherersDemo implements Demo {
      * @since           0.4.0
      */
     private void customDistinctBy(final List<Money> money) {
-        this.logger.entry(money);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(money));
+        }
 
         assert money != null;
         assert !money.isEmpty();
@@ -229,7 +261,9 @@ public final class StreamGatherersDemo implements Demo {
                 .gather(GatherersFactory.distinctBy(Money::currency))
                 .forEach(e -> this.logger.info(e.toString()));
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**
@@ -239,7 +273,9 @@ public final class StreamGatherersDemo implements Demo {
      * @since           0.4.0
      */
     private void customReduceByGatherer(final List<Money> money) {
-        this.logger.entry(money);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(money));
+        }
 
         assert money != null;
         assert !money.isEmpty();
@@ -248,7 +284,9 @@ public final class StreamGatherersDemo implements Demo {
                 .gather(GatherersFactory.reduceBy(Money::currency, Money::add))
                 .forEach(e -> this.logger.info(e.toString()));
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**
@@ -258,7 +296,9 @@ public final class StreamGatherersDemo implements Demo {
      * @since           0.4.0
      */
     private void customMaxByGatherer(final List<Money> money) {
-        this.logger.entry(money);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(money));
+        }
 
         assert money != null;
         assert !money.isEmpty();
@@ -268,7 +308,9 @@ public final class StreamGatherersDemo implements Demo {
                 .gather(GatherersFactory.maxBy(Money::amount))
                 .forEach(e -> this.logger.info(e.toString()));
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**
@@ -278,7 +320,9 @@ public final class StreamGatherersDemo implements Demo {
      * @since           0.4.0
      */
     private void customMinByGatherer(final List<Money> money) {
-        this.logger.entry(money);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(money));
+        }
 
         assert money != null;
         assert !money.isEmpty();
@@ -288,7 +332,9 @@ public final class StreamGatherersDemo implements Demo {
                 .gather(GatherersFactory.minBy(Money::amount))
                 .forEach(e -> this.logger.info(e.toString()));
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**
@@ -297,7 +343,9 @@ public final class StreamGatherersDemo implements Demo {
      * @since   0.4.0
      */
     private void customMapNotNullGatherer() {
-        this.logger.entry();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
 
         final List<Money> money = this.getMoneyWithNulls();
 
@@ -305,7 +353,9 @@ public final class StreamGatherersDemo implements Demo {
                 .gather(GatherersFactory.mapNotNull(m -> m.multiply(BigDecimal.TWO)))
                 .forEach(e -> this.logger.info(e.toString()));
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**
@@ -315,7 +365,9 @@ public final class StreamGatherersDemo implements Demo {
      * @since           0.4.0
      */
     private void customFindFirstGatherer(final List<Money> money) {
-        this.logger.entry(money);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(money));
+        }
 
         assert money != null;
         assert !money.isEmpty();
@@ -324,7 +376,9 @@ public final class StreamGatherersDemo implements Demo {
                 .gather(GatherersFactory.findFirst(m -> m.currency().equals(Currency.getInstance("PLN"))))
                 .forEach(e -> this.logger.info(e.toString()));
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**
@@ -334,7 +388,9 @@ public final class StreamGatherersDemo implements Demo {
      * @since           0.4.0
      */
     private void customFindLastGatherer(final List<Money> money) {
-        this.logger.entry(money);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(money));
+        }
 
         assert money != null;
         assert !money.isEmpty();
@@ -343,7 +399,9 @@ public final class StreamGatherersDemo implements Demo {
                 .gather(GatherersFactory.findLast(m -> m.currency().equals(Currency.getInstance("PLN"))))
                 .forEach(e -> this.logger.info(e.toString()));
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**
@@ -352,7 +410,9 @@ public final class StreamGatherersDemo implements Demo {
      * @since   0.4.0
      */
     private void customGatherAndThen() {
-        this.logger.entry();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
 
         final List<Money> money = this.getMoneyWithNulls();
 
@@ -367,7 +427,9 @@ public final class StreamGatherersDemo implements Demo {
                 .gather(gatherers)
                 .forEach(e -> this.logger.info(e.toString()));
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**
@@ -376,7 +438,9 @@ public final class StreamGatherersDemo implements Demo {
      * @return  java.util.List&lt;net.jmp.demo.java22.records.Money&gt;
      */
     private List<Money> getMoneyWithNulls() {
-        this.logger.entry();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
 
         // Cannot add nulls in List.of()
 
@@ -390,7 +454,9 @@ public final class StreamGatherersDemo implements Demo {
                 null
         );
 
-        this.logger.exit(money);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exitWith(money));
+        }
 
         return money;
     }

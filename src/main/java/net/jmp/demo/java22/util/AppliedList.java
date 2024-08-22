@@ -92,7 +92,7 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
      * @param   <T> The type of element
      * @return      net.jmp.demo.java22.util.AppliedList&lt;T&gt;
      */
-    static <T> AppliedList<T> of() {
+    public static <T> AppliedList<T> of() {
         return new AppliedList<>(new ArrayList<>());
     }
 
@@ -103,7 +103,7 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
      * @param   t   T
      * @return      net.jmp.demo.java22.util.AppliedList&lt;T&gt;
      */
-    static <T> AppliedList<T> of(final T t) {
+    public static <T> AppliedList<T> of(final T t) {
         final AppliedList<T> list = new AppliedList<>();
 
         list.add(Objects.requireNonNull(t));
@@ -119,7 +119,7 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
      * @param   t2  T
      * @return      net.jmp.demo.java22.util.AppliedList&lt;T&gt;
      */
-    static <T> AppliedList<T> of(final T t1, final T t2) {
+    public static <T> AppliedList<T> of(final T t1, final T t2) {
         final AppliedList<T> list = new AppliedList<>();
 
         list.add(Objects.requireNonNull(t1));
@@ -137,7 +137,7 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
      * @param   t3  T
      * @return      net.jmp.demo.java22.util.AppliedList&lt;T&gt;
      */
-    static <T> AppliedList<T> of(final T t1, final T t2, final T t3) {
+    public static <T> AppliedList<T> of(final T t1, final T t2, final T t3) {
         final AppliedList<T> list = new AppliedList<>();
 
         list.add(Objects.requireNonNull(t1));

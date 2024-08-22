@@ -1,6 +1,7 @@
 package net.jmp.demo.java22;
 
 /*
+ * (#)Main.java 0.7.1   08/22/2024
  * (#)Main.java 0.6.0   08/15/2024
  * (#)Main.java 0.5.0   08/10/2024
  * (#)Main.java 0.3.0   08/07/2024
@@ -8,7 +9,7 @@ package net.jmp.demo.java22;
  * (#)Main.java 0.1.0   08/02/2024
  *
  * @author   Jonathan Parker
- * @version  0.6.0
+ * @version  0.7.1
  * @since    0.1.0
  *
  * MIT License
@@ -39,16 +40,17 @@ import java.util.Objects;
 
 import net.jmp.demo.java22.demos.*;
 
-import org.slf4j.LoggerFactory;
+import static net.jmp.demo.java22.util.LoggerUtils.*;
 
-import org.slf4j.ext.XLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The main class.
  */
 final class Main implements Runnable {
     /** The logger. */
-    private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
+    private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
     /** The command line arguments. */
     private final String[] arguments;
@@ -69,7 +71,9 @@ final class Main implements Runnable {
      */
     @Override
     public void run() {
-        this.logger.entry();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
 
         if (this.logger.isInfoEnabled() || this.logger.isWarnEnabled() || this.logger.isErrorEnabled()) {
             final String name = Name.NAME_STRING;
@@ -83,14 +87,18 @@ final class Main implements Runnable {
 
         this.runDemos();
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**
      * Method that runs the demo classes.
      */
     private void runDemos() {
-        this.logger.entry();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
 
         List<Demo> demos = List.of(
                 new KeyedFunctionExecutorDemo(),
@@ -105,6 +113,8 @@ final class Main implements Runnable {
 
         demos.forEach(Demo::demo);
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 }

@@ -1,11 +1,12 @@
 package net.jmp.demo.java22.demos;
 
 /*
+ * (#)StructuredConcurrencyDemo.java    0.7.1   08/22/2024
  * (#)StructuredConcurrencyDemo.java    0.7.0   08/18/2024
  * (#)StructuredConcurrencyDemo.java    0.6.0   08/15/2024
  *
  * @author   Jonathan Parker
- * @version  0.7.0
+ * @version  0.7.1
  * @since    0.6.0
  *
  * MIT License
@@ -44,9 +45,10 @@ import java.util.stream.Stream;
 
 import net.jmp.demo.java22.scopes.CustomScope;
 
-import org.slf4j.LoggerFactory;
+import static net.jmp.demo.java22.util.LoggerUtils.*;
 
-import org.slf4j.ext.XLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A class the demonstrates using structured concurrency.
@@ -55,7 +57,7 @@ import org.slf4j.ext.XLogger;
  */
 public final class StructuredConcurrencyDemo implements Demo {
     /** The logger. */
-    private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
+    private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
     /**
      * The default constructor.
@@ -69,21 +71,27 @@ public final class StructuredConcurrencyDemo implements Demo {
      */
     @Override
     public void demo() {
-        this.logger.entry();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
 
         this.shutdownOnFailure();
         this.shutdownOnSuccess();
         this.noShutdownPolicy();
         this.customPolicy();
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**
      * Use the custom scope as a policy.
      */
     private void customPolicy() {
-        this.logger.entry();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
 
         final List<Callable<Integer>> tasks = List.of(
                 () -> 1 + 0,
@@ -103,11 +111,13 @@ public final class StructuredConcurrencyDemo implements Demo {
             results.forEach(result -> this.logger.info("Custom result: {}", result));
             throwables.forEach(throwable -> this.logger.info("Custom throwable: {}", throwable.getMessage()));
         } catch (final InterruptedException ie) {
-            this.logger.catching(ie);
+            this.logger.error("A thread was interrupted", ie);
             Thread.currentThread().interrupt();
         }
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**
@@ -119,7 +129,9 @@ public final class StructuredConcurrencyDemo implements Demo {
      * @throws          java.lang.InterruptedException
      */
     private <T> CustomScopeResultsAndThrowables<T> allResultsAndThrowables(final List<Callable<T>> tasks) throws InterruptedException {
-        this.logger.entry();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
 
         List<T> results;
         List<Throwable> throwables;
@@ -135,7 +147,9 @@ public final class StructuredConcurrencyDemo implements Demo {
 
         final CustomScopeResultsAndThrowables<T> scopeResults = new CustomScopeResultsAndThrowables<>(results, throwables);
 
-        this.logger.exit(scopeResults);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exitWith(scopeResults));
+        }
 
         return scopeResults;
     }
@@ -146,7 +160,9 @@ public final class StructuredConcurrencyDemo implements Demo {
      * or failure.
      */
     private void noShutdownPolicy() {
-        this.logger.entry();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
 
         final List<Callable<Integer>> tasks = List.of(
                 () -> 1 + 0,
@@ -170,11 +186,13 @@ public final class StructuredConcurrencyDemo implements Demo {
                 }
             });
         } catch (final InterruptedException e) {
-            this.logger.catching(e);
+            this.logger.error("A thread was interruped", e);
             Thread.currentThread().interrupt();
         }
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**
@@ -189,7 +207,9 @@ public final class StructuredConcurrencyDemo implements Demo {
      * @throws          java.lang.InterruptedException
      */
     private Stream<Future<Integer>> executeAll(final List<Callable<Integer>> tasks) throws InterruptedException {
-        this.logger.entry(tasks);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(tasks));
+        }
 
         Stream<Future<Integer>> results;
 
@@ -206,7 +226,9 @@ public final class StructuredConcurrencyDemo implements Demo {
             results = futures.stream().map(Supplier::get);
         }
 
-        this.logger.exit(results);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exitWith(results));
+        }
 
         return results;
     }
@@ -232,7 +254,9 @@ public final class StructuredConcurrencyDemo implements Demo {
      * Get the value or handle an exception.
      */
     private void shutdownOnFailure() {
-        this.logger.entry();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
 
         // First case
 
@@ -241,7 +265,7 @@ public final class StructuredConcurrencyDemo implements Demo {
 
             this.logger.info("User: {}; Order: {}", response.user, response.orderNumber);
         } catch (final ExecutionException | InterruptedException e) {
-            this.logger.catching(e);
+            this.logger.error("A thread incurred an exception or was interrupted", e);
 
             if (e instanceof InterruptedException) {
                 Thread.currentThread().interrupt();
@@ -265,18 +289,22 @@ public final class StructuredConcurrencyDemo implements Demo {
 
             results.forEach(this.logger::info);
         } catch (final InterruptedException ie) {
-            this.logger.catching(ie);
+            this.logger.error("A thread was interrupted", ie);
             Thread.currentThread().interrupt();
         }
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**
      * Get the value of the first callable that succeeds
      */
     private void shutdownOnSuccess() {
-        this.logger.entry();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
 
         final List<Callable<String>> tasks = List.of(
                 () -> UUID.randomUUID().toString(),
@@ -290,14 +318,16 @@ public final class StructuredConcurrencyDemo implements Demo {
 
             this.logger.info("Result: {}", result);
         } catch (final ExecutionException | InterruptedException | TimeoutException e) {
-            this.logger.catching(e);
+            this.logger.error("A thread incurred an exception, timed out, or was interrupted", e);
 
             if (e instanceof InterruptedException) {
                 Thread.currentThread().interrupt();
             }
         }
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**
@@ -312,7 +342,9 @@ public final class StructuredConcurrencyDemo implements Demo {
      * @throws          java.util.concurrent.TimeoutException
      */
     private String race(final List<Callable<String>> tasks, final Instant instant) throws ExecutionException, InterruptedException, TimeoutException {
-        this.logger.entry(tasks, instant);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(tasks, instant));
+        }
 
         String result;
 
@@ -327,7 +359,9 @@ public final class StructuredConcurrencyDemo implements Demo {
             result = scope.joinUntil(instant).result();
         }
 
-        this.logger.exit(result);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exitWith(result));
+        }
 
         return result;
     }
@@ -341,7 +375,9 @@ public final class StructuredConcurrencyDemo implements Demo {
      * @throws          java.lang.InterruptedException
      */
     private Stream<String> runAll(final List<Callable<String>> tasks) throws InterruptedException {
-        this.logger.entry(tasks);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(tasks));
+        }
 
         Stream<String> results;
 
@@ -359,7 +395,7 @@ public final class StructuredConcurrencyDemo implements Demo {
             // This is known as a supplying function, but it is not a supplier
 
             scope.join().throwIfFailed(exception -> {
-                this.logger.catching(exception);
+                this.logger.error("A scope failed", exception);
 
                 return new RuntimeException(exception.getMessage());
             });
@@ -367,7 +403,9 @@ public final class StructuredConcurrencyDemo implements Demo {
             results = suppliers.stream().map(Supplier::get);
         }
 
-        this.logger.exit(results);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exitWith(results));
+        }
 
         return results;
     }
@@ -381,7 +419,9 @@ public final class StructuredConcurrencyDemo implements Demo {
      * @throws  java.lang.InterruptedException
      */
     private Response getResponse() throws ExecutionException, InterruptedException {
-        this.logger.entry();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
 
         Response response = null;
 
@@ -397,7 +437,9 @@ public final class StructuredConcurrencyDemo implements Demo {
             response = new Response(user.get(), orderNumber.get());
         }
 
-        this.logger.exit(response);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exitWith(response));
+        }
 
         return response;
     }
