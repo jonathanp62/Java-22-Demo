@@ -39,9 +39,10 @@ import java.util.function.Predicate;
 
 import javax.annotation.Nonnull;
 
-import org.slf4j.LoggerFactory;
+import static net.jmp.demo.java22.util.LoggerUtils.*;
 
-import org.slf4j.ext.XLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An applied list.
@@ -50,7 +51,7 @@ import org.slf4j.ext.XLogger;
  */
 public final class AppliedList<T> extends AppliedBaseCollection<T> implements List<T>, AutoCloseable {
     /** The logger. */
-    private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
+    private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
     /** The list. */
     private final List<T> list;
@@ -152,11 +153,15 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
      */
     @Override
     public void close() {
-        this.logger.entry();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
 
         super.close();
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**
@@ -168,7 +173,9 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
      * @return          boolean
      */
     public boolean addIf(final T t, @Nonnull final Predicate<? super T> filter) {
-        this.logger.entry(t, filter);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(t, filter));
+        }
 
         boolean result;
 
@@ -178,7 +185,9 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
             result = true;
         }
 
-        this.logger.exit(result);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exitWith(result));
+        }
 
         return result;
     }
@@ -194,7 +203,9 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
      * @return          boolean
      */
     public boolean applyAndAddIf(final T t, final Function<? super T, ? extends T> mapper, @Nonnull final Predicate<? super T> filter) {
-        this.logger.entry(t, mapper, filter);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(t, mapper, filter));
+        }
 
         boolean result;
 
@@ -206,7 +217,9 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
             result = true;
         }
 
-        this.logger.exit(result);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exitWith(result));
+        }
 
         return result;
     }
@@ -219,12 +232,16 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
      * @return          boolean
      */
     public boolean applyAndAdd(final T t, final Function<? super T, ? extends T> mapper) {
-        this.logger.entry(t, mapper);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(t, mapper));
+        }
 
         final T mappedValue = mapper.apply(t);
         final boolean result = this.list.add(mappedValue);
 
-        this.logger.exit(result);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exitWith(result));
+        }
 
         return result;
     }
@@ -238,11 +255,15 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
      * @return          boolean
      */
     public boolean applyAndAddAll(@Nonnull final Collection<? extends T> c, final Function<? super T, ? extends T> mapper) {
-        this.logger.entry(c, mapper);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(c, mapper));
+        }
 
         final boolean result = super.applyAndAddAll(this.list, c, mapper);
 
-        this.logger.exit(result);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exitWith(result));
+        }
 
         return result;
     }
@@ -255,11 +276,15 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
      * @param   onEnd       java.lang.Runnable
      */
     public void clearAndApply(final Consumer<T> onElement, final Runnable onEnd) {
-        this.logger.entry(onElement, onEnd);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(onElement, onEnd));
+        }
 
         super.clearAndApply(this.list, onElement, onEnd);
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**
@@ -269,7 +294,9 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
      * @param   onEnd       java.lang.Runnable
      */
     public void consume(final Consumer<T> onElement, final Runnable onEnd) {
-        this.logger.entry(onElement, onEnd);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(onElement, onEnd));
+        }
 
         this.list.forEach(e -> {
             if (e != null) {
@@ -279,7 +306,9 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
 
         onEnd.run();
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**
@@ -291,7 +320,9 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
      * @return              boolean
      */
     public boolean removeAndApply(final T object, final Consumer<T> consumer) {
-        this.logger.entry(object, consumer);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(object, consumer));
+        }
 
         final int index = this.list.indexOf(object);
 
@@ -307,7 +338,9 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
             }
         }
 
-        this.logger.exit(result);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exitWith(result));
+        }
 
         return result;
     }
@@ -321,7 +354,9 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
      * @return              T
      */
     public T removeAndApply(final int index, final Consumer<T> consumer) {
-        this.logger.entry(index, consumer);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(index, consumer));
+        }
 
         final T element = this.list.remove(index);
 
@@ -329,7 +364,9 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
             super.runTask(() -> consumer.accept(element));
         }
 
-        this.logger.exit(element);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exitWith(element));
+        }
 
         return element;
     }
@@ -347,11 +384,15 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
     public boolean removeAllAndApply(@Nonnull final Collection<? extends T> c,
                                      final Consumer<T> onElement,
                                      final Runnable onEnd) {
-        this.logger.entry(c, onElement, onEnd);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(c, onElement, onEnd));
+        }
 
         final boolean result = super.removeAllAndApply(this.list, c, onElement, onEnd);
 
-        this.logger.exit(result);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exitWith(result));
+        }
 
         return result;
     }
@@ -369,7 +410,9 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
     public boolean removeIfAndApply(final T object,
                                     final Predicate<? super T> matcher,
                                     final Consumer<T> consumer) {
-        this.logger.entry(object, matcher, consumer);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(object, matcher, consumer));
+        }
 
         final int index = this.list.indexOf(object);
 
@@ -387,7 +430,9 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
             }
         }
 
-        this.logger.exit(result);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exitWith(result));
+        }
 
         return result;
     }
@@ -405,7 +450,9 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
     public T removeIfAndApply(final int index,
                               final Predicate<? super T> matcher,
                               final Consumer<T> consumer) {
-        this.logger.entry(index, matcher, consumer);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(index, matcher, consumer));
+        }
 
         T result = null;
 
@@ -421,7 +468,9 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
             }
         }
 
-        this.logger.exit(result);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exitWith(result));
+        }
 
         return result;
     }
@@ -442,11 +491,15 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
     public boolean retainAllAndApply(@Nonnull final Collection<? extends T> c,
                                      final Consumer<T> onElement,
                                      final Runnable onEnd) {
-        this.logger.entry(c, onElement, onEnd);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(c, onElement, onEnd));
+        }
 
         final boolean result = super.retainAllAndApply(this.list, c, onElement, onEnd);
 
-        this.logger.exit(result);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exitWith(result));
+        }
 
         return result;
     }

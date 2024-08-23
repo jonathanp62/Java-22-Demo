@@ -30,10 +30,13 @@ package net.jmp.demo.java22.util;
  * SOFTWARE.
  */
 
+import static net.jmp.demo.java22.constants.LoggerConstants.*;
+
 import static net.jmp.demo.java22.util.LoggerUtils.*;
 
 import static org.junit.Assert.*;
 
+import net.jmp.demo.java22.constants.LoggerConstants;
 import org.junit.Test;
 
 public final class TestLoggerUtils {
@@ -42,7 +45,7 @@ public final class TestLoggerUtils {
         final String result = entry();
 
         assert result != null;
-        assertEquals("entry", result);
+        assertEquals(ENTRY, result);
     }
 
     @Test
@@ -68,7 +71,7 @@ public final class TestLoggerUtils {
         final String result = exit();
 
         assert result != null;
-        assertEquals("exit", result);
+        assertEquals(EXIT, result);
     }
 
     @Test
