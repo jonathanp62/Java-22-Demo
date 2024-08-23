@@ -1,11 +1,12 @@
 #
+# (#)libs.versions.toml 0.8.0   08/23/2024
 # (#)libs.versions.toml 0.6.0   08/17/2024
 # (#)libs.versions.toml 0.5.0   08/13/2024
 # (#)libs.versions.toml 0.2.0   08/07/2024
 # (#)libs.versions.toml 0.1.0   08/02/2024
 #
 #  @author   Jonathan Parker
-#  @version  0.6.0
+#  @version  0.8.0
 #  @since    0.1.0
 #
 #  MIT License
@@ -38,7 +39,6 @@ junit-junit = "4.13.2"
 org-assertj-assertj-core = "3.24.2"
 org-awaitility-awaitility = "4.2.0"
 org-slf4j-slf4j-api = "2.0.16"
-org-slf4j-slf4j-ext = "2.0.16"
 
 [libraries]
 ch-qos-logback-logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "ch-qos-logback-logback-classic" }
@@ -48,4 +48,3 @@ junit-junit = { module = "junit:junit", version.ref = "junit-junit" }
 org-assertj-assertj-core = { module = "org.assertj:assertj-core", version.ref = "org-assertj-assertj-core" }
 org-awaitility-awaitility = { module = "org.awaitility:awaitility", version.ref = "org-awaitility-awaitility" }
 org-slf4j-slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "org-slf4j-slf4j-api" }
-org-slf4j-slf4j-ext = { module = "org.slf4j:slf4j-ext", version.ref = "org-slf4j-slf4j-ext" }

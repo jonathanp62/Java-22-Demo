@@ -1,13 +1,14 @@
 package net.jmp.demo.java22.util;
 
 /*
+ * (#)AppliedQueue.java 0.8.0   08/23/2024
  * (#)AppliedQueue.java 0.7.0   08/18/2024
  * (#)AppliedQueue.java 0.6.0   08/16/2024
  * (#)AppliedQueue.java 0.5.0   08/10/2024
  * (#)AppliedQueue.java 0.4.0   08/09/2024
  *
  * @author   Jonathan Parker
- * @version  0.7.0
+ * @version  0.8.0
  * @since    0.4.0
  *
  * MIT License
@@ -47,9 +48,10 @@ import java.util.function.Supplier;
 
 import javax.annotation.Nonnull;
 
-import org.slf4j.LoggerFactory;
+import static net.jmp.demo.java22.util.LoggerUtils.*;
 
-import org.slf4j.ext.XLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An applied queue.
@@ -58,7 +60,7 @@ import org.slf4j.ext.XLogger;
  */
 public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Queue<T>, AutoCloseable {
     /** The logger. */
-    private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
+    private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
     /** The queue. */
     private final Queue<T> queue;
@@ -87,11 +89,15 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
      */
     @Override
     public void close() {
-        this.logger.entry();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
 
         super.close();
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**
@@ -106,7 +112,9 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
     private boolean addOrOfferIf(final T t,
                                  @Nonnull final Predicate<? super T> matcher,
                                  final Function<? super T, Boolean> function) {
-        this.logger.entry(t, matcher, function);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(t, matcher, function));
+        }
 
         boolean result = true;  // Return true if the element did not match
 
@@ -114,7 +122,9 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
             result = function.apply(t);
         }
 
-        this.logger.exit(result);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exitWith(result));
+        }
 
         return result;
     }
@@ -134,7 +144,9 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
                                          final Function<? super T, ? extends T> mapper,
                                          @Nonnull final Predicate<? super T> matcher,
                                          final Function<? super T, Boolean> function) {
-        this.logger.entry(t, mapper, matcher, function);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(t, mapper, matcher, function));
+        }
 
         boolean result = true;  // Return true if the element did not match
 
@@ -144,7 +156,9 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
             result = function.apply(mappedValue);
         }
 
-        this.logger.exit(result);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exitWith(result));
+        }
 
         return result;
     }
@@ -160,7 +174,9 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
      */
     private T peekOrPollOrRemoveAndApply(final Consumer<T> consumer,
                                          final Supplier<T> supplier) {
-        this.logger.entry(consumer, supplier);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(consumer, supplier));
+        }
 
         final T element = supplier.get();
 
@@ -168,7 +184,9 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
             super.runTask(() -> consumer.accept(element));
         }
 
-        this.logger.exit(element);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exitWith(element));
+        }
 
         return element;
     }
@@ -184,12 +202,16 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
     private boolean applyAndAddOrOffer(final T t,
                                        final Function<? super T, ? extends T> mapper,
                                        final Function<? super T, Boolean> function) {
-        this.logger.entry(t, mapper, function);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(t, mapper, function));
+        }
 
         final T mappedValue = mapper.apply(t);
         final boolean result = function.apply(mappedValue);
 
-        this.logger.exit(result);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exitWith(result));
+        }
 
         return result;
     }
@@ -203,11 +225,15 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
      * @return          boolean
      */
     public boolean addIf(final T t, @Nonnull final Predicate<? super T> matcher) {
-        this.logger.entry(t, matcher);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(t, matcher));
+        }
 
         final boolean result = this.addOrOfferIf(t, matcher, this.queue::add);
 
-        this.logger.exit(result);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exitWith(result));
+        }
 
         return result;
     }
@@ -225,11 +251,15 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
     public boolean applyAndAddIf(final T t,
                                  final Function<? super T, ? extends T> mapper,
                                  @Nonnull final Predicate<? super T> matcher) {
-        this.logger.entry(t, mapper, matcher);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(t, mapper, matcher));
+        }
 
         final boolean result = this.applyAndAddOrOfferIf(t, mapper, matcher, this.queue::add);
 
-        this.logger.exit(result);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exitWith(result));
+        }
 
         return result;
     }
@@ -243,11 +273,15 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
      * @return          boolean
      */
     public boolean offerIf(final T t, @Nonnull final Predicate<? super T> matcher) {
-        this.logger.entry(t, matcher);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(t, matcher));
+        }
 
         final boolean result = this.addOrOfferIf(t, matcher, this.queue::offer);
 
-        this.logger.exit(result);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exitWith(result));
+        }
 
         return result;
     }
@@ -265,11 +299,15 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
     public boolean applyAndOfferIf(final T t,
                                    final Function<? super T, ? extends T> mapper,
                                    @Nonnull final Predicate<? super T> matcher) {
-        this.logger.entry(t, mapper, matcher);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(t, mapper, matcher));
+        }
 
         final boolean result = this.applyAndAddOrOfferIf(t, mapper, matcher, this.queue::offer);
 
-        this.logger.exit(result);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exitWith(result));
+        }
 
         return result;
     }
@@ -282,11 +320,15 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
      * @return          boolean
      */
     public boolean applyAndOffer(final T t, final Function<? super T, ? extends T> mapper) {
-        this.logger.entry(t, mapper);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(t, mapper));
+        }
 
         final boolean result = this.applyAndAddOrOffer(t, mapper, this.queue::offer);
 
-        this.logger.exit(result);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exitWith(result));
+        }
 
         return result;
     }
@@ -299,11 +341,15 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
      * @return          boolean
      */
     public boolean applyAndAdd(final T t, final Function<? super T, ? extends T> mapper) {
-        this.logger.entry(t, mapper);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(t, mapper));
+        }
 
         final boolean result = this.applyAndAddOrOffer(t, mapper, this.queue::add);
 
-        this.logger.exit(result);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exitWith(result));
+        }
 
         return result;
     }
@@ -318,11 +364,15 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
      */
     public boolean applyAndAddAll(@Nonnull final Collection<? extends T> c,
                                   final Function<? super T, ? extends T> mapper) {
-        this.logger.entry(c, mapper);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(c, mapper));
+        }
 
         final boolean result = super.applyAndAddAll(this.queue, c, mapper);
 
-        this.logger.exit(result);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exitWith(result));
+        }
 
         return result;
     }
@@ -335,11 +385,15 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
      * @param   onEnd       java.lang.Runnable
      */
     public void clearAndApply(final Consumer<T> onElement, final Runnable onEnd) {
-        this.logger.entry(onElement);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(onElement, onEnd));
+        }
 
         super.clearAndApply(this.queue, onElement, onEnd);
 
-        this.logger.exit();
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /**
@@ -351,7 +405,9 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
      * @return              T
      */
     public T elementAndApply(final Consumer<T> consumer) throws NoSuchElementException {
-        this.logger.entry(consumer);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(consumer));
+        }
 
         if (this.queue.isEmpty()) {
             throw new NoSuchElementException();
@@ -359,7 +415,9 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
 
         final T element = this.peekOrPollOrRemoveAndApply(consumer, this.queue::element);
 
-        this.logger.exit(element);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exitWith(element));
+        }
 
         return element;
     }
@@ -373,11 +431,15 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
      * @return              T
      */
     public T peekAndApply(final Consumer<T> consumer) {
-        this.logger.entry(consumer);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(consumer));
+        }
 
         final T element = this.peekOrPollOrRemoveAndApply(consumer, this.queue::peek);
 
-        this.logger.exit(element);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exitWith(element));
+        }
 
         return element;
     }
@@ -389,11 +451,15 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
      * @param   consumer    java.util.function.Consumer&lt;T&gt;
      */
     public T pollAndApply(final Consumer<T> consumer) {
-        this.logger.entry(consumer);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(consumer));
+        }
 
         final T element = this.peekOrPollOrRemoveAndApply(consumer, this.queue::poll);
 
-        this.logger.exit(element);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exitWith(element));
+        }
 
         return element;
     }
@@ -405,7 +471,9 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
      * @param   consumer    java.util.function.Consumer&lt;T&gt;
      */
     public T removeAndApply(final Consumer<T> consumer) throws NoSuchElementException {
-        this.logger.entry(consumer);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(consumer));
+        }
 
         if (this.queue.isEmpty()) {
             throw new NoSuchElementException();
@@ -413,7 +481,9 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
 
         final T element = this.peekOrPollOrRemoveAndApply(consumer, this.queue::remove);
 
-        this.logger.exit(element);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exitWith(element));
+        }
 
         return element;
     }
@@ -432,11 +502,15 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
     public boolean removeAllAndApply(@Nonnull final Collection<? extends T> c,
                                      final Consumer<T> onElement,
                                      final Runnable onEnd) {
-        this.logger.entry(c, onElement, onEnd);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(c, onElement, onEnd));
+        }
 
         final boolean result = super.removeAllAndApply(this.queue, c, onElement, onEnd);
 
-        this.logger.exit(result);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exitWith(result));
+        }
 
         return result;
     }
@@ -450,7 +524,9 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
      */
     public boolean removeIfAndApply(@Nonnull final Predicate<? super T> matcher,
                                     @Nonnull final Consumer<T> consumer) {
-        this.logger.entry(matcher, consumer);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(matcher, consumer));
+        }
 
         final WrappedObject<Boolean> result = WrappedObject.of(false);
 
@@ -463,7 +539,9 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
             });
         }
 
-        this.logger.exit(result.get());
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exitWith(result.get()));
+        }
 
         return result.get();
     }
@@ -485,19 +563,18 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
     public boolean retainAllAndApply(@Nonnull final Collection<? extends T> c,
                                      final Consumer<T> onElement,
                                      final Runnable onEnd) {
-        this.logger.entry(c, onElement, onEnd);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(c, onElement, onEnd));
+        }
 
         final boolean result = super.retainAllAndApply(this.queue, c, onElement, onEnd);
 
-        this.logger.exit(result);
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exitWith(result));
+        }
 
         return result;
     }
-
-    /*
-     * Methods to implement:
-     *   retainAllAndApply
-     */
 
     /* Queue and Collection method overrides */
 

@@ -612,7 +612,7 @@ public final class TestAppliedList {
     }
 
     /* @todo This is a flaky unit test */
-    
+
     @Test
     public void testRetainAllAndApplyOnFullMatchingCollection() {
         try (final AppliedList<String> list = new AppliedList<>()) {

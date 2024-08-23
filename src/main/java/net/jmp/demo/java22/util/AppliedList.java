@@ -1,11 +1,12 @@
 package net.jmp.demo.java22.util;
 
 /*
+ * (#)AppliedList.java  0.8.0   08/22/2024
  * (#)AppliedList.java  0.7.0   08/18/2024
  * (#)AppliedList.java  0.6.0   08/17/2024
  *
  * @author   Jonathan Parker
- * @version  0.7.0
+ * @version  0.8.0
  * @since    0.6.0
  *
  * MIT License

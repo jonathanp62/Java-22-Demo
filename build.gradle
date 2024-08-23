@@ -87,7 +87,6 @@ dependencies {
     runtimeOnly         libs.ch.qos.logback.logback.core
     implementation      libs.com.google.guava.guava
     implementation      libs.org.slf4j.slf4j.api
-    implementation      libs.org.slf4j.slf4j.ext
     testImplementation  libs.junit.junit
     testImplementation  libs.org.assertj.assertj.core
     testImplementation  libs.org.awaitility.awaitility
