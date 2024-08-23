@@ -56,10 +56,10 @@ public final class CustomScope<T> extends StructuredTaskScope<T> {
      * fails in this task scope. This method is not invoked if
      * a subtask completes after the task scope is shut down.
      *
-     * @param   subtask java.util.concurrent.StructuredTaskScope.Subtask
+     * @param   subtask java.util.concurrent.StructuredTaskScope.Subtask&lt;? extends T&gt;
      */
     @Override
-    protected void handleComplete(Subtask<? extends T> subtask) {
+    protected void handleComplete(final Subtask<? extends T> subtask) {
         super.handleComplete(subtask);
 
         if (subtask.state() == Subtask.State.SUCCESS) {
@@ -79,7 +79,7 @@ public final class CustomScope<T> extends StructuredTaskScope<T> {
      * finish, the task scope is shut down, or the current thread is
      * interrupted.
      *
-     * @return  net.jmp.demo.java22.scopes.CustomScope
+     * @return  net.jmp.demo.java22.scopes.CustomScope&lt;T&gt;
      * @throws  java.lang.InterruptedException
      */
     @Override
