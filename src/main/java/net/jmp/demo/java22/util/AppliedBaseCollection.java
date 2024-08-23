@@ -114,12 +114,12 @@ public class AppliedBaseCollection<T> {
      * Adds all the elements in the specified collection to this list.
      * Apply the mapper function to each element before adding it.
      *
-     * @param   target  java.util.Collection&lt;T&gt;
+     * @param   target  java.util.Collection&lt;? super T&gt;
      * @param   source  java.util.Collection&lt;? extends T&gt;
      * @param   mapper  java.util.function.Function&lt;? super T, ? extends T&gt;
      * @return          boolean
      */
-    protected boolean applyAndAddAll(final Collection<T> target,
+    protected boolean applyAndAddAll(final Collection<? super T> target,
                                      final Collection<? extends T> source,
                                      final Function<? super T, ? extends T> mapper) {
         if (this.logger.isTraceEnabled()) {
@@ -146,11 +146,13 @@ public class AppliedBaseCollection<T> {
      * Apply the onElement to each element
      * and then clear the collection.
      *
-     * @param   collection  java.util.Collection&lt;T&gt;
+     * @param   collection  java.util.Collection&lt;? extends T&gt;
      * @param   onElement   java.util.function.Consumer&lt;T&gt;
      * @param   onEnd       java.lang.Runnable
      */
-    protected void clearAndApply(final Collection<T> collection, final Consumer<T> onElement, final Runnable onEnd) {
+    protected void clearAndApply(final Collection<? extends T> collection,
+                                 final Consumer<T> onElement,
+                                 final Runnable onEnd) {
         if (this.logger.isTraceEnabled()) {
             this.logger.trace(entryWith(collection, onElement, onEnd));
         }
@@ -176,13 +178,13 @@ public class AppliedBaseCollection<T> {
      * no elements in common with the specified collection.
      * Apply the onElement consumer to each removed element.
      *
-     * @param   target      java.util.Collection&lt;T&gt;
+     * @param   target      java.util.Collection&lt;? super T&gt;
      * @param   source      java.util.Collection&lt;? extends T&gt;
      * @param   onElement   java.util.function.Consumer&lt;T&gt;
      * @param   onEnd       java.lang.Runnable
      * @return              boolean
      */
-    protected boolean removeAllAndApply(final Collection<T> target,
+    protected boolean removeAllAndApply(final Collection<? super T> target,
                                         final Collection<? extends T> source,
                                         final Consumer<T> onElement,
                                         final Runnable onEnd) {
