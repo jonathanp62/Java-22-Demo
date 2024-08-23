@@ -1,12 +1,13 @@
 package net.jmp.demo.java22.util;
 
 /*
+ * (#)AppliedList.java  0.9.0   08/23/2024
  * (#)AppliedList.java  0.8.0   08/22/2024
  * (#)AppliedList.java  0.7.0   08/18/2024
  * (#)AppliedList.java  0.6.0   08/17/2024
  *
  * @author   Jonathan Parker
- * @version  0.8.0
+ * @version  0.9.0
  * @since    0.6.0
  *
  * MIT License
@@ -78,9 +79,9 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
      * A constructor that takes a list
      * and creates an unmodifiable object.
      *
-     * @param   list    java.util.List&lt;T&gt;
+     * @param   list    java.util.List&lt;? extends T&gt;
      */
-    private AppliedList(final List<T> list) {
+    private AppliedList(final List<? extends T> list) {
         super();
 
         this.list = Collections.unmodifiableList(list);
@@ -176,13 +177,7 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
             this.logger.trace(entryWith(t, filter));
         }
 
-        boolean result;
-
-        if (filter.test(t)) {
-            result = this.list.add(t);
-        } else {
-            result = true;
-        }
+        final boolean result = super.addIf(t, this.list, filter);
 
         if (this.logger.isTraceEnabled()) {
             this.logger.trace(exitWith(result));
@@ -206,15 +201,7 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
             this.logger.trace(entryWith(t, mapper, filter));
         }
 
-        boolean result;
-
-        if (filter.test(t)) {
-            final T mappedValue = mapper.apply(t);
-
-            result = this.list.add(mappedValue);
-        } else {
-            result = true;
-        }
+        final boolean result = super.applyAndAddIf(t, this.list, mapper, filter);
 
         if (this.logger.isTraceEnabled()) {
             this.logger.trace(exitWith(result));
@@ -235,8 +222,7 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
             this.logger.trace(entryWith(t, mapper));
         }
 
-        final T mappedValue = mapper.apply(t);
-        final boolean result = this.list.add(mappedValue);
+        final boolean result = super.applyAndAdd(t, this.list, mapper);
 
         if (this.logger.isTraceEnabled()) {
             this.logger.trace(exitWith(result));
@@ -271,10 +257,10 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
      * Apply the onElement to each element
      * and then clear the list.
      *
-     * @param   onElement   java.util.function.Consumer&lt;T&gt;
+     * @param   onElement   java.util.function.Consumer&lt;? super T&gt;
      * @param   onEnd       java.lang.Runnable
      */
-    public void clearAndApply(final Consumer<T> onElement, final Runnable onEnd) {
+    public void clearAndApply(final Consumer<? super T> onElement, final Runnable onEnd) {
         if (this.logger.isTraceEnabled()) {
             this.logger.trace(entryWith(onElement, onEnd));
         }
@@ -297,13 +283,7 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
             this.logger.trace(entryWith(onElement, onEnd));
         }
 
-        this.list.forEach(e -> {
-            if (e != null) {
-                super.runTask(() -> onElement.accept(e));
-            }
-        });
-
-        onEnd.run();
+        super.consume(this.list, onElement, onEnd);
 
         if (this.logger.isTraceEnabled()) {
             this.logger.trace(exit());

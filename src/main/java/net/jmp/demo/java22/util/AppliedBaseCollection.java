@@ -1,6 +1,7 @@
 package net.jmp.demo.java22.util;
 
 /*
+ * (#)AppliedBaseCollection.java    0.9.0   08/23/2024
  * (#)AppliedBaseCollection.java    0.8.0   08/22/2024
  * (#)AppliedBaseCollection.java    0.7.1   08/22/2024
  * (#)AppliedBaseCollection.java    0.7.0   08/20/2024
@@ -9,7 +10,7 @@ package net.jmp.demo.java22.util;
  * (#)AppliedBaseCollection.java    0.4.0   08/09/2024
  *
  * @author   Jonathan Parker
- * @version  0.8.0
+ * @version  0.9.0
  * @since    0.4.0
  *
  * MIT License
@@ -46,6 +47,7 @@ import java.util.concurrent.Future;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import static net.jmp.demo.java22.util.LoggerUtils.*;
 
@@ -111,6 +113,99 @@ public class AppliedBaseCollection<T> {
     }
 
     /**
+     * Inserts the element into the collection if the
+     * applied predicate function evaluates to true.
+     *
+     * @param   t           T
+     * @param   collection  java.util.Collection&lt;? super T&gt;
+     * @param   filter      java.util.function.Predicate&lt;? super T&gt;
+     * @return              boolean
+     */
+    protected boolean addIf(final T t,
+                            final Collection<? super T> collection,
+                            final Predicate<? super T> filter) {
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(t, collection, filter));
+        }
+
+        boolean result;
+
+        if (filter.test(t)) {
+            result = collection.add(t);
+        } else {
+            result = true;
+        }
+
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exitWith(result));
+        }
+
+        return result;
+    }
+
+    /**
+     * Inserts the element into the collection after applying
+     * the mapper function if the applied predicate
+     * function evaluates to true.
+     *
+     * @param   t           T
+     * @param   collection  java.util.Collection&lt;? super T&gt;
+     * @param   mapper      java.util.function.Function&lt;? super T,? extends T&gt;
+     * @param   filter      java.util.function.Predicate&lt;? super T&gt;
+     * @return              boolean
+     */
+    protected boolean applyAndAddIf(final T t,
+                                    final Collection<? super T> collection,
+                                    final Function<? super T, ? extends T> mapper,
+                                    final Predicate<? super T> filter) {
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(t, collection, mapper, filter));
+        }
+
+        boolean result;
+
+        if (filter.test(t)) {
+            final T mappedValue = mapper.apply(t);
+
+            result = collection.add(mappedValue);
+        } else {
+            result = true;
+        }
+
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exitWith(result));
+        }
+
+        return result;
+    }
+
+    /**
+     * Inserts the element into the collection after applying the
+     * mapper function if the element is not already present.
+     *
+     * @param   t           T
+     * @param   collection  java.util.Collection&lt;? super T&gt;
+     * @param   mapper      java.util.function.Function&lt;? super T, ? extends T&gt;
+     * @return              boolean
+     */
+    protected boolean applyAndAdd(final T t,
+                               final Collection<? super T> collection,
+                               final Function<? super T, ? extends T> mapper) {
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(t, collection, mapper));
+        }
+
+        final T mappedValue = mapper.apply(t);
+        final boolean result = collection.add(mappedValue);
+
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exitWith(result));
+        }
+
+        return result;
+    }
+
+    /**
      * Adds all the elements in the specified collection to this list.
      * Apply the mapper function to each element before adding it.
      *
@@ -130,8 +225,7 @@ public class AppliedBaseCollection<T> {
 
         if (!source.isEmpty()) {
             source.forEach(e -> {
-                target.add(mapper.apply(e));
-                result.set(true);
+                result.set(target.add(mapper.apply(e)));
             });
         }
 
@@ -147,11 +241,11 @@ public class AppliedBaseCollection<T> {
      * and then clear the collection.
      *
      * @param   collection  java.util.Collection&lt;? extends T&gt;
-     * @param   onElement   java.util.function.Consumer&lt;T&gt;
+     * @param   onElement   java.util.function.Consumer&lt;? super T&gt;
      * @param   onEnd       java.lang.Runnable
      */
     protected void clearAndApply(final Collection<? extends T> collection,
-                                 final Consumer<T> onElement,
+                                 final Consumer<? super T> onElement,
                                  final Runnable onEnd) {
         if (this.logger.isTraceEnabled()) {
             this.logger.trace(entryWith(collection, onElement, onEnd));
@@ -164,6 +258,33 @@ public class AppliedBaseCollection<T> {
         });
 
         collection.clear();
+
+        onEnd.run();
+
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
+    }
+
+    /**
+     * Consume all the elements in the collection.
+     *
+     * @param   collection  java.util.Collection&lt;? extends T&gt;
+     * @param   onElement   java.util.function.Consumer&lt;? super T&gt;
+     * @param   onEnd       java.lang.Runnable
+     */
+    protected void consume(final Collection<? extends T> collection,
+                           final Consumer<? super T> onElement,
+                           final Runnable onEnd) {
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(collection, onElement, onEnd));
+        }
+
+        collection.forEach(e -> {
+            if (e != null) {
+                this.runTask(() -> onElement.accept(e));
+            }
+        });
 
         onEnd.run();
 

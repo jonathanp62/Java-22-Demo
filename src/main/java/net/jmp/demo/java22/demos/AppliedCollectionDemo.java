@@ -1,12 +1,13 @@
 package net.jmp.demo.java22.demos;
 
 /*
+ * (#)AppliedCollectionDemo.java    0.9.0   08/23/2024
  * (#)AppliedCollectionDemo.java    0.7.1   08/22/2024
  * (#)AppliedCollectionDemo.java    0.7.0   08/19/2024
  * (#)AppliedCollectionDemo.java    0.5.0   08/10/2024
  *
  * @author   Jonathan Parker
- * @version  0.7.1
+ * @version  0.9.0
  * @since    0.5.0
  *
  * MIT License
@@ -80,6 +81,7 @@ public final class AppliedCollectionDemo implements Demo {
 
         this.appliedQueues();
         this.appliedLists();
+        this.appliedSets();
 
         if (this.logger.isTraceEnabled()) {
             this.logger.trace(exit());
@@ -331,6 +333,19 @@ public final class AppliedCollectionDemo implements Demo {
             assert integerList.size() == 2;
             assert integerList.contains(2);
             assert integerList.contains(6);
+        }
+
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
+    }
+
+    /**
+     * Applied sets.
+     */
+    private void appliedSets() {
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
         }
 
         if (this.logger.isTraceEnabled()) {

@@ -1,6 +1,7 @@
 package net.jmp.demo.java22.util;
 
 /*
+ * (#)AppliedQueue.java 0.9.0   08/23/2024
  * (#)AppliedQueue.java 0.8.0   08/23/2024
  * (#)AppliedQueue.java 0.7.0   08/18/2024
  * (#)AppliedQueue.java 0.6.0   08/16/2024
@@ -8,7 +9,7 @@ package net.jmp.demo.java22.util;
  * (#)AppliedQueue.java 0.4.0   08/09/2024
  *
  * @author   Jonathan Parker
- * @version  0.8.0
+ * @version  0.9.0
  * @since    0.4.0
  *
  * MIT License
@@ -379,10 +380,10 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
      * Apply the consumer to each element
      * and then clear the queue.
      *
-     * @param   onElement   java.util.function.Consumer&lt;T&gt;
+     * @param   onElement   java.util.function.Consumer&lt;? super T&gt;
      * @param   onEnd       java.lang.Runnable
      */
-    public void clearAndApply(final Consumer<T> onElement, final Runnable onEnd) {
+    public void clearAndApply(final Consumer<? super T> onElement, final Runnable onEnd) {
         if (this.logger.isTraceEnabled()) {
             this.logger.trace(entryWith(onElement, onEnd));
         }
