@@ -47,8 +47,6 @@ import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import javax.annotation.Nonnull;
-
 import static net.jmp.demo.java22.util.LoggerUtils.*;
 
 import org.slf4j.Logger;
@@ -121,8 +119,8 @@ public class AppliedBaseCollection<T> {
      * @param   mapper  java.util.function.Function&lt;? super T, ? extends T&gt;
      * @return          boolean
      */
-    protected boolean applyAndAddAll(@Nonnull final Collection<T> target,
-                                     @Nonnull final Collection<? extends T> source,
+    protected boolean applyAndAddAll(final Collection<T> target,
+                                     final Collection<? extends T> source,
                                      final Function<? super T, ? extends T> mapper) {
         if (this.logger.isTraceEnabled()) {
             this.logger.trace(entryWith(target, source, mapper));
@@ -184,8 +182,8 @@ public class AppliedBaseCollection<T> {
      * @param   onEnd       java.lang.Runnable
      * @return              boolean
      */
-    protected boolean removeAllAndApply(@Nonnull final Collection<T> target,
-                                        @Nonnull final Collection<? extends T> source,
+    protected boolean removeAllAndApply(final Collection<T> target,
+                                        final Collection<? extends T> source,
                                         final Consumer<T> onElement,
                                         final Runnable onEnd) {
         if (this.logger.isTraceEnabled()) {
@@ -225,8 +223,8 @@ public class AppliedBaseCollection<T> {
      * @param   onElement   java.util.function.Consumer&lt;T&gt;
      * @return              boolean
      */
-    protected boolean retainAllAndApply(@Nonnull Collection<T> target,
-                                        @Nonnull final Collection<? extends T> source,
+    protected boolean retainAllAndApply(final Collection<T> target,
+                                        final Collection<? extends T> source,
                                         final Consumer<T> onElement,
                                         final Runnable onEnd) {
         if (this.logger.isTraceEnabled()) {

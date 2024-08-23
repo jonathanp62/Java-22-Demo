@@ -38,8 +38,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import javax.annotation.Nonnull;
-
 import static net.jmp.demo.java22.util.LoggerUtils.*;
 
 import org.slf4j.Logger;
@@ -173,7 +171,7 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
      * @param   filter  java.util.function.Predicate&lt;? super T&gt;
      * @return          boolean
      */
-    public boolean addIf(final T t, @Nonnull final Predicate<? super T> filter) {
+    public boolean addIf(final T t, final Predicate<? super T> filter) {
         if (this.logger.isTraceEnabled()) {
             this.logger.trace(entryWith(t, filter));
         }
@@ -203,7 +201,7 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
      * @param   filter  java.util.function.Predicate&lt;? super T&gt;
      * @return          boolean
      */
-    public boolean applyAndAddIf(final T t, final Function<? super T, ? extends T> mapper, @Nonnull final Predicate<? super T> filter) {
+    public boolean applyAndAddIf(final T t, final Function<? super T, ? extends T> mapper, final Predicate<? super T> filter) {
         if (this.logger.isTraceEnabled()) {
             this.logger.trace(entryWith(t, mapper, filter));
         }
@@ -255,7 +253,7 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
      * @param   mapper  java.util.function.Function&lt;? super T, ? extends T&gt;
      * @return          boolean
      */
-    public boolean applyAndAddAll(@Nonnull final Collection<? extends T> c, final Function<? super T, ? extends T> mapper) {
+    public boolean applyAndAddAll(final Collection<? extends T> c, final Function<? super T, ? extends T> mapper) {
         if (this.logger.isTraceEnabled()) {
             this.logger.trace(entryWith(c, mapper));
         }
@@ -382,7 +380,7 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
      * @param   onElement   java.util.function.Consumer&lt;T&gt;
      * @return              boolean
      */
-    public boolean removeAllAndApply(@Nonnull final Collection<? extends T> c,
+    public boolean removeAllAndApply(final Collection<? extends T> c,
                                      final Consumer<T> onElement,
                                      final Runnable onEnd) {
         if (this.logger.isTraceEnabled()) {
@@ -489,7 +487,7 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
      * @param   onElement   java.util.function.Consumer&lt;T&gt;
      * @return              boolean
      */
-    public boolean retainAllAndApply(@Nonnull final Collection<? extends T> c,
+    public boolean retainAllAndApply(final Collection<? extends T> c,
                                      final Consumer<T> onElement,
                                      final Runnable onEnd) {
         if (this.logger.isTraceEnabled()) {

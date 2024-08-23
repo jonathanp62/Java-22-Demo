@@ -46,8 +46,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import javax.annotation.Nonnull;
-
 import static net.jmp.demo.java22.util.LoggerUtils.*;
 
 import org.slf4j.Logger;
@@ -110,7 +108,7 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
      * @return              boolean
      */
     private boolean addOrOfferIf(final T t,
-                                 @Nonnull final Predicate<? super T> matcher,
+                                 final Predicate<? super T> matcher,
                                  final Function<? super T, Boolean> function) {
         if (this.logger.isTraceEnabled()) {
             this.logger.trace(entryWith(t, matcher, function));
@@ -142,7 +140,7 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
      */
     private boolean applyAndAddOrOfferIf(final T t,
                                          final Function<? super T, ? extends T> mapper,
-                                         @Nonnull final Predicate<? super T> matcher,
+                                         final Predicate<? super T> matcher,
                                          final Function<? super T, Boolean> function) {
         if (this.logger.isTraceEnabled()) {
             this.logger.trace(entryWith(t, mapper, matcher, function));
@@ -224,7 +222,7 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
      * @param   matcher java.util.function.Predicate&lt;? super T&gt;
      * @return          boolean
      */
-    public boolean addIf(final T t, @Nonnull final Predicate<? super T> matcher) {
+    public boolean addIf(final T t, final Predicate<? super T> matcher) {
         if (this.logger.isTraceEnabled()) {
             this.logger.trace(entryWith(t, matcher));
         }
@@ -250,7 +248,7 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
      */
     public boolean applyAndAddIf(final T t,
                                  final Function<? super T, ? extends T> mapper,
-                                 @Nonnull final Predicate<? super T> matcher) {
+                                 final Predicate<? super T> matcher) {
         if (this.logger.isTraceEnabled()) {
             this.logger.trace(entryWith(t, mapper, matcher));
         }
@@ -272,7 +270,7 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
      * @param   matcher java.util.function.Predicate&lt;? super T&gt;
      * @return          boolean
      */
-    public boolean offerIf(final T t, @Nonnull final Predicate<? super T> matcher) {
+    public boolean offerIf(final T t, final Predicate<? super T> matcher) {
         if (this.logger.isTraceEnabled()) {
             this.logger.trace(entryWith(t, matcher));
         }
@@ -298,7 +296,7 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
      */
     public boolean applyAndOfferIf(final T t,
                                    final Function<? super T, ? extends T> mapper,
-                                   @Nonnull final Predicate<? super T> matcher) {
+                                   final Predicate<? super T> matcher) {
         if (this.logger.isTraceEnabled()) {
             this.logger.trace(entryWith(t, mapper, matcher));
         }
@@ -362,7 +360,7 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
      * @param   mapper  java.util.function.Function&lt;? super T, ? extends T&gt;
      * @return          boolean
      */
-    public boolean applyAndAddAll(@Nonnull final Collection<? extends T> c,
+    public boolean applyAndAddAll(final Collection<? extends T> c,
                                   final Function<? super T, ? extends T> mapper) {
         if (this.logger.isTraceEnabled()) {
             this.logger.trace(entryWith(c, mapper));
@@ -499,7 +497,7 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
      * @param   onEnd       java.lang.Runnable
      * @return              boolean
      */
-    public boolean removeAllAndApply(@Nonnull final Collection<? extends T> c,
+    public boolean removeAllAndApply(final Collection<? extends T> c,
                                      final Consumer<T> onElement,
                                      final Runnable onEnd) {
         if (this.logger.isTraceEnabled()) {
@@ -522,8 +520,8 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
      * @param   consumer    java.util.function.Consumer&lt;&gt;
      * @return              boolean
      */
-    public boolean removeIfAndApply(@Nonnull final Predicate<? super T> matcher,
-                                    @Nonnull final Consumer<T> consumer) {
+    public boolean removeIfAndApply(final Predicate<? super T> matcher,
+                                    final Consumer<T> consumer) {
         if (this.logger.isTraceEnabled()) {
             this.logger.trace(entryWith(matcher, consumer));
         }
@@ -560,7 +558,7 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
      * @param   onEnd       java.lang.Runnable
      * @return              boolean
      */
-    public boolean retainAllAndApply(@Nonnull final Collection<? extends T> c,
+    public boolean retainAllAndApply(final Collection<? extends T> c,
                                      final Consumer<T> onElement,
                                      final Runnable onEnd) {
         if (this.logger.isTraceEnabled()) {
@@ -594,20 +592,17 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
     }
 
     @Override
-    @Nonnull
     public Iterator<T> iterator() {
         return this.queue.iterator();
     }
 
     @Override
-    @Nonnull
     public Object[] toArray() {
         return this.queue.toArray();
     }
 
     @Override
-    @Nonnull
-    public <T1> T1[] toArray(@Nonnull T1[] a) {
+    public <T1> T1[] toArray(T1[] a) {
         return this.queue.toArray(a);
     }
 
@@ -622,22 +617,22 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
     }
 
     @Override
-    public boolean containsAll(@Nonnull Collection<?> c) {
+    public boolean containsAll(Collection<?> c) {
         return this.queue.containsAll(c);
     }
 
     @Override
-    public boolean addAll(@Nonnull Collection<? extends T> c) {
+    public boolean addAll(Collection<? extends T> c) {
         return this.queue.addAll(c);
     }
 
     @Override
-    public boolean removeAll(@Nonnull Collection<?> c) {
+    public boolean removeAll(Collection<?> c) {
         return this.queue.removeAll(c);
     }
 
     @Override
-    public boolean retainAll(@Nonnull Collection<?> c) {
+    public boolean retainAll(Collection<?> c) {
         return this.queue.retainAll(c);
     }
 
