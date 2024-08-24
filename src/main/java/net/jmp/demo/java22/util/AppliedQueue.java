@@ -167,12 +167,12 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
      * this queue is empty.
      * Apply the consumer to the retrieved element if it is not null.
      *
-     * @param   consumer    java.util.function.Consumer&lt;T&gt;
-     * @param   supplier    java.util.function.Supplier&lt;T&gt;
+     * @param   consumer    java.util.function.Consumer&lt;? super T&gt;
+     * @param   supplier    java.util.function.Supplier&lt;? extends T&gt;
      * @return              T
      */
-    private T peekOrPollOrRemoveAndApply(final Consumer<T> consumer,
-                                         final Supplier<T> supplier) {
+    private T peekOrPollOrRemoveAndApply(final Consumer<? super T> consumer,
+                                         final Supplier<? extends T> supplier) {
         if (this.logger.isTraceEnabled()) {
             this.logger.trace(entryWith(consumer, supplier));
         }
@@ -400,10 +400,10 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
      * from peekAndApply only in that it throws an exception if this queue is empty.
      * Apply the consumer to the retrieved element.
      *
-     * @param   consumer    java.util.function.Consumer&lt;T&gt;
+     * @param   consumer    java.util.function.Consumer&lt;? super T&gt;
      * @return              T
      */
-    public T elementAndApply(final Consumer<T> consumer) throws NoSuchElementException {
+    public T elementAndApply(final Consumer<? super T> consumer) throws NoSuchElementException {
         if (this.logger.isTraceEnabled()) {
             this.logger.trace(entryWith(consumer));
         }
@@ -426,10 +426,10 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
      * this queue is empty.
      * Apply the consumer to the retrieved element if it is not null.
      *
-     * @param   consumer    java.util.function.Consumer&lt;T&gt;
+     * @param   consumer    java.util.function.Consumer&lt;? super T&gt;
      * @return              T
      */
-    public T peekAndApply(final Consumer<T> consumer) {
+    public T peekAndApply(final Consumer<? super T> consumer) {
         if (this.logger.isTraceEnabled()) {
             this.logger.trace(entryWith(consumer));
         }
@@ -447,9 +447,9 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
      * Retrieves and removes the head of this queue, or returns null if this queue is empty.
      * Apply the consumer to the retrieved element if it is not null.
      *
-     * @param   consumer    java.util.function.Consumer&lt;T&gt;
+     * @param   consumer    java.util.function.Consumer&lt;? super T&gt;
      */
-    public T pollAndApply(final Consumer<T> consumer) {
+    public T pollAndApply(final Consumer<? super T> consumer) {
         if (this.logger.isTraceEnabled()) {
             this.logger.trace(entryWith(consumer));
         }
@@ -467,9 +467,9 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
      * Retrieves and removes the head of this queue, or throw an exception if this queue is empty.
      * Apply the consumer to the retrieved element if it is not null.
      *
-     * @param   consumer    java.util.function.Consumer&lt;T&gt;
+     * @param   consumer    java.util.function.Consumer&lt;? super T&gt;
      */
-    public T removeAndApply(final Consumer<T> consumer) throws NoSuchElementException {
+    public T removeAndApply(final Consumer<? super T> consumer) throws NoSuchElementException {
         if (this.logger.isTraceEnabled()) {
             this.logger.trace(entryWith(consumer));
         }
@@ -494,12 +494,12 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
      * Apply the onElement consumer to each removed element.
      *
      * @param   c           java.util.Collection&lt;? extends T&gt;
-     * @param   onElement   java.util.function.Consumer&lt;T&gt;
+     * @param   onElement   java.util.function.Consumer&lt;? super T&gt;
      * @param   onEnd       java.lang.Runnable
      * @return              boolean
      */
     public boolean removeAllAndApply(final Collection<? extends T> c,
-                                     final Consumer<T> onElement,
+                                     final Consumer<? super T> onElement,
                                      final Runnable onEnd) {
         if (this.logger.isTraceEnabled()) {
             this.logger.trace(entryWith(c, onElement, onEnd));
@@ -518,11 +518,11 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
      * Removes all the elements of this collection that satisfy the given predicate.
      *
      * @param   matcher     java.util.function.Predicate&lt;? super T&gt;
-     * @param   consumer    java.util.function.Consumer&lt;&gt;
+     * @param   consumer    java.util.function.Consumer&lt;? super T&gt;
      * @return              boolean
      */
     public boolean removeIfAndApply(final Predicate<? super T> matcher,
-                                    final Consumer<T> consumer) {
+                                    final Consumer<? super T> consumer) {
         if (this.logger.isTraceEnabled()) {
             this.logger.trace(entryWith(matcher, consumer));
         }
@@ -555,12 +555,12 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
      * Apply the onElement consumer to each retained element.
      *
      * @param   c           java.util.Collection&lt;? extends T&gt;
-     * @param   onElement   java.util.function.Consumer&lt;T&gt;
+     * @param   onElement   java.util.function.Consumer&lt;? super T&gt;
      * @param   onEnd       java.lang.Runnable
      * @return              boolean
      */
     public boolean retainAllAndApply(final Collection<? extends T> c,
-                                     final Consumer<T> onElement,
+                                     final Consumer<? super T> onElement,
                                      final Runnable onEnd) {
         if (this.logger.isTraceEnabled()) {
             this.logger.trace(entryWith(c, onElement, onEnd));

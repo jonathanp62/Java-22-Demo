@@ -275,10 +275,10 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
     /**
      * Consume all the elements in the list.
      *
-     * @param   onElement   java.util.function.Consumer&lt;T&gt;
+     * @param   onElement   java.util.function.Consumer&lt;? super T&gt;
      * @param   onEnd       java.lang.Runnable
      */
-    public void consume(final Consumer<T> onElement, final Runnable onEnd) {
+    public void consume(final Consumer<? super T> onElement, final Runnable onEnd) {
         if (this.logger.isTraceEnabled()) {
             this.logger.trace(entryWith(onElement, onEnd));
         }
@@ -295,10 +295,10 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
      * Apply the consumer to the removed element if it is not null.
      *
      * @param   object      T
-     * @param   consumer    java.util.function.Consumer&lt;T&gt;
+     * @param   consumer    java.util.function.Consumer&lt;? super T&gt;
      * @return              boolean
      */
-    public boolean removeAndApply(final T object, final Consumer<T> consumer) {
+    public boolean removeAndApply(final T object, final Consumer<? super T> consumer) {
         if (this.logger.isTraceEnabled()) {
             this.logger.trace(entryWith(object, consumer));
         }
@@ -329,10 +329,10 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
      * Apply the consumer to the removed element if it is not null.
      *
      * @param   index       int
-     * @param   consumer    java.util.function.Consumer&lt;T&gt;
+     * @param   consumer    java.util.function.Consumer&lt;? super T&gt;
      * @return              T
      */
-    public T removeAndApply(final int index, final Consumer<T> consumer) {
+    public T removeAndApply(final int index, final Consumer<? super T> consumer) {
         if (this.logger.isTraceEnabled()) {
             this.logger.trace(entryWith(index, consumer));
         }
@@ -357,11 +357,11 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
      * Apply the onElement consumer to each removed element.
      *
      * @param   c           java.util.Collection&lt;? extends T&gt;
-     * @param   onElement   java.util.function.Consumer&lt;T&gt;
+     * @param   onElement   java.util.function.Consumer&lt;? super T&gt;
      * @return              boolean
      */
     public boolean removeAllAndApply(final Collection<? extends T> c,
-                                     final Consumer<T> onElement,
+                                     final Consumer<? super T> onElement,
                                      final Runnable onEnd) {
         if (this.logger.isTraceEnabled()) {
             this.logger.trace(entryWith(c, onElement, onEnd));
@@ -383,12 +383,12 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
      *
      * @param   object      T
      * @param   matcher     java.util.function.Predicate&lt;? super T&gt;
-     * @param   consumer    java.util.function.Consumer&lt;T&gt;
+     * @param   consumer    java.util.function.Consumer&lt;? super T&gt;
      * @return              boolean
      */
     public boolean removeIfAndApply(final T object,
                                     final Predicate<? super T> matcher,
-                                    final Consumer<T> consumer) {
+                                    final Consumer<? super T> consumer) {
         if (this.logger.isTraceEnabled()) {
             this.logger.trace(entryWith(object, matcher, consumer));
         }
@@ -423,12 +423,12 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
      *
      * @param   index       int
      * @param   matcher     java.util.function.Predicate&lt;? super T&gt;
-     * @param   consumer    java.util.function.Consumer&lt;T&gt;
+     * @param   consumer    java.util.function.Consumer&lt;? super T&gt;
      * @return              T
      */
     public T removeIfAndApply(final int index,
                               final Predicate<? super T> matcher,
-                              final Consumer<T> consumer) {
+                              final Consumer<? super T> consumer) {
         if (this.logger.isTraceEnabled()) {
             this.logger.trace(entryWith(index, matcher, consumer));
         }
@@ -464,11 +464,11 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
      * Apply the onElement consumer to each retained element.
      *
      * @param   c           java.util.Collection&lt;? extends T&gt;
-     * @param   onElement   java.util.function.Consumer&lt;T&gt;
+     * @param   onElement   java.util.function.Consumer&lt;? super T&gt;
      * @return              boolean
      */
     public boolean retainAllAndApply(final Collection<? extends T> c,
-                                     final Consumer<T> onElement,
+                                     final Consumer<? super T> onElement,
                                      final Runnable onEnd) {
         if (this.logger.isTraceEnabled()) {
             this.logger.trace(entryWith(c, onElement, onEnd));

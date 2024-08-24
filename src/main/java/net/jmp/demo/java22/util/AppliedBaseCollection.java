@@ -301,13 +301,13 @@ public class AppliedBaseCollection<T> {
      *
      * @param   target      java.util.Collection&lt;? super T&gt;
      * @param   source      java.util.Collection&lt;? extends T&gt;
-     * @param   onElement   java.util.function.Consumer&lt;T&gt;
+     * @param   onElement   java.util.function.Consumer&lt;? super T&gt;
      * @param   onEnd       java.lang.Runnable
      * @return              boolean
      */
     protected boolean removeAllAndApply(final Collection<? super T> target,
                                         final Collection<? extends T> source,
-                                        final Consumer<T> onElement,
+                                        final Consumer<? super T> onElement,
                                         final Runnable onEnd) {
         if (this.logger.isTraceEnabled()) {
             this.logger.trace(entryWith(target, source, onElement, onEnd));
@@ -343,12 +343,12 @@ public class AppliedBaseCollection<T> {
      *
      * @param   target      java.util.Collection&lt;T&gt;
      * @param   source      java.util.Collection&lt;? extends T&gt;
-     * @param   onElement   java.util.function.Consumer&lt;T&gt;
+     * @param   onElement   java.util.function.Consumer&lt;? super T&gt;
      * @return              boolean
      */
     protected boolean retainAllAndApply(final Collection<T> target,
                                         final Collection<? extends T> source,
-                                        final Consumer<T> onElement,
+                                        final Consumer<? super T> onElement,
                                         final Runnable onEnd) {
         if (this.logger.isTraceEnabled()) {
             this.logger.trace(entryWith(target, source, onElement, onEnd));

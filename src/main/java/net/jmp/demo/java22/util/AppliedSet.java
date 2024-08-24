@@ -272,10 +272,10 @@ public final class AppliedSet<T> extends AppliedBaseCollection<T> implements Set
     /**
      * Consume all the elements in the set.
      *
-     * @param   onElement   java.util.function.Consumer&lt;T&gt;
+     * @param   onElement   java.util.function.Consumer&lt;? super T&gt;
      * @param   onEnd       java.lang.Runnable
      */
-    public void consume(final Consumer<T> onElement, final Runnable onEnd) {
+    public void consume(final Consumer<? super T> onElement, final Runnable onEnd) {
         if (this.logger.isTraceEnabled()) {
             this.logger.trace(entryWith(onElement, onEnd));
         }
