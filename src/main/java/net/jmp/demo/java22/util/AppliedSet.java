@@ -287,6 +287,32 @@ public final class AppliedSet<T> extends AppliedBaseCollection<T> implements Set
         }
     }
 
+    /**
+     * Removes the occurrence of this element from the set if one exists.
+     * Apply the consumer to the removed element if it is not null.
+     *
+     * @param   object      T
+     * @param   consumer    java.util.function.Consumer&lt;? super T&gt;
+     * @return              boolean
+     */
+    public boolean removeAndApply(final T object, final Consumer<? super T> consumer) {
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(object, consumer));
+        }
+
+        final boolean result = this.set.remove(object);
+
+        if (object != null) {
+            super.runTask(() -> consumer.accept(object));
+        }
+
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exitWith(result));
+        }
+
+        return result;
+    }
+
     /*
      * Methods to implement:
      *   removeAllAndApply
