@@ -377,6 +377,28 @@ public final class AppliedList<T> extends AppliedBaseCollection<T> implements Li
     }
 
     /**
+     * Removes the element into the list if the
+     * applied predicate function evaluates to true.
+     *
+     * @param   t       T
+     * @param   filter  java.util.function.Predicate&lt;? super T&gt;
+     * @return          boolean
+     */
+    public boolean removeIf(final T t, final Predicate<? super T> filter) {
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(t, filter));
+        }
+
+        final boolean result = super.removeIf(t, this.list, filter);
+
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exitWith(result));
+        }
+
+        return result;
+    }
+
+    /**
      * Removes the first occurrence of this element from the list if one exists
      * and the applied predicate function evaluates to true.
      * Apply the consumer to the removed element if it is not null.

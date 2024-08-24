@@ -515,6 +515,28 @@ public final class AppliedQueue<T> extends AppliedBaseCollection<T> implements Q
     }
 
     /**
+     * Removes the element into the queue if the
+     * applied predicate function evaluates to true.
+     *
+     * @param   t       T
+     * @param   filter  java.util.function.Predicate&lt;? super T&gt;
+     * @return          boolean
+     */
+    public boolean removeIf(final T t, final Predicate<? super T> filter) {
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(t, filter));
+        }
+
+        final boolean result = super.removeIf(t, this.queue, filter);
+
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exitWith(result));
+        }
+
+        return result;
+    }
+
+    /**
      * Removes all the elements of this collection that satisfy the given predicate.
      *
      * @param   matcher     java.util.function.Predicate&lt;? super T&gt;

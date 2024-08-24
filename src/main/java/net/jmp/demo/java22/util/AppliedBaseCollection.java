@@ -332,6 +332,36 @@ public class AppliedBaseCollection<T> {
 
         return result.get();
     }
+
+    /**
+     * Removes the element from the collection if the
+     * applied predicate function evaluates to true.
+     *
+     * @param   t           T
+     * @param   collection  java.util.Collection&lt;? super T&gt;
+     * @param   filter      java.util.function.Predicate&lt;? super T&gt;
+     * @return              boolean
+     */
+    protected boolean removeIf(final T t,
+                            final Collection<? super T> collection,
+                            final Predicate<? super T> filter) {
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(t, collection, filter));
+        }
+
+        boolean result = false;
+
+        if (filter.test(t)) {
+            result = collection.remove(t);
+        }
+
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exitWith(result));
+        }
+
+        return result;
+    }
+
     /**
      * Retains only the elements in this list that are contained
      * in the specified collection (optional operation). In other

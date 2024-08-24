@@ -1,12 +1,13 @@
 package net.jmp.demo.java22.util;
 
 /*
+ * (#)TestAppliedList.java  0.9.0   08/24/2024
  * (#)TestAppliedList.java  0.7.1   08/22/2024
  * (#)TestAppliedList.java  0.7.0   08/19/2024
  * (#)TestAppliedList.java  0.6.0   08/17/2024
  *
  * @author   Jonathan Parker
- * @version  0.7.1
+ * @version  0.9.0
  * @since    0.6.0
  *
  * MIT License
@@ -416,6 +417,56 @@ public final class TestAppliedList {
 
             assertFalse(result);
             assertEquals(3, list.size());
+        }
+    }
+
+    @Test
+    public void testRemoveIf() {
+        try (final AppliedList<String> list = new AppliedList<>()) {
+            final List<String> values = List.of("value 1", "value 2", "value 3");
+
+            list.addAll(values);
+
+            final boolean result = list.removeIf("value 2", s -> s.startsWith("value"));
+
+            assertTrue(result);
+            assertEquals(2, list.size());
+            assertTrue(list.contains("value 1"));
+            assertTrue(list.contains("value 3"));
+        }
+    }
+
+    @Test
+    public void testRemoveIfFalsePredicate() {
+        try (final AppliedList<String> list = new AppliedList<>()) {
+            final List<String> values = List.of("value 1", "value 2", "value 3");
+
+            list.addAll(values);
+
+            final boolean result = list.removeIf("value 2", s -> s.isEmpty());
+
+            assertFalse(result);
+            assertEquals(3, list.size());
+            assertTrue(list.contains("value 1"));
+            assertTrue(list.contains("value 2"));
+            assertTrue(list.contains("value 3"));
+        }
+    }
+
+    @Test
+    public void testRemoveIfNotInSet() {
+        try (final AppliedList<String> list = new AppliedList<>()) {
+            final List<String> values = List.of("value 1", "value 2", "value 3");
+
+            list.addAll(values);
+
+            final boolean result = list.removeIf("value 4", s -> s.startsWith("value"));
+
+            assertFalse(result);
+            assertEquals(3, list.size());
+            assertTrue(list.contains("value 1"));
+            assertTrue(list.contains("value 2"));
+            assertTrue(list.contains("value 3"));
         }
     }
 

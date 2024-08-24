@@ -1,13 +1,14 @@
 package net.jmp.demo.java22.util;
 
 /*
+ * (#)TestAppliedQueue.java 0.9.0   08/24/2024
  * (#)TestAppliedQueue.java 0.7.1   08/22/2024
  * (#)TestAppliedQueue.java 0.7.0   08/18/2024
  * (#)TestAppliedQueue.java 0.6.0   08/17/2024
  * (#)TestAppliedQueue.java 0.5.0   08/13/2024
  *
  * @author   Jonathan Parker
- * @version  0.7.1
+ * @version  0.9.0
  * @since    0.5.0
  *
  * MIT License
@@ -385,6 +386,56 @@ public final class TestAppliedQueue {
 
             assertFalse(result);
             assertEquals(0, queue.size());
+        }
+    }
+
+    @Test
+    public void testRemoveIf() {
+        try (final AppliedQueue<String> queue = new AppliedQueue<>()) {
+            final List<String> values = List.of("value 1", "value 2", "value 3");
+
+            queue.addAll(values);
+
+            final boolean result = queue.removeIf("value 2", s -> s.startsWith("value"));
+
+            assertTrue(result);
+            assertEquals(2, queue.size());
+            assertTrue(queue.contains("value 1"));
+            assertTrue(queue.contains("value 3"));
+        }
+    }
+
+    @Test
+    public void testRemoveIfFalsePredicate() {
+        try (final AppliedQueue<String> queue = new AppliedQueue<>()) {
+            final List<String> values = List.of("value 1", "value 2", "value 3");
+
+            queue.addAll(values);
+
+            final boolean result = queue.removeIf("value 2", s -> s.isEmpty());
+
+            assertFalse(result);
+            assertEquals(3, queue.size());
+            assertTrue(queue.contains("value 1"));
+            assertTrue(queue.contains("value 2"));
+            assertTrue(queue.contains("value 3"));
+        }
+    }
+
+    @Test
+    public void testRemoveIfNotInSet() {
+        try (final AppliedQueue<String> queue = new AppliedQueue<>()) {
+            final List<String> values = List.of("value 1", "value 2", "value 3");
+
+            queue.addAll(values);
+
+            final boolean result = queue.removeIf("value 4", s -> s.startsWith("value"));
+
+            assertFalse(result);
+            assertEquals(3, queue.size());
+            assertTrue(queue.contains("value 1"));
+            assertTrue(queue.contains("value 2"));
+            assertTrue(queue.contains("value 3"));
         }
     }
 

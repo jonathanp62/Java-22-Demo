@@ -340,6 +340,28 @@ public final class AppliedSet<T> extends AppliedBaseCollection<T> implements Set
     }
 
     /**
+     * Removes the element into the set if the
+     * applied predicate function evaluates to true.
+     *
+     * @param   t       T
+     * @param   filter  java.util.function.Predicate&lt;? super T&gt;
+     * @return          boolean
+     */
+    public boolean removeIf(final T t, final Predicate<? super T> filter) {
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(t, filter));
+        }
+
+        final boolean result = super.removeIf(t, this.set, filter);
+
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exitWith(result));
+        }
+
+        return result;
+    }
+
+    /**
      * Removes the occurrence of this element from the set if one exists
      * and the applied predicate function evaluates to true.
      * Apply the consumer to the removed element if it is not null.
@@ -401,11 +423,6 @@ public final class AppliedSet<T> extends AppliedBaseCollection<T> implements Set
 
         return result;
     }
-
-    /*
-     * Methods to implement:
-     *   removeIf
-     */
 
     /* Set and Collection method overrides */
 

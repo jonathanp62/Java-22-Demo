@@ -1,10 +1,11 @@
 package net.jmp.demo.java22.util;
 
 /*
+ * (#)TestAppliedSet.java   0.9.0   08/24/2024
  * (#)TestAppliedSet.java   0.6.0   08/17/2024
  *
  * @author   Jonathan Parker
- * @version  0.6.0
+ * @version  0.9.0
  * @since    0.6.0
  *
  * MIT License
@@ -369,6 +370,56 @@ public final class TestAppliedSet {
 
             assertFalse(result);
             assertEquals(3, set.size());
+        }
+    }
+
+    @Test
+    public void testRemoveIf() {
+        try (final AppliedSet<String> set = new AppliedSet<>()) {
+            final List<String> values = List.of("value 1", "value 2", "value 3");
+
+            set.addAll(values);
+
+            final boolean result = set.removeIf("value 2", s -> s.startsWith("value"));
+
+            assertTrue(result);
+            assertEquals(2, set.size());
+            assertTrue(set.contains("value 1"));
+            assertTrue(set.contains("value 3"));
+        }
+    }
+
+    @Test
+    public void testRemoveIfFalsePredicate() {
+        try (final AppliedSet<String> set = new AppliedSet<>()) {
+            final List<String> values = List.of("value 1", "value 2", "value 3");
+
+            set.addAll(values);
+
+            final boolean result = set.removeIf("value 2", s -> s.isEmpty());
+
+            assertFalse(result);
+            assertEquals(3, set.size());
+            assertTrue(set.contains("value 1"));
+            assertTrue(set.contains("value 2"));
+            assertTrue(set.contains("value 3"));
+        }
+    }
+
+    @Test
+    public void testRemoveIfNotInSet() {
+        try (final AppliedSet<String> set = new AppliedSet<>()) {
+            final List<String> values = List.of("value 1", "value 2", "value 3");
+
+            set.addAll(values);
+
+            final boolean result = set.removeIf("value 4", s -> s.startsWith("value"));
+
+            assertFalse(result);
+            assertEquals(3, set.size());
+            assertTrue(set.contains("value 1"));
+            assertTrue(set.contains("value 2"));
+            assertTrue(set.contains("value 3"));
         }
     }
 
