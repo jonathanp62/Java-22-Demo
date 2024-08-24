@@ -1,12 +1,13 @@
 package net.jmp.demo.java22.demos;
 
 /*
+ * (#)KeyedFunctionExecutorDemo.java    0.9.0   08/24/2024
  * (#)KeyedFunctionExecutorDemo.java    0.7.1   08/22/2024
  * (#)KeyedFunctionExecutorDemo.java    0.5.0   08/14/2024
  * (#)KeyedFunctionExecutorDemo.java    0.2.0   08/07/2024
  *
  * @author   Jonathan Parker
- * @version  0.7.1
+ * @version  0.9.0
  * @since    0.2.0
  *
  * MIT License
@@ -68,9 +69,25 @@ public final class KeyedFunctionExecutorDemo implements Demo {
             this.logger.trace(entry());
         }
 
+        this.stringDemo();
+        this.numberDemo();
+
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
+    }
+
+    /**
+     * Use a value type of string.
+     */
+    private void stringDemo() {
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
+
         try (final KeyedFunctionExecutor<String> keyedFunctionExecutor = new KeyedFunctionExecutor<>()) {
             final Function<String, Void> function = s -> {
-                logger.info("Function processed value: {}", s);
+                logger.info("String function processed value: {}", s);
 
                 return null;
             };
@@ -82,6 +99,35 @@ public final class KeyedFunctionExecutorDemo implements Demo {
 
             elements.forEach(e -> {
                 keyedFunctionExecutor.process(function, e, STR."Value for \{e}");
+            });
+        }
+
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
+    }
+
+    /**
+     * Use a value type of integer but
+     * demonstrate using a super type
+     * in the function.
+     */
+    private void numberDemo() {
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
+
+        try (final KeyedFunctionExecutor<Integer> keyedFunctionExecutor = new KeyedFunctionExecutor<>()) {
+            final Function<Number, Void> function = n -> {
+                logger.info("Number function processed value: {}", n);
+
+                return null;
+            };
+
+            final List<Integer> elements = List.of(1, 2, 3, 4, 5);
+
+            elements.forEach(e -> {
+                keyedFunctionExecutor.process(function, String.valueOf(e), e * 2);
             });
         }
 

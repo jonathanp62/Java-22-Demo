@@ -1,13 +1,14 @@
 package net.jmp.demo.java22.util;
 
 /*
+ * (#)KeyedFunctionExecutor.java    0.9.0   08/24/2024
  * (#)KeyedFunctionExecutor.java    0.8.0   08/22/2024
  * (#)KeyedFunctionExecutor.java    0.5.0   08/14/2024
  * (#)KeyedFunctionExecutor.java    0.4.0   08/09/2024
  * (#)KeyedFunctionExecutor.java    0.2.0   08/07/2024
  *
  * @author   Jonathan Parker
- * @version  0.8.0
+ * @version  0.9.0
  * @since    0.2.0
  *
  * MIT License
@@ -147,11 +148,11 @@ public final class KeyedFunctionExecutor<T> implements AutoCloseable {
     /**
      * Process the keyed function.
      *
-     * @param   function    java.util.function.Function&lt;T, java.lang.Void&gt;
+     * @param   function    java.util.function.Function&lt;? super T, java.lang.Void&gt;
      * @param   key         java.lang.String
      * @param   value       T
      */
-    public void process(final Function<T, Void> function, final String key, final T value) {
+    public void process(final Function<? super T, Void> function, final String key, final T value) {
         if (this.logger.isTraceEnabled()) {
             this.logger.trace(entryWith(function, key, value));
         }
