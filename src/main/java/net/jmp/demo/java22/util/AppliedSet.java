@@ -373,11 +373,38 @@ public final class AppliedSet<T> extends AppliedBaseCollection<T> implements Set
         return result;
     }
 
+    /**
+     * Retains only the elements in this set that are contained
+     * in the specified collection (optional operation). In other
+     * words, removes from this set all of its elements that are
+     * not contained in the specified collection. After this call
+     * returns, this collection will contain only elements in common
+     * with the specified collection.
+     * Apply the onElement consumer to each retained element.
+     *
+     * @param   c           java.util.Collection&lt;? extends T&gt;
+     * @param   onElement   java.util.function.Consumer&lt;? super T&gt;
+     * @return              boolean
+     */
+    public boolean retainAllAndApply(final Collection<? extends T> c,
+                                     final Consumer<? super T> onElement,
+                                     final Runnable onEnd) {
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(c, onElement, onEnd));
+        }
+
+        final boolean result = super.retainAllAndApply(this.set, c, onElement, onEnd);
+
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exitWith(result));
+        }
+
+        return result;
+    }
+
     /*
      * Methods to implement:
      *   removeIf
-     *   removeIfAndApply
-     *   retainAllAndApply
      */
 
     /* Set and Collection method overrides */
