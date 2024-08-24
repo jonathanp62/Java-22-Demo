@@ -339,6 +339,40 @@ public final class AppliedSet<T> extends AppliedBaseCollection<T> implements Set
         return result;
     }
 
+    /**
+     * Removes the occurrence of this element from the set if one exists
+     * and the applied predicate function evaluates to true.
+     * Apply the consumer to the removed element if it is not null.
+     *
+     * @param   object      T
+     * @param   matcher     java.util.function.Predicate&lt;? super T&gt;
+     * @param   consumer    java.util.function.Consumer&lt;? super T&gt;
+     * @return              boolean
+     */
+    public boolean removeIfAndApply(final T object,
+                                    final Predicate<? super T> matcher,
+                                    final Consumer<? super T> consumer) {
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(object, matcher, consumer));
+        }
+
+        boolean result = false;
+
+        if (matcher.test(object)) {
+            result = this.set.remove(object);
+
+            if (object != null) {
+                super.runTask(() -> consumer.accept(object));
+            }
+        }
+
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exitWith(result));
+        }
+
+        return result;
+    }
+
     /*
      * Methods to implement:
      *   removeIf

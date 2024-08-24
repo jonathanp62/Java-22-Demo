@@ -32,6 +32,7 @@ package net.jmp.demo.java22.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import java.util.concurrent.TimeUnit;
 
@@ -368,6 +369,105 @@ public final class TestAppliedSet {
 
             assertFalse(result);
             assertEquals(3, set.size());
+        }
+    }
+
+    @Test
+    public void testRemoveIfAndApplyByObjectFound() {
+        try (final AppliedSet<String> set = new AppliedSet<>()) {
+            final WrappedObject<Boolean> consumed = WrappedObject.of(false);
+            final WrappedObject<String> removedElement = new WrappedObject<>();
+
+            final List<String> values = List.of("value 1", "value 2", "value 3");
+
+            set.addAll(values);
+
+            final Consumer<String> consumer = e -> {
+                removedElement.set(e.toUpperCase());
+                consumed.set(true);
+            };
+
+            final boolean result = set.removeIfAndApply("value 2", s -> s.startsWith("value"), consumer);
+
+            assertTrue(result);
+            assertEquals(2, set.size());
+            assertTrue(set.contains("value 1"));
+            assertTrue(set.contains("value 3"));
+
+            await().atMost(AWAIT_TIME, TimeUnit.MILLISECONDS)
+                    .untilAsserted(
+                            () -> assertThat(consumed.get())
+                                    .isTrue()
+                    );
+
+            assertEquals("VALUE 2", removedElement.get());
+        }
+    }
+
+    @Test
+    public void testRemoveIfAndApplyByObjectFoundNoMatch() {
+        try (final AppliedSet<String> set = new AppliedSet<>()) {
+            final List<String> values = List.of("value 1", "value 2", "value 3");
+
+            set.addAll(values);
+
+            final boolean result = set.removeIfAndApply("value 2", s -> s.isEmpty(), System.out::println);
+
+            assertFalse(result);
+            assertEquals(3, set.size());
+            assertTrue(set.contains("value 1"));
+            assertTrue(set.contains("value 2"));
+            assertTrue(set.contains("value 3"));
+        }
+    }
+
+    @Test
+    public void testRemoveIfAndApplyByObjectNotFound() {
+        try (final AppliedSet<String> set = new AppliedSet<>()) {
+            final List<String> values = List.of("value 1", "value 2", "value 3");
+
+            set.addAll(values);
+
+            final boolean result = set.removeIfAndApply("value 4", s -> s.startsWith("value"), System.out::println);
+
+            assertFalse(result);
+            assertEquals(3, set.size());
+            assertTrue(set.contains("value 1"));
+            assertTrue(set.contains("value 2"));
+            assertTrue(set.contains("value 3"));
+        }
+    }
+
+    @Test
+    public void testRemoveIfAndApplyByNullObject() {
+        try (final AppliedSet<String> set = new AppliedSet<>()) {
+            set.add("value 1");
+            set.add(null);
+            set.add("value 3");
+
+            final boolean result = set.removeIfAndApply(null, Objects::isNull, System.out::println);
+
+            assertTrue(result);
+            assertEquals(2, set.size());
+            assertTrue(set.contains("value 1"));
+            assertTrue(set.contains("value 3"));
+        }
+    }
+
+    @Test
+    public void testRemoveIfAndApplyByNullObjectNoMatch() {
+        try (final AppliedSet<String> set = new AppliedSet<>()) {
+            set.add("value 1");
+            set.add(null);
+            set.add("value 3");
+
+            final boolean result = set.removeIfAndApply(null, Objects::nonNull, System.out::println);
+
+            assertFalse(result);
+            assertEquals(3, set.size());
+            assertTrue(set.contains("value 1"));
+            assertTrue(set.contains(null));
+            assertTrue(set.contains("value 3"));
         }
     }
 }
