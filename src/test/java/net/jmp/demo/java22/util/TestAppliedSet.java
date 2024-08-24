@@ -310,4 +310,64 @@ public final class TestAppliedSet {
             assertTrue(set.contains("value 3"));
         }
     }
+
+    @Test
+    public void testRemoveAllAndApply() {
+        try (final AppliedSet<String> set = new AppliedSet<>()) {
+            final WrappedObject<Boolean> consumed = new WrappedObject<>(false);
+            final List<String> values = List.of("value 1", "value 2", "value 3");
+
+            set.addAll(values);
+
+            final boolean result = set.removeAllAndApply(
+                    values,
+                    e -> System.out.println(STR."testRemoveAllAndApply: \{e}"),
+                    () -> consumed.set(true)
+            );
+
+            await().atMost(AWAIT_TIME, TimeUnit.MILLISECONDS)
+                    .untilAsserted(
+                            () -> assertThat(consumed.get())
+                                    .isTrue()
+                    );
+
+            assertTrue(result);
+            assertEquals(0, set.size());
+        }
+    }
+
+    @Test
+    public void testRemoveAllAndApplyOnEmptyCollection() {
+        try (final AppliedSet<String> set = new AppliedSet<>()) {
+            final List<String> values = List.of("value 1", "value 2", "value 3");
+
+            values.forEach(set::add);
+
+            final boolean result = set.removeAllAndApply(new ArrayList<>(), e -> {
+                System.out.println(STR."testRemoveAllAndApply: \{e}");
+            }, () -> {});
+
+            assertFalse(result);
+            assertEquals(3, set.size());
+        }
+    }
+
+    @Test
+    public void testRemoveAllAndApplyOnNonMatchingCollection() {
+        try (final AppliedSet<String> set = new AppliedSet<>()) {
+            final List<String> values = List.of("value 1", "value 2", "value 3");
+            final List<String> removals = List.of("value 4", "value 5");
+
+            values.forEach(set::add);
+
+            final boolean result = set.removeAllAndApply(
+                    removals,
+                    e -> System.out.println(STR."testRemoveAllAndApply: \{e}"),
+                    () -> {}
+            );
+
+            assertFalse(result);
+            assertEquals(3, set.size());
+        }
+    }
 }

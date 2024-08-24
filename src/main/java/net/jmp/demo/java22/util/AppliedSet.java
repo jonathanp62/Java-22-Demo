@@ -313,9 +313,34 @@ public final class AppliedSet<T> extends AppliedBaseCollection<T> implements Set
         return result;
     }
 
+    /**
+     * Removes all of this collection's elements that are also contained in the specified
+     * collection (optional operation). After this call returns, this collection will contain
+     * no elements in common with the specified collection.
+     * Apply the onElement consumer to each removed element.
+     *
+     * @param   c           java.util.Collection&lt;? extends T&gt;
+     * @param   onElement   java.util.function.Consumer&lt;? super T&gt;
+     * @return              boolean
+     */
+    public boolean removeAllAndApply(final Collection<? extends T> c,
+                                     final Consumer<? super T> onElement,
+                                     final Runnable onEnd) {
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(c, onElement, onEnd));
+        }
+
+        final boolean result = super.removeAllAndApply(this.set, c, onElement, onEnd);
+
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exitWith(result));
+        }
+
+        return result;
+    }
+
     /*
      * Methods to implement:
-     *   removeAllAndApply
      *   removeIf
      *   removeIfAndApply
      *   retainAllAndApply
