@@ -34,7 +34,9 @@ package net.jmp.demo.java22.demos;
  */
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -43,6 +45,7 @@ import java.util.stream.IntStream;
 
 import net.jmp.demo.java22.util.AppliedList;
 import net.jmp.demo.java22.util.AppliedQueue;
+import net.jmp.demo.java22.util.AppliedSet;
 
 import static net.jmp.demo.java22.util.LoggerUtils.*;
 
@@ -280,7 +283,7 @@ public final class AppliedCollectionDemo implements Demo {
     }
 
     /**
-     * Remove all and apply from a list;
+     * Remove all and apply from a list.
      */
     private void removeAllAndApplyFromList() {
         if (this.logger.isTraceEnabled()) {
@@ -310,7 +313,7 @@ public final class AppliedCollectionDemo implements Demo {
     }
 
     /**
-     * Retain all and apply from a list;
+     * Retain all and apply from a list.
      */
     private void retainAllAndApplyFromList() {
         if (this.logger.isTraceEnabled()) {
@@ -346,6 +349,139 @@ public final class AppliedCollectionDemo implements Demo {
     private void appliedSets() {
         if (this.logger.isTraceEnabled()) {
             this.logger.trace(entry());
+        }
+
+        this.addToAndRemoveFromSet();
+        this.applyAndAddAllToSet();
+        this.removeAllAndApplyFromSet();
+        this.retainAllAndApplyFromSet();
+
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
+    }
+
+    /**
+     * Add to and remove from a set.
+     */
+    private void addToAndRemoveFromSet() {
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
+
+        try (final AppliedSet<String> stringSet = new AppliedSet<>()) {
+            final Set<String> words = Set.of(
+                    "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"
+            );
+
+            words.forEach(word -> {
+                if (!stringSet.applyAndAdd(word, this.capitalizer)) {
+                    this.logger.warn("Failed to add word: {}", word);
+                }
+            });
+
+            final Consumer<String> consumer = string -> this.logger.info(STR."SE: \{string.toUpperCase()})");
+
+            stringSet.removeAndApply("One", consumer);
+            stringSet.removeIfAndApply("Two", s -> s.length() == 3, consumer);
+            stringSet.removeIfAndApply("Three", s -> s.length() == 5, consumer);
+            stringSet.removeIfAndApply("Ten", s -> s.length() == 3, consumer);
+            stringSet.removeIfAndApply("Four", s -> s.length() == 4, consumer);
+            stringSet.removeIfAndApply("Five", s -> s.length() == 4, consumer);
+            stringSet.removeIfAndApply("Six", s -> s.length() == 3, consumer);
+            stringSet.removeIfAndApply("Seven", s -> s.length() == 5, consumer);
+            stringSet.removeAndApply("Eight", consumer);
+            stringSet.removeAndApply("Nine", consumer);
+
+            assert stringSet.isEmpty();
+        }
+
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
+    }
+
+    /**
+     * Apply and add all to a set.
+     */
+    private void applyAndAddAllToSet() {
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
+
+        final Set<Integer> source = new HashSet<>();
+
+        IntStream.rangeClosed(1, 10).forEach(source::add);
+
+        try (final AppliedSet<Integer> integerSet = new AppliedSet<>()) {
+            final boolean result = integerSet.applyAndAddAll(source, e -> e * 10);
+
+            assert result;
+
+            integerSet.forEach(e -> this.logger.info("Added: {}", e));
+
+            integerSet.clearAndApply(e -> this.logger.info("Cleared: {}", e), () -> {});
+        }
+
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
+    }
+
+    /**
+     * Remove all and apply from a set.
+     */
+    private void removeAllAndApplyFromSet() {
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
+
+        try (final AppliedSet<Integer> integerSet = new AppliedSet<>()) {
+            integerSet.add(2);
+            integerSet.add(4);
+            integerSet.add(6);
+
+            final List<Integer> removals = List.of(2, 6);
+            final boolean result = integerSet.removeAllAndApply(
+                    removals,
+                    e -> this.logger.info("Removed: {}", e),
+                    () -> {}
+            );
+
+            assert result;
+            assert integerSet.size() == 1;
+            assert integerSet.contains(4);
+        }
+
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
+    }
+
+    /**
+     * Retain all and apply from a set.
+     */
+    private void retainAllAndApplyFromSet() {
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
+
+        try (final AppliedSet<Integer> integerSet = new AppliedSet<>()) {
+            integerSet.add(2);
+            integerSet.add(4);
+            integerSet.add(6);
+
+            final List<Integer> retains = List.of(2, 6);
+            final boolean result = integerSet.retainAllAndApply(
+                    retains,
+                    e -> this.logger.info("Retained: {}", e),
+                    () -> {}
+            );
+
+            assert result;
+            assert integerSet.size() == 2;
+            assert integerSet.contains(2);
+            assert integerSet.contains(6);
         }
 
         if (this.logger.isTraceEnabled()) {
